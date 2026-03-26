@@ -1,5 +1,30 @@
-# Add files here to ignore them from prettier formatting
-/dist
-/coverage
-/.nx/cache
-/.nx/workspace-data
+# Dependencias
+node_modules/
+dist/
+build/
+.angular/
+
+# Archivos generados
+*.min.js
+*.min.css
+coverage/
+
+# Archivos de configuración que no deben formatearse
+package-lock.json
+yarn.lock
+.vscode/
+.idea/
+
+# Archivos de documentación específicos
+CHANGELOG.md
+LICENSE
+
+# Archivos de build
+.next/
+.nuxt/
+
+# Archivos de ambiente
+.env
+.env.local
+.env.production
+.angular
