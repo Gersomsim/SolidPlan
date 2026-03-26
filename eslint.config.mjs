@@ -28,10 +28,22 @@ export default [
                     ],
                     depConstraints: [
                         {
-                            sourceTag: "*",
-                            onlyDependOnLibsWithTags: [
-                                "*"
-                            ]
+                            sourceTag: '*',
+                            onlyDependOnLibsWithTags: ['*'],
+                            sourceTag: "scope:util",
+                            onlyDependOnLibsWithTags: ["scope:util"]
+                        },
+                        {
+                            sourceTag: "scope:ui",
+                            onlyDependOnLibsWithTags: ["scope:util"]
+                        },
+                        {
+                            sourceTag: "scope:api",
+                            onlyDependOnLibsWithTags: ["scope:util"]
+                        },
+                        {
+                            sourceTag: "scope:app",
+                            onlyDependOnLibsWithTags: ["scope:ui", "scope:util", "scope:api"]
                         }
                     ]
                 }

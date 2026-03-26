@@ -17,6 +17,30 @@
     ],
     "sharedGlobals": []
   },
+  "projects": {
+    "api": { "tags": ["scope:api"] },
+    "frontend": { "tags": ["scope:app"] },
+    "ui": { "tags": ["scope:ui"] },
+    "util": { "tags": ["scope:util"] }
+  },
+  "dependencyConstraints": [
+    {
+      "sourceTag": "scope:util",
+      "onlyDependOnLibsWithTags": ["scope:util"]
+    },
+    {
+      "sourceTag": "scope:ui",
+      "onlyDependOnLibsWithTags": ["scope:util"]
+    },
+    {
+      "sourceTag": "scope:api",
+      "onlyDependOnLibsWithTags": ["scope:util"]
+    },
+    {
+      "sourceTag": "scope:app",
+      "onlyDependOnLibsWithTags": ["scope:ui", "scope:util", "scope:api"]
+    }
+  ],
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
@@ -123,7 +147,8 @@
       "unitTestRunner": "vitest-analog"
     },
     "@nx/angular:component": {
-      "style": "css"
+      "style": "css",
+      "inlineStyle": false
     }
   }
 }
