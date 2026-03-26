@@ -1,1 +1,2 @@
-export type ClasificationType = 'LABOR' | 'EQUIPMENT' | 'MATERIAL';
+// @deprecated — archivo con typo. Usar classification.type.ts
+export * from './classification.type';

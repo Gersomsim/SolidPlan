@@ -1,27 +1,38 @@
-import { ResourceStatus } from "../types";
-import { ClasificationResource } from "./clasification-resource.model";
+import { ResourceStatus } from '../types';
+import { ClassificationResource } from './classification-resource.model';
 
+/**
+ * Recurso utilizable en las actividades del proyecto.
+ *
+ * Tipos via ClassificationResource:
+ *   - LABOR: mano de obra (albañil, carpintero, electricista)
+ *   - EQUIPMENT: maquinaria y herramienta (excavadora, andamio, grúa)
+ *   - MATERIAL: insumos consumibles (cemento, varilla, pintura)
+ *
+ * El inventario solo aplica para recursos tipo MATERIAL.
+ * Para LABOR y EQUIPMENT el inventario es irrelevante.
+ */
 export interface Resource {
   id: string;
-  organizationId: string; // ID de la organización a la que pertenece el recurso 
-  
+  tenantId: string;
+
   identification: {
-    sku: string; // Código de control interno
+    sku: string;          // Código interno de control. Ej: 'MAT-CEM-001'
     name: string;
     description?: string;
   };
 
-  classification: ClasificationResource;
-  clasificationId: string;
+  classification: ClassificationResource;
+  classificationId: string;
 
   costing: {
     unitCost: number;
-    currency: string;
+    currency: string; // ISO 4217. Ej: 'MXN', 'USD', 'COP'
   };
 
   inventory?: {
-    currentStock: number; // Solo relevante si es MATERIAL
-    minimumStock?: number; // Para alertas de reabastecimiento
+    currentStock: number;  // Stock actual (solo MATERIAL)
+    minimumStock?: number; // Alerta de reabastecimiento cuando currentStock < minimumStock
   };
 
   status: ResourceStatus;

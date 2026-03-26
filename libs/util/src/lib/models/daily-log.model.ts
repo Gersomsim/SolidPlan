@@ -1,33 +1,53 @@
 import { Weather } from '../types';
 
+/**
+ * Bitácora de obra (Daily Log).
+ *
+ * Registro de actividades, incidentes y avances en obra.
+ * Puede haber múltiples registros por día y por proyecto — no hay límite.
+ * Cualquier miembro asignado al proyecto puede crear una bitácora.
+ *
+ * Evidencias:
+ *   `evidence.mediaIds` son IDs del modelo File. Los archivos se almacenan
+ *   en S3 y se gestionan centralizadamente — ver File model.
+ *
+ * Bloqueo:
+ *   `isLocked` evita ediciones una vez firmada o pasado el período de gracia.
+ *   Un log bloqueado es legalmente válido para muchos clientes constructores.
+ */
 export interface DailyLog {
-  id: string; // UUID
-  projectId: string; // ID del proyecto al que pertenece.
-  organizationId: string; // Tenant ID (para asegurar el aislamiento de datos).
-  authorId: string; // ID del usuario que crea el reporte (usualmente el Residente de Obra o Supervisor).
-  //Cuerpo del Reporte
-  reportDate: Date; // Fecha del reporte
+  id: string;
+  tenantId: string;  // Tenant ID — aislamiento de datos
+  projectId: string;
+  authorId: string;  // Usuario que crea el registro (cualquier miembro del proyecto)
+
+  reportDate: Date;  // Fecha a la que corresponde el registro (no necesariamente hoy)
+
   content: {
-    title: string
-    description: string //Detalle de las actividades realizadas.
-    incidents?: string //Campo específico para problemas (accidentes, retrasos de proveedores, huelgas).
-    observations?: string //Notas adicionales o recordatorios para el día siguiente.
-  }
+    title: string;
+    description: string;   // Detalle de las actividades realizadas
+    incidents?: string;    // Problemas: accidentes, retrasos de proveedores, huelgas
+    observations?: string; // Notas para el día siguiente o recordatorios
+  };
+
   metrics: {
-    headcount: number //Cuántas personas trabajaron ese día (cuadrillas).
-    workingHours: number //Horas trabajadas ese día.
-    machineryInUse: string[] //Lista de maquinaria pesada activa (ej: "Excavadora CAT 320").
-  }
+    headcount: number;        // Personas trabajando ese día (cuadrillas)
+    workingHours: number;     // Horas trabajadas en total
+    machineryInUse: string[]; // Maquinaria pesada activa. Ej: 'Excavadora CAT 320'
+  };
+
   evidence: {
-    photos: string[]; //Lista de referencias (IDs) a fotos tomadas en el sitio. Sin fotos, una bitácora de obra no tiene validez para muchos clientes.
-    documents?: string[]; //Lista de referencias (IDs) a documentos tomados en el sitio.
+    mediaIds: string[];   // IDs de File (fotos de obra subidas a S3)
+    documentIds?: string[]; // IDs de File (documentos adjuntos)
   };
 
   environment: {
     weather: Weather;
     temperature?: number; // Celsius
   };
-  isLocked: boolean; // Una vez firmado o pasado cierto tiempo, no debería editarse
+
+  isLocked: boolean; // true = no editable (firmado o período de gracia vencido)
+
   createdAt: Date;
   updatedAt: Date;
 }

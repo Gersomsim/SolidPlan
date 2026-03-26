@@ -49,6 +49,7 @@ Antes de crear cualquier componente nuevo en `apps/frontend`, seguir este flujo 
 - Antes de implementar cualquier feature (frontend o backend), verificar si el modelo ya existe en `libs/util`.
 - Si el modelo no existe, crearlo en `libs/util` antes de implementar la feature.
 - Tanto `apps/api` como `apps/frontend` importan modelos desde `libs/util`.
+- Documentación completa del modelo de dominio: `docs/domain-model.md` — leerla antes de implementar cualquier entidad.
 
 # Multitenancy
 
