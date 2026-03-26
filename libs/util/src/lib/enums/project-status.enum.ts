@@ -1,0 +1,7 @@
+export const ProjectStatusEnum = {
+  PLANNING: 'PLANNING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  HALTED: 'HALTED',
+  COMPLETED: 'COMPLETED',
+  ARCHIVED: 'ARCHIVED',
+};

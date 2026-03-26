@@ -22,6 +22,95 @@
 
 <!-- nx configuration end-->
 
+# Estructura del monorepo
+
+```
+apps/
+  api/        → NestJS API (backend)
+  frontend/   → Angular (frontend)
+libs/
+  ui/         → Angular lib — componentes reutilizables (botones, cards, tablas, badges, etc.)
+  util/       → TypeScript lib — modelos, interfaces, mappers y utilidades compartidas entre apps
+```
+
+# Reglas de componentes frontend (Angular)
+
+Antes de crear cualquier componente nuevo en `apps/frontend`, seguir este flujo obligatorio:
+
+1. **¿Existe en `libs/ui`?** → Usarlo directamente.
+2. **¿Es reutilizable en otras páginas/contextos?** → Crearlo en `libs/ui`, exportarlo, luego importarlo en `apps/frontend`.
+3. **¿Es único e irrepetible de esa página?** → Crearlo directamente en `apps/frontend` (no va a `libs/ui`).
+
+> El objetivo es maximizar la reutilización. Ante la duda, priorizar `libs/ui`.
+
+# Reglas de modelos y utilidades (lib/util)
+
+- **Todos los modelos, interfaces, DTOs y mappers viven en `libs/util`.**
+- Antes de implementar cualquier feature (frontend o backend), verificar si el modelo ya existe en `libs/util`.
+- Si el modelo no existe, crearlo en `libs/util` antes de implementar la feature.
+- Tanto `apps/api` como `apps/frontend` importan modelos desde `libs/util`.
+
+# Multitenancy
+
+Esta aplicación es **multitenant**. El tenant representa una **organización/empresa constructora**.
+
+### Estrategia de aislamiento
+- **MVP (actual):** row-level — una sola BD, todas las entidades tienen `tenantId` como FK.
+- **Futuro (producción):** schema-based — un schema/BD por tenant. Diseñar desde ahora pensando en esta migración: no acoplar lógica que asuma una sola BD global.
+
+### Reglas invariables
+- Un **usuario pertenece a un solo tenant** (no hay usuarios multi-tenant).
+- Un **tenant puede tener múltiples proyectos**; los proyectos pertenecen al tenant.
+- **Toda entidad de negocio** debe tener `tenantId` (o relación hacia una entidad que lo tenga).
+- En `apps/api`: **todos los queries y mutaciones filtran por `tenantId`** extraído del JWT/contexto del request. Nunca exponer datos cross-tenant.
+- En `libs/util`: los modelos de entidades de negocio incluyen `tenantId: string`.
+
+### Entidades principales (MVP)
+
+| Entidad | Descripción |
+|---------|-------------|
+| `Tenant` | Organización/empresa constructora |
+| `TenantConfig` | Configuración del tenant (ej. `autoAssignViewerOnProjectCreate`) |
+| `User` | Usuario, pertenece a un solo tenant. Sin rol global; el rol es por proyecto |
+| `StageTemplate` | Catálogo de etapas reutilizables a nivel tenant (ej. "Cimientos", "Estructura") |
+| `Project` | Proyecto de construcción. Tiene estados Y etapas. Campos: nombre, descripción, fechas, presupuesto, ubicación |
+| `ProjectStage` | Etapa personalizada del proyecto. Seleccionada del catálogo o creada nueva. Tiene nombre, orden y estado |
+| `ProjectMember` | Relación User↔Project con rol: `ADMIN` \| `SUPERVISOR` \| `RESIDENT` \| `VIEWER` |
+| `ActivityState` | Estado personalizado de actividad. Scope: tenant o proyecto. Gestionado por admin |
+| `Activity` | Actividad del cronograma. Árbol recursivo (`parentId`). Asignada a un rol → deriva al usuario con ese rol en el proyecto |
+| `DailyLog` | Bitácora. Múltiples por día/proyecto. La crea cualquier miembro asignado al proyecto |
+| `Media` | Fotos/archivos asociados a un `DailyLog` (otros adjuntos a futuro) |
+
+### Roles de proyecto
+| Rol | Descripción |
+|-----|-------------|
+| `ADMIN` | Administrador del proyecto |
+| `SUPERVISOR` | Supervisor de obra |
+| `RESIDENT` | Residente de obra |
+| `VIEWER` | Solo lectura |
+
+> Roles de administración del SaaS (super-admin, etc.) se definen en fases posteriores al MVP.
+
+### Visibilidad de proyectos
+- La visibilidad **siempre depende de la asignación explícita** (`ProjectMember`).
+- Ningún usuario ve proyectos en los que no tiene un rol asignado.
+- **Excepción configurable:** `TenantConfig.autoAssignViewerOnProjectCreate = true` → al crear un proyecto se agrega automáticamente a todos los usuarios del tenant con rol `VIEWER`.
+
+### Actividades y cronograma
+- Estructura **árbol recursivo** (`parentId` auto-referencial): n niveles de sub-actividades.
+- Asignación **por rol** → se resuelve al usuario que tiene ese rol en el proyecto.
+- Progreso **configurable al crear la actividad**:
+  - `PERCENTAGE` → valor 0–100%
+  - `STATE` → estado discreto seleccionado de `ActivityState`
+- `ActivityState` es gestionable por el admin del proyecto o del tenant. Puede tener scope tenant (reutilizable) o proyecto (local).
+- Vista cronograma = **Gantt** sobre el árbol de actividades del proyecto.
+
+### Etapas de proyecto
+- No son predefinidas globalmente.
+- `StageTemplate` es un catálogo a nivel tenant: el admin crea etapas reutilizables.
+- Al configurar un proyecto, se seleccionan etapas del catálogo o se crean nuevas, y se ordenan.
+- Cada `ProjectStage` tiene nombre, orden y estado propio que puede afectar el estado del proyecto.
+
 # Design System
 
 Este proyecto usa un design system definido. SIEMPRE seguirlo al crear o modificar cualquier componente frontend.
