@@ -18,6 +18,8 @@
     "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
+    "@analogjs/vite-plugin-angular": "~2.1.2",
+    "@analogjs/vitest-angular": "~2.1.2",
     "@angular-devkit/core": "~21.2.0",
     "@angular-devkit/schematics": "~21.2.0",
     "@angular/build": "~21.2.0",
@@ -29,12 +31,17 @@
     "@nx/eslint": "22.6.1",
     "@nx/eslint-plugin": "22.6.1",
     "@nx/js": "22.6.1",
+    "@nx/vite": "22.6.1",
+    "@nx/vitest": "22.6.1",
     "@nx/web": "22.6.1",
     "@schematics/angular": "~21.2.0",
     "@swc-node/register": "1.11.1",
     "@swc/core": "1.15.8",
     "@swc/helpers": "0.5.18",
+    "@types/node": "20.19.9",
     "@typescript-eslint/utils": "^8.40.0",
+    "@vitest/coverage-v8": "~4.0.0",
+    "@vitest/ui": "~4.0.8",
     "angular-eslint": "^21.2.0",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
@@ -44,6 +51,7 @@
     "tslib": "^2.3.0",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.40.0",
+    "vite": "^7.0.0",
     "vitest": "^4.0.8"
   },
   "workspaces": [
