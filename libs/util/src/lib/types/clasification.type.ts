@@ -1,0 +1,1 @@
+export type ClasificationType = 'LABOR' | 'EQUIPMENT' | 'MATERIAL';

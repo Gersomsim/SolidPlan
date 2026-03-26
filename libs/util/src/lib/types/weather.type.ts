@@ -1,0 +1,1 @@
+export type Weather = "CLEAR" | "RAIN" | "OVERCAST" | "EXTREME";
