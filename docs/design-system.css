@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+/* ============================================================
+   SOLID PLAN — Design System (Tailwind v4)
+   Construction Project Manager
+   ============================================================ */
+
+@theme {
+
+  /* ----------------------------------------------------------
+     COLORES — Brand palette
+     ---------------------------------------------------------- */
+
+  --color-primary:          #1E3A5F;  /* Azul ingeniería */
+  --color-primary-hover:    #2C5282;  /* Hover del primary */
+  --color-primary-light:    #63B3ED;  /* Primary en dark mode */
+
+  --color-secondary:        #4A5568;  /* Gris acero */
+  --color-secondary-bg:     #EDF2F7;  /* Fondo secondary button */
+
+  --color-accent:           #F59E0B;  /* Naranja obra */
+  --color-accent-hover:     #D97706;  /* Hover naranja */
+
+  --color-success:          #2F855A;  /* Verde progreso */
+  --color-danger:           #C53030;  /* Rojo alerta */
+
+  /* ----------------------------------------------------------
+     COLORES — Neutral palette
+     ---------------------------------------------------------- */
+
+  --color-background:       #F7FAFC;  /* Fondo app */
+  --color-surface:          #FFFFFF;  /* Cards, modals */
+  --color-border:           #E2E8F0;  /* Bordes */
+  --color-hover-row:        #F1F5F9;  /* Hover filas tabla */
+
+  --color-text-primary:     #1A202C;  /* Texto principal */
+  --color-text-secondary:   #718096;  /* Texto secundario */
+
+  /* ----------------------------------------------------------
+     COLORES — Dark mode
+     ---------------------------------------------------------- */
+
+  --color-dark-background:  #1A202C;
+  --color-dark-surface:     #2D3748;
+  --color-dark-text:        #E2E8F0;
+
+  /* ----------------------------------------------------------
+     COLORES — Badges de estado
+     ---------------------------------------------------------- */
+
+  --color-status-planning:  #718096;  /* Planificación — gris */
+  --color-status-progress:  #F59E0B;  /* En progreso — naranja */
+  --color-status-done:      #2F855A;  /* Completado — verde */
+  --color-status-delayed:   #C53030;  /* Retrasado — rojo */
+  --color-status-review:    #1E3A5F;  /* En revisión — azul */
+
+  /* ----------------------------------------------------------
+     TIPOGRAFÍA
+     ---------------------------------------------------------- */
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --text-h1:    2rem;       /* 32px — peso 700 */
+  --text-h2:    1.5rem;     /* 24px — peso 600 */
+  --text-h3:    1.25rem;    /* 20px — peso 600 */
+  --text-h4:    1.125rem;   /* 18px — peso 600 */
+  --text-body:  1rem;       /* 16px — peso 400 */
+  --text-small: 0.875rem;   /* 14px — peso 400 */
+  --text-label: 0.75rem;    /* 12px — peso 500 */
+
+  /* ----------------------------------------------------------
+     BORDER RADIUS
+     ---------------------------------------------------------- */
+
+  --radius-input:   10px;   /* Inputs y botones */
+  --radius-default: 12px;   /* Radius global */
+  --radius-card:    16px;   /* Cards */
+  --radius-badge:   9999px; /* Pill / badges */
+
+  /* ----------------------------------------------------------
+     SOMBRAS
+     ---------------------------------------------------------- */
+
+  --shadow-card:  0 2px 8px rgba(0,0,0,0.08);
+  --shadow-hover: 0 6px 16px rgba(0,0,0,0.12);
+
+  /* ----------------------------------------------------------
+     SIDEBAR
+     ---------------------------------------------------------- */
+
+  --color-sidebar-bg:        #1E3A5F;
+  --color-sidebar-text:      #FFFFFF;
+  --color-sidebar-active:    rgba(255,255,255,0.15);
+  --color-sidebar-hover:     rgba(255,255,255,0.08);
+
+  /* ----------------------------------------------------------
+     TABLA
+     ---------------------------------------------------------- */
+
+  --spacing-row-height: 48px;
+}

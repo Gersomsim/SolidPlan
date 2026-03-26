@@ -21,3 +21,20 @@
 - The `nx-generate` skill handles generator discovery internally - don't call nx_docs just to look up generator syntax
 
 <!-- nx configuration end-->
+
+# Design System
+
+Este proyecto usa un design system definido. SIEMPRE seguirlo al crear o modificar cualquier componente frontend.
+
+- Guía completa + clases Tailwind + ejemplos: `docs/design-system.md`
+- Tokens CSS (@theme para Tailwind v4): `docs/design-system.css`
+
+Reglas no negociables:
+- Fuente única: **Inter** (nunca decorativas)
+- Colores siempre desde tokens (nunca hex hardcodeados)
+- Border radius: `rounded-input` (botones/inputs), `rounded-card` (cards), `rounded-badge` (pills)
+- Sombras: solo `shadow-card` y `shadow-hover`
+- Botón naranja (`bg-accent`) exclusivo para acciones de campo/obra
+- Badges siempre pill shape + texto UPPERCASE
+- Filas de tabla mínimo 48px de altura
+- Dark mode usando variables `dark-*`
