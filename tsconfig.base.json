@@ -24,6 +24,9 @@
     "paths": {
       "@org/ui": [
         "libs/ui/src/index.ts"
+      ],
+      "@org/util": [
+        "libs/util/src/index.ts"
       ]
     }
   }
