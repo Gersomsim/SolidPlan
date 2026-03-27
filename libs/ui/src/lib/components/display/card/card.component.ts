@@ -20,7 +20,7 @@ export type CardPadding = 'none' | 'sm' | 'md' | 'lg';
   templateUrl: './card.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Card {
+export class CardComponent {
   readonly title = input('');
   readonly subtitle = input('');
   readonly loading = input(false);
