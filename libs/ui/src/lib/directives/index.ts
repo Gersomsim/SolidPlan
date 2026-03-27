@@ -13,3 +13,5 @@ export * from './step-icon.directive';
 export * from './suffix.directive';
 export * from './table-empty-state.directive';
 export * from './table-loading.directive';
+export * from './timeline-content.directive';
+export * from './timeline-item.directive';
