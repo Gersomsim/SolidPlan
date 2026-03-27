@@ -22,7 +22,7 @@ export type SortDirection = 'asc' | 'desc' | null;
   imports: [NgTemplateOutlet],
   templateUrl: './table.component.html',
 })
-export class Table<T extends Record<string, unknown> = Record<string, unknown>> {
+export class TableComponent<T extends Record<string, unknown> = Record<string, unknown>> {
   readonly columns      = input<TableColumn[]>([]);
   readonly data         = input<T[]>([]);
   readonly loading      = input(false);
@@ -46,6 +46,11 @@ export class Table<T extends Record<string, unknown> = Record<string, unknown>> 
   readonly allSelected = computed(() => {
     const d = this.data();
     return d.length > 0 && this.selectedRows().length === d.length;
+  });
+
+  readonly partiallySelected = computed(() => {
+    const selected = this.selectedRows().length;
+    return selected > 0 && selected < this.data().length;
   });
 
   getCellSlot(key: string): LibCellDirective | undefined {
