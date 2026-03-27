@@ -77,7 +77,7 @@
 
   <!-- ── VERTICAL ── -->
   <div class="flex flex-col">
-    @for (step of steps(); track step.key; let last = $last; let i = $index) {
+    @for (step of steps(); track step.key; let last = $last) {
       <div class="flex gap-4">
 
         <!-- Left column: circle + vertical connector -->
@@ -111,7 +111,7 @@
         </div>
 
         <!-- Right column: label + optional content -->
-        <div class="pb-6" [class.pb-0]="last">
+        <div [class]="last ? '' : 'pb-6'">
           <p
             class="text-small font-medium pt-1 transition-colors"
             [class.text-primary]="step.status === 'active'"

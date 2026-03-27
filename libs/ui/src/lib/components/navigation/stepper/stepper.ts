@@ -58,6 +58,7 @@ export class Stepper {
 
   onStepClick(step: StepItem): void {
     if (!this.canClick(step)) return;
+    if (step.key === this.activeStep()) return;
     this.activeStep.set(step.key);
     this.stepChange.emit(step.key);
   }
