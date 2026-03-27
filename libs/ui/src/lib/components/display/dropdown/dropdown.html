@@ -1,0 +1,47 @@
+<div
+  #triggerEl
+  class="inline-block"
+  (click)="trigger() === 'click' && !disabled() ? toggle() : null"
+  (mouseenter)="onTriggerMouseEnter()"
+  (mouseleave)="onTriggerMouseLeave()"
+>
+  <ng-content />
+</div>
+
+<ng-template #panel>
+  <div
+    class="min-w-[160px] rounded-card border border-border bg-surface shadow-hover py-1 z-50"
+    (mouseenter)="onPanelMouseEnter()"
+    (mouseleave)="onPanelMouseLeave()"
+  >
+    @for (item of items(); track item.label) {
+      @if (item.divider) {
+        <hr class="my-1 border-border" />
+      } @else if (customItemSlot(); as slot) {
+        <div
+          role="menuitem"
+          [class]="itemClasses(item)"
+          (click)="onItemClick(item)"
+        >
+          <ng-container
+            [ngTemplateOutlet]="slot.template"
+            [ngTemplateOutletContext]="{ $implicit: item }"
+          />
+        </div>
+      } @else {
+        <button
+          type="button"
+          role="menuitem"
+          [class]="itemClasses(item)"
+          [disabled]="item.disabled ?? false"
+          (click)="onItemClick(item)"
+        >
+          @if (item.icon) {
+            <span class="mr-2 text-base leading-none">{{ item.icon }}</span>
+          }
+          {{ item.label }}
+        </button>
+      }
+    }
+  </div>
+</ng-template>
