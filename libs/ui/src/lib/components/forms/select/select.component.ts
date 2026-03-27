@@ -1,19 +1,16 @@
 import {
   Component, input, inject, signal, computed, OnInit, forwardRef, Injector,
-  contentChild, TemplateRef,
 } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
 import {
   ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl, AbstractControl,
 } from '@angular/forms';
 import { ErrorMessageService } from '../../../services/error-message.service';
 import { SelectOption } from '../../../models/select-option.model';
-import { LibOptionDirective } from '../../../directives/option.directive';
 
 @Component({
   selector: 'lib-select',
   standalone: true,
-  imports: [NgTemplateOutlet],
+  imports: [],
   templateUrl: './select.component.html',
   providers: [
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SelectComponent), multi: true },
@@ -24,11 +21,10 @@ export class SelectComponent implements ControlValueAccessor, OnInit {
   readonly hint        = input('');
   readonly placeholder = input('Selecciona una opción');
   readonly options     = input<SelectOption[]>([]);
+  // TODO: multi-select value handling (selectedOptions) is not implemented; currently only the first selected option is emitted
   readonly multiple    = input(false);
   readonly disabled    = input(false);
   readonly errors      = input<Record<string, string>>({});
-
-  readonly optionTpl = contentChild(LibOptionDirective, { read: TemplateRef });
 
   readonly value     = signal<unknown>(null);
   readonly isFocused = signal(false);
@@ -57,19 +53,6 @@ export class SelectComponent implements ControlValueAccessor, OnInit {
     const [key, params] = Object.entries(ctrl.errors)[0];
     return this.errorService.getMessage(key, params as Record<string, unknown>, this.errors());
   }
-
-  readonly groups = computed(() => {
-    const result: Record<string, SelectOption[]> = {};
-    for (const opt of this.options()) {
-      const g = opt.group ?? '';
-      (result[g] ??= []).push(opt);
-    }
-    return result;
-  });
-
-  readonly hasGroups = computed(() =>
-    this.options().some(o => !!o.group)
-  );
 
   onChange: (v: unknown) => void = () => {};
   onTouched: () => void = () => {};
