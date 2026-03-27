@@ -1,0 +1,104 @@
+<div class="w-full overflow-x-auto rounded-card border border-border-light">
+  <table class="w-full border-collapse text-sm">
+
+    <thead
+      [class.sticky]="stickyHeader()"
+      [class.top-0]="stickyHeader()"
+      [class.z-10]="stickyHeader()"
+    >
+      <tr class="bg-secondary-bg text-text-secondary border-b border-border-light">
+        @if (selectable()) {
+          <th class="w-9 px-3 py-3 text-left">
+            <input
+              type="checkbox"
+              [checked]="allSelected()"
+              (change)="toggleAllSelection()"
+              class="cursor-pointer rounded accent-primary"
+            />
+          </th>
+        }
+        @for (col of columns(); track col.key) {
+          <th
+            [style.width]="col.width || null"
+            [class]="'px-4 py-3 font-semibold uppercase tracking-wide text-xs ' + getAlignClass(col)"
+            [class.cursor-pointer]="col.sortable"
+            (click)="onSortClick(col)"
+          >
+            {{ col.label }}
+            @if (col.sortable) {
+              <span class="ml-1 text-text-muted">{{ getSortIcon(col) }}</span>
+            }
+          </th>
+        }
+      </tr>
+    </thead>
+
+    <tbody>
+      @if (loading()) {
+        @if (loadingSlot()) {
+          <tr>
+            <td [attr.colspan]="columns().length + (selectable() ? 1 : 0)">
+              <ng-container *ngTemplateOutlet="loadingSlot()!.template" />
+            </td>
+          </tr>
+        } @else {
+          @for (s of [1, 2, 3, 4, 5]; track s) {
+            <tr data-testid="skeleton-row" class="border-b border-border-light animate-pulse">
+              @if (selectable()) {
+                <td class="px-3 py-4"><div class="h-4 w-4 rounded bg-border-light"></div></td>
+              }
+              @for (col of columns(); track col.key) {
+                <td class="px-4 py-4"><div class="h-4 rounded bg-border-light w-3/4"></div></td>
+              }
+            </tr>
+          }
+        }
+      } @else if (data().length === 0) {
+        @if (emptySlot()) {
+          <tr>
+            <td [attr.colspan]="columns().length + (selectable() ? 1 : 0)">
+              <ng-container *ngTemplateOutlet="emptySlot()!.template" />
+            </td>
+          </tr>
+        } @else {
+          <tr>
+            <td
+              [attr.colspan]="columns().length + (selectable() ? 1 : 0)"
+              class="px-4 py-8 text-center text-text-muted"
+            >
+              {{ emptyMessage() }}
+            </td>
+          </tr>
+        }
+      } @else {
+        @for (row of data(); track $index; let i = $index) {
+          <tr
+            [class]="'border-b border-border-light transition-colors hover:bg-secondary-bg cursor-pointer' + (isRowSelected(row) ? ' bg-primary/10' : '') + (isRowStriped(i) ? ' bg-secondary-bg' : '')"
+            (click)="onRowClick(row)"
+          >
+            @if (selectable()) {
+              <td class="px-3 py-4" (click)="$event.stopPropagation()">
+                <input
+                  type="checkbox"
+                  [checked]="isRowSelected(row)"
+                  (change)="toggleRowSelection(row)"
+                  class="cursor-pointer rounded accent-primary"
+                />
+              </td>
+            }
+            @for (col of columns(); track col.key) {
+              <td [class]="'px-4 py-4 text-text-primary ' + getAlignClass(col)">
+                @if (getCellSlot(col.key); as slot) {
+                  <ng-container *ngTemplateOutlet="slot.template; context: { $implicit: row }" />
+                } @else {
+                  {{ row[col.key] }}
+                }
+              </td>
+            }
+          </tr>
+        }
+      }
+    </tbody>
+
+  </table>
+</div>
