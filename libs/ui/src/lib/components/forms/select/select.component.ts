@@ -13,10 +13,10 @@ import { SelectOption } from '../../../models/select-option.model';
   imports: [],
   templateUrl: './select.component.html',
   providers: [
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SelectComponent), multi: true },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => Select), multi: true },
   ],
 })
-export class SelectComponent implements ControlValueAccessor, OnInit {
+export class Select implements ControlValueAccessor, OnInit {
   readonly label       = input('');
   readonly hint        = input('');
   readonly placeholder = input('Selecciona una opción');

@@ -7,7 +7,7 @@ import { RADIO_GROUP } from './radio-group.component';
   imports: [],
   templateUrl: './radio.component.html',
 })
-export class RadioComponent {
+export class Radio {
   readonly value    = input<unknown>(null);
   readonly label    = input('');
   readonly disabled = input(false);

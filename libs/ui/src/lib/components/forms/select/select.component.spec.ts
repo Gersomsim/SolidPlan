@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { SelectComponent } from './select.component';
+import { Select } from './select.component';
 import { ErrorMessageService } from '../../../services/error-message.service';
 import { SelectOption } from '../../../models/select-option.model';
 
 @Component({
   standalone: true,
-  imports: [SelectComponent, ReactiveFormsModule],
+  imports: [Select, ReactiveFormsModule],
   template: `
     <lib-select label="Status" [options]="options" [formControl]="ctrl" />
   `,

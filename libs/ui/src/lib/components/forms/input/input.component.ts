@@ -17,10 +17,10 @@ import { LibSuffixDirective } from '../../../directives/suffix.directive';
   imports: [NgTemplateOutlet],
   templateUrl: './input.component.html',
   providers: [
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => InputComponent), multi: true },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => Input), multi: true },
   ],
 })
-export class InputComponent implements ControlValueAccessor, OnInit {
+export class Input implements ControlValueAccessor, OnInit {
   readonly label       = input('');
   readonly hint        = input('');
   readonly placeholder = input('');

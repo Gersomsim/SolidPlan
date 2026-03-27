@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TextareaComponent } from './textarea.component';
+import { Textarea } from './textarea.component';
 import { ErrorMessageService } from '../../../services/error-message.service';
 
 @Component({
   standalone: true,
-  imports: [TextareaComponent, ReactiveFormsModule],
+  imports: [Textarea, ReactiveFormsModule],
   template: `<lib-textarea label="Notes" [rows]="4" [formControl]="ctrl" />`,
 })
 class TestHostComponent {

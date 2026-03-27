@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { RadioGroupComponent } from './radio-group.component';
-import { RadioComponent } from './radio.component';
+import { RadioGroup } from './radio-group.component';
+import { Radio } from './radio.component';
 import { ErrorMessageService } from '../../../services/error-message.service';
 
 @Component({
   standalone: true,
-  imports: [RadioGroupComponent, RadioComponent, ReactiveFormsModule],
+  imports: [RadioGroup, Radio, ReactiveFormsModule],
   template: `
     <lib-radio-group label="Status" [formControl]="ctrl">
       <lib-radio value="active" label="Active" />

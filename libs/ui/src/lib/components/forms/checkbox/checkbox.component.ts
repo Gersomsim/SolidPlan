@@ -12,10 +12,10 @@ import { ErrorMessageService } from '../../../services/error-message.service';
   imports: [],
   templateUrl: './checkbox.component.html',
   providers: [
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CheckboxComponent), multi: true },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => Checkbox), multi: true },
   ],
 })
-export class CheckboxComponent implements ControlValueAccessor, OnInit {
+export class Checkbox implements ControlValueAccessor, OnInit {
   readonly label    = input('');
   readonly hint     = input('');
   readonly disabled = input(false);

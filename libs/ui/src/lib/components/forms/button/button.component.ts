@@ -10,7 +10,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
   templateUrl: './button.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ButtonComponent {
+export class Button {
   readonly variant  = input<ButtonVariant>('primary');
   readonly size     = input<ButtonSize>('md');
   readonly type     = input<'button' | 'submit' | 'reset'>('button');

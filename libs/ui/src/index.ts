@@ -17,15 +17,15 @@ export { LibPrefixDirective } from './lib/directives/prefix.directive';
 export { LibSuffixDirective } from './lib/directives/suffix.directive';
 
 // Form components
-export { ButtonComponent } from './lib/components/forms/button/button.component';
+export { Button } from './lib/components/forms/button/button.component';
 export type { ButtonSize, ButtonVariant } from './lib/components/forms/button/button.component';
-export { CheckboxComponent } from './lib/components/forms/checkbox/checkbox.component';
-export { FileUploadComponent } from './lib/components/forms/file-upload/file-upload.component';
-export { InputComponent } from './lib/components/forms/input/input.component';
-export { RADIO_GROUP, RadioGroupComponent } from './lib/components/forms/radio-group/radio-group.component';
-export { RadioComponent } from './lib/components/forms/radio-group/radio.component';
-export { SelectComponent } from './lib/components/forms/select/select.component';
-export { TextareaComponent } from './lib/components/forms/textarea/textarea.component';
+export { Checkbox } from './lib/components/forms/checkbox/checkbox.component';
+export { FileUpload } from './lib/components/forms/file-upload/file-upload.component';
+export { Input } from './lib/components/forms/input/input.component';
+export { RADIO_GROUP, RadioGroup } from './lib/components/forms/radio-group/radio-group.component';
+export { Radio } from './lib/components/forms/radio-group/radio.component';
+export { Select } from './lib/components/forms/select/select.component';
+export { Textarea } from './lib/components/forms/textarea/textarea.component';
 
 // Models — table
 export type { TableColumn } from './lib/models/table-column.model';

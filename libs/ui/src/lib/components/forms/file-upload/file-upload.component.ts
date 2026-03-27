@@ -22,10 +22,10 @@ import { ErrorMessageService } from '../../../services/error-message.service';
   imports: [],
   templateUrl: './file-upload.component.html',
   providers: [
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FileUploadComponent), multi: true },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FileUpload), multi: true },
   ],
 })
-export class FileUploadComponent implements ControlValueAccessor, OnInit {
+export class FileUpload implements ControlValueAccessor, OnInit {
   readonly label       = input('');
   readonly hint        = input('');
   readonly accept      = input('');

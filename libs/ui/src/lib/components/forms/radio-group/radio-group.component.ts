@@ -6,7 +6,7 @@ import {
 } from '@angular/forms';
 import { ErrorMessageService } from '../../../services/error-message.service';
 
-export const RADIO_GROUP = new InjectionToken<RadioGroupComponent>('RADIO_GROUP');
+export const RADIO_GROUP = new InjectionToken<RadioGroup>('RADIO_GROUP');
 
 @Component({
   selector: 'lib-radio-group',
@@ -14,11 +14,11 @@ export const RADIO_GROUP = new InjectionToken<RadioGroupComponent>('RADIO_GROUP'
   imports: [],
   templateUrl: './radio-group.component.html',
   providers: [
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RadioGroupComponent), multi: true },
-    { provide: RADIO_GROUP, useExisting: forwardRef(() => RadioGroupComponent) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RadioGroup), multi: true },
+    { provide: RADIO_GROUP, useExisting: forwardRef(() => RadioGroup) },
   ],
 })
-export class RadioGroupComponent implements ControlValueAccessor, OnInit {
+export class RadioGroup implements ControlValueAccessor, OnInit {
   readonly label       = input('');
   readonly hint        = input('');
   readonly orientation = input<'horizontal' | 'vertical'>('vertical');

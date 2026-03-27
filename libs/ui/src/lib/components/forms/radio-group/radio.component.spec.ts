@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { vi } from 'vitest';
-import { RadioComponent } from './radio.component';
+import { Radio } from './radio.component';
 import { RADIO_GROUP } from './radio-group.component';
 
 describe('RadioComponent (isolated)', () => {
-  let fixture: ComponentFixture<RadioComponent>;
-  let component: RadioComponent;
+  let fixture: ComponentFixture<Radio>;
+  let component: Radio;
   let mockSelect: ReturnType<typeof vi.fn>;
   let selectedValue: ReturnType<typeof signal<unknown>>;
   let effectiveDisabled: ReturnType<typeof signal<boolean>>;
@@ -23,13 +23,13 @@ describe('RadioComponent (isolated)', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [RadioComponent],
+      imports: [Radio],
       providers: [
         { provide: RADIO_GROUP, useValue: mockGroup },
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(RadioComponent);
+    fixture = TestBed.createComponent(Radio);
     component = fixture.componentInstance;
   });
 

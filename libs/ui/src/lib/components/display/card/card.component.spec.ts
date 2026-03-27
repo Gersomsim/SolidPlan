@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CardComponent } from './card.component';
+import { Card } from './card.component';
 import { LibCardActionsDirective } from '../../../directives/card-actions.directive';
 import { LibCardFooterDirective } from '../../../directives/card-footer.directive';
 import { LibCardHeaderDirective } from '../../../directives/card-header.directive';
@@ -8,7 +8,7 @@ import { LibCardPrefixDirective } from '../../../directives/card-prefix.directiv
 
 @Component({
   standalone: true,
-  imports: [CardComponent],
+  imports: [Card],
   template: `
     <lib-card
       [title]="title()"
@@ -34,7 +34,7 @@ class BasicHostComponent {
 @Component({
   standalone: true,
   imports: [
-    CardComponent,
+    Card,
     LibCardActionsDirective,
     LibCardFooterDirective,
     LibCardPrefixDirective,
@@ -52,7 +52,7 @@ class SlotHostComponent {}
 
 @Component({
   standalone: true,
-  imports: [CardComponent, LibCardHeaderDirective],
+  imports: [Card, LibCardHeaderDirective],
   template: `
     <lib-card title="Ignorado" subtitle="Ignorado">
       <ng-template libCardHeader>

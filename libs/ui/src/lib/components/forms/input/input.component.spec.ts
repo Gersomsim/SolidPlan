@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { InputComponent } from './input.component';
+import { Input } from './input.component';
 import { ErrorMessageService } from '../../../services/error-message.service';
 
 @Component({
   standalone: true,
-  imports: [InputComponent, ReactiveFormsModule],
+  imports: [Input, ReactiveFormsModule],
   template: `
     <lib-input label="Name" hint="Your full name" [formControl]="ctrl" />
   `,

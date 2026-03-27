@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
-import { ButtonComponent } from './button.component';
+import { Button } from './button.component';
 
 @Component({
   standalone: true,
-  imports: [ButtonComponent],
+  imports: [Button],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<lib-button [variant]="variant()" [loading]="loading()" [disabled]="disabled()">Save</lib-button>`,
 })

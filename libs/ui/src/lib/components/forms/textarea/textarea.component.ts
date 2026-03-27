@@ -12,10 +12,10 @@ import { ErrorMessageService } from '../../../services/error-message.service';
   imports: [],
   templateUrl: './textarea.component.html',
   providers: [
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TextareaComponent), multi: true },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => Textarea), multi: true },
   ],
 })
-export class TextareaComponent implements ControlValueAccessor, OnInit {
+export class Textarea implements ControlValueAccessor, OnInit {
   readonly label       = input('');
   readonly hint        = input('');
   readonly placeholder = input('');

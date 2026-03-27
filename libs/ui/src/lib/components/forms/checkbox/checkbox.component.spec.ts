@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { CheckboxComponent } from './checkbox.component';
+import { Checkbox } from './checkbox.component';
 import { ErrorMessageService } from '../../../services/error-message.service';
 
 @Component({
   standalone: true,
-  imports: [CheckboxComponent, ReactiveFormsModule],
+  imports: [Checkbox, ReactiveFormsModule],
   template: `<lib-checkbox label="Accept terms" [formControl]="ctrl" />`,
 })
 class TestHostComponent {

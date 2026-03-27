@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
-import { TableComponent } from './table.component';
+import { Table } from './table.component';
 import type { SortDirection } from './table.component';
 import { TableColumn } from '../../../models/table-column.model';
 import { LibCellDirective } from '../../../directives/cell.directive';
@@ -18,28 +18,28 @@ const DATA: Project[] = [
 
 @Component({
   standalone: true,
-  imports: [TableComponent],
+  imports: [Table],
   template: `<lib-table [columns]="cols" [data]="rows" />`,
 })
 class BasicHostComponent { cols = COLUMNS; rows = DATA; }
 
 @Component({
   standalone: true,
-  imports: [TableComponent],
+  imports: [Table],
   template: `<lib-table [columns]="cols" [data]="[]" emptyMessage="Sin resultados" />`,
 })
 class EmptyHostComponent { cols = COLUMNS; }
 
 @Component({
   standalone: true,
-  imports: [TableComponent],
+  imports: [Table],
   template: `<lib-table [columns]="cols" [data]="[]" [loading]="true" />`,
 })
 class LoadingHostComponent { cols = COLUMNS; }
 
 @Component({
   standalone: true,
-  imports: [TableComponent, LibCellDirective],
+  imports: [Table, LibCellDirective],
   template: `
     <lib-table [columns]="cols" [data]="rows">
       <ng-template libCell="name" let-row>CUSTOM:{{ row.name }}</ng-template>
@@ -50,7 +50,7 @@ class CustomCellHostComponent { cols = COLUMNS; rows = DATA; }
 
 @Component({
   standalone: true,
-  imports: [TableComponent],
+  imports: [Table],
   template: `
     <lib-table
       [columns]="cols"
@@ -72,7 +72,7 @@ class SortAndClickHostComponent {
 
 @Component({
   standalone: true,
-  imports: [TableComponent],
+  imports: [Table],
   template: `
     <lib-table
       [columns]="cols"

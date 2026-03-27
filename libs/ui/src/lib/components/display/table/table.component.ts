@@ -22,7 +22,7 @@ export type SortDirection = 'asc' | 'desc' | null;
   imports: [NgTemplateOutlet],
   templateUrl: './table.component.html',
 })
-export class TableComponent<T extends Record<string, unknown> = Record<string, unknown>> {
+export class Table<T extends Record<string, unknown> = Record<string, unknown>> {
   readonly columns      = input<TableColumn[]>([]);
   readonly data         = input<T[]>([]);
   readonly loading      = input(false);
