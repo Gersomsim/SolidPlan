@@ -1,12 +1,17 @@
-import {
-  Component, input, output, contentChildren, contentChild,
-  signal, computed, ChangeDetectionStrategy,
-} from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { TableColumn } from '../../../models/table-column.model';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  contentChild,
+  contentChildren,
+  input, output,
+  signal,
+} from '@angular/core';
 import { LibCellDirective } from '../../../directives/cell.directive';
 import { LibEmptyStateDirective } from '../../../directives/table-empty-state.directive';
 import { LibLoadingDirective } from '../../../directives/table-loading.directive';
+import { TableColumn } from '../../../models/table-column.model';
 
 export type SortDirection = 'asc' | 'desc' | null;
 
@@ -17,7 +22,7 @@ export type SortDirection = 'asc' | 'desc' | null;
   imports: [NgTemplateOutlet],
   templateUrl: './table.component.html',
 })
-export class TableComponent<T extends Record<string, unknown> = Record<string, unknown>> {
+export class Table<T extends Record<string, unknown> = Record<string, unknown>> {
   readonly columns      = input<TableColumn[]>([]);
   readonly data         = input<T[]>([]);
   readonly loading      = input(false);

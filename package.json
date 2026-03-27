@@ -2,7 +2,9 @@
   "name": "@org/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "dev:front": "npx nx run frontend:serve"
+  },
   "private": true,
   "dependencies": {
     "@angular/cdk": "^21.2.4",

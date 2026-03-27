@@ -24,7 +24,7 @@ export class ErrorMessageService {
    * previous overrides.
    */
   configure(overrides: Partial<ErrorMessages>): void {
-    this.messages = { ...this.messages, ...overrides };
+    this.messages = { ...this.messages, ...overrides } as ErrorMessages;
   }
 
   getMessage(

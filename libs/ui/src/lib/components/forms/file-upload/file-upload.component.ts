@@ -1,18 +1,25 @@
 import {
-  Component, input, inject, signal, OnInit, forwardRef, Injector,
-  contentChild, TemplateRef, effect,
+  Component,
+  Injector,
+  OnInit,
+  TemplateRef,
+  contentChild,
+  effect,
+  forwardRef,
+  inject,
+  input,
+  signal,
 } from '@angular/core';
 import {
-  ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl, AbstractControl,
+  AbstractControl,
+  ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl,
 } from '@angular/forms';
-import { NgTemplateOutlet } from '@angular/common';
-import { ErrorMessageService } from '../../../services/error-message.service';
 import { LibFilePreviewDirective } from '../../../directives/file-preview.directive';
+import { ErrorMessageService } from '../../../services/error-message.service';
 
 @Component({
   selector: 'lib-file-upload',
-  standalone: true,
-  imports: [NgTemplateOutlet],
+  imports: [],
   templateUrl: './file-upload.component.html',
   providers: [
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FileUploadComponent), multi: true },

@@ -1,5 +1,5 @@
-import { Component, input, inject } from '@angular/core';
-import { RadioGroupComponent, RADIO_GROUP } from './radio-group.component';
+import { Component, inject, input } from '@angular/core';
+import { RADIO_GROUP } from './radio-group.component';
 
 @Component({
   selector: 'lib-radio',
