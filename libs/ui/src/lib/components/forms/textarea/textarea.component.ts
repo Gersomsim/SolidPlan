@@ -22,8 +22,6 @@ export class TextareaComponent implements ControlValueAccessor, OnInit {
   readonly rows        = input(4);
   readonly disabled    = input(false);
   readonly readonly    = input(false);
-  readonly autoResize  = input(false);
-  readonly maxRows     = input(0);
   readonly errors      = input<Record<string, string>>({});
 
   readonly value     = signal('');
