@@ -20,7 +20,7 @@ import { ErrorMessageService } from '../../../services/error-message.service';
 @Component({
   selector: 'lib-file-upload',
   imports: [],
-  templateUrl: './file-upload.component.html',
+  templateUrl: './file-upload.html',
   providers: [
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FileUpload), multi: true },
   ],

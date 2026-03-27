@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
-import { Button } from './button.component';
+import { Button } from './button';
 
 @Component({
   standalone: true,

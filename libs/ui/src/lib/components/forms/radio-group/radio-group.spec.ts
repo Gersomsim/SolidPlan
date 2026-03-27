@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { RadioGroup } from './radio-group.component';
-import { Radio } from './radio.component';
+import { RadioGroup } from './radio-group';
+import { Radio } from './radio';
 import { ErrorMessageService } from '../../../services/error-message.service';
 
 @Component({

@@ -1,31 +1,33 @@
 import {
-  Component, input, inject, signal, OnInit, forwardRef, Injector, computed, InjectionToken,
+  Component, input, inject, signal, computed, OnInit, forwardRef, Injector,
 } from '@angular/core';
 import {
   ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl, AbstractControl,
 } from '@angular/forms';
 import { ErrorMessageService } from '../../../services/error-message.service';
-
-export const RADIO_GROUP = new InjectionToken<RadioGroup>('RADIO_GROUP');
+import { SelectOption } from '../../../models/select-option.model';
 
 @Component({
-  selector: 'lib-radio-group',
+  selector: 'lib-select',
   standalone: true,
   imports: [],
-  templateUrl: './radio-group.component.html',
+  templateUrl: './select.html',
   providers: [
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RadioGroup), multi: true },
-    { provide: RADIO_GROUP, useExisting: forwardRef(() => RadioGroup) },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => Select), multi: true },
   ],
 })
-export class RadioGroup implements ControlValueAccessor, OnInit {
+export class Select implements ControlValueAccessor, OnInit {
   readonly label       = input('');
   readonly hint        = input('');
-  readonly orientation = input<'horizontal' | 'vertical'>('vertical');
+  readonly placeholder = input('Selecciona una opción');
+  readonly options     = input<SelectOption[]>([]);
+  // TODO: multi-select value handling (selectedOptions) is not implemented; currently only the first selected option is emitted
+  readonly multiple    = input(false);
   readonly disabled    = input(false);
   readonly errors      = input<Record<string, string>>({});
 
-  readonly selectedValue = signal<unknown>(null);
+  readonly value     = signal<unknown>(null);
+  readonly isFocused = signal(false);
   private readonly _disabledByForm = signal(false);
   readonly effectiveDisabled = computed(() => this.disabled() || this._disabledByForm());
 
@@ -55,14 +57,21 @@ export class RadioGroup implements ControlValueAccessor, OnInit {
   onChange: (v: unknown) => void = () => {};
   onTouched: () => void = () => {};
 
-  writeValue(value: unknown): void { this.selectedValue.set(value); }
+  writeValue(value: unknown): void { this.value.set(value); }
   registerOnChange(fn: (v: unknown) => void): void { this.onChange = fn; }
   registerOnTouched(fn: () => void): void { this.onTouched = fn; }
   setDisabledState(isDisabled: boolean): void { this._disabledByForm.set(isDisabled); }
 
-  select(value: unknown): void {
-    this.selectedValue.set(value);
-    this.onChange(value);
+  onSelectChange(event: Event): void {
+    const val = (event.target as HTMLSelectElement).value;
+    const matched = this.options().find(o => String(o.value) === val);
+    const newVal = matched ? matched.value : val;
+    this.value.set(newVal);
+    this.onChange(newVal);
     this.onTouched();
+  }
+
+  isSelected(option: SelectOption): boolean {
+    return this.value() === option.value;
   }
 }

@@ -7,7 +7,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
   selector: 'lib-button',
   standalone: true,
   imports: [],
-  templateUrl: './button.component.html',
+  templateUrl: './button.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Button {

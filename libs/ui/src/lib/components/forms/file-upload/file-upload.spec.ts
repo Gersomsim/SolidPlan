@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { FileUpload } from './file-upload.component';
+import { FileUpload } from './file-upload';
 import { ErrorMessageService } from '../../../services/error-message.service';
 
 @Component({

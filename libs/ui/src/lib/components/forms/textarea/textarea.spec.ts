@@ -1,21 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Input } from './input.component';
+import { Textarea } from './textarea';
 import { ErrorMessageService } from '../../../services/error-message.service';
 
 @Component({
   standalone: true,
-  imports: [Input, ReactiveFormsModule],
-  template: `
-    <lib-input label="Name" hint="Your full name" [formControl]="ctrl" />
-  `,
+  imports: [Textarea, ReactiveFormsModule],
+  template: `<lib-textarea label="Notes" [rows]="4" [formControl]="ctrl" />`,
 })
 class TestHostComponent {
   ctrl = new FormControl('', [Validators.required]);
 }
 
-describe('InputComponent', () => {
+describe('TextareaComponent', () => {
   let fixture: ComponentFixture<TestHostComponent>;
   let host: TestHostComponent;
 
@@ -30,32 +28,24 @@ describe('InputComponent', () => {
   });
 
   it('renders label', () => {
-    const label = fixture.nativeElement.querySelector('label');
-    expect(label.textContent.trim()).toBe('Name');
+    expect(fixture.nativeElement.querySelector('label').textContent.trim()).toBe('Notes');
   });
 
-  it('renders hint', () => {
-    const hint = fixture.nativeElement.querySelector('[data-hint]');
-    expect(hint.textContent.trim()).toBe('Your full name');
-  });
-
-  it('shows error message when control is touched and invalid', () => {
+  it('shows required error when touched', () => {
     host.ctrl.markAsTouched();
     fixture.detectChanges();
     const error = fixture.nativeElement.querySelector('[data-error]');
-    expect(error).not.toBeNull();
     expect(error.textContent.trim()).toBe('Este campo es obligatorio');
   });
 
-  it('does not show error when control is not touched', () => {
-    const error = fixture.nativeElement.querySelector('[data-error]');
-    expect(error).toBeNull();
+  it('sets rows attribute', () => {
+    const ta = fixture.nativeElement.querySelector('textarea');
+    expect(ta.getAttribute('rows')).toBe('4');
   });
 
-  it('writes value to the native input', () => {
-    host.ctrl.setValue('Hello');
+  it('writes value to textarea', () => {
+    host.ctrl.setValue('hello');
     fixture.detectChanges();
-    const input = fixture.nativeElement.querySelector('input');
-    expect(input.value).toBe('Hello');
+    expect(fixture.nativeElement.querySelector('textarea').value).toBe('hello');
   });
 });

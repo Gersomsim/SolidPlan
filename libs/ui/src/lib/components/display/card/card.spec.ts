@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Card } from './card.component';
+import { Card } from './card';
 import { LibCardActionsDirective } from '../../../directives/card-actions.directive';
 import { LibCardFooterDirective } from '../../../directives/card-footer.directive';
 import { LibCardHeaderDirective } from '../../../directives/card-header.directive';

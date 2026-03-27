@@ -20,7 +20,7 @@ export type SortDirection = 'asc' | 'desc' | null;
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet],
-  templateUrl: './table.component.html',
+  templateUrl: './table.html',
 })
 export class Table<T extends Record<string, unknown> = Record<string, unknown>> {
   readonly columns      = input<TableColumn[]>([]);

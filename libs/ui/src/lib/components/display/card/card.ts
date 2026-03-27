@@ -17,7 +17,7 @@ export type CardPadding = 'none' | 'sm' | 'md' | 'lg';
   selector: 'lib-card',
   standalone: true,
   imports: [NgTemplateOutlet],
-  templateUrl: './card.component.html',
+  templateUrl: './card.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Card {

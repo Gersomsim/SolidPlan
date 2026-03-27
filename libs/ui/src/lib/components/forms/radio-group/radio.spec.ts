@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { vi } from 'vitest';
-import { Radio } from './radio.component';
-import { RADIO_GROUP } from './radio-group.component';
+import { Radio } from './radio';
+import { RADIO_GROUP } from './radio-group';
 
 describe('RadioComponent (isolated)', () => {
   let fixture: ComponentFixture<Radio>;

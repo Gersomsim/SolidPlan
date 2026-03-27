@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
-import { Table } from './table.component';
-import type { SortDirection } from './table.component';
+import { Table } from './table';
+import type { SortDirection } from './table';
 import { TableColumn } from '../../../models/table-column.model';
 import { LibCellDirective } from '../../../directives/cell.directive';
 

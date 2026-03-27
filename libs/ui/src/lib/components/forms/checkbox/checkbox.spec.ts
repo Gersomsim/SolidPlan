@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Checkbox } from './checkbox.component';
+import { Checkbox } from './checkbox';
 import { ErrorMessageService } from '../../../services/error-message.service';
 
 @Component({

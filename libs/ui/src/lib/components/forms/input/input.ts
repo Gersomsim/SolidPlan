@@ -1,44 +1,54 @@
 import {
-  Component, input, inject, signal, OnInit, forwardRef, Injector, computed,
+  Component, input, inject, Injector, contentChild, TemplateRef,
+  signal, computed, OnInit, forwardRef,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import {
-  ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl, AbstractControl,
+  ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl,
+  AbstractControl,
 } from '@angular/forms';
 import { ErrorMessageService } from '../../../services/error-message.service';
+import { LibPrefixDirective } from '../../../directives/prefix.directive';
+import { LibSuffixDirective } from '../../../directives/suffix.directive';
 
 @Component({
-  selector: 'lib-textarea',
+  selector: 'lib-input',
   standalone: true,
-  imports: [],
-  templateUrl: './textarea.component.html',
+  imports: [NgTemplateOutlet],
+  templateUrl: './input.html',
   providers: [
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => Textarea), multi: true },
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => Input), multi: true },
   ],
 })
-export class Textarea implements ControlValueAccessor, OnInit {
+export class Input implements ControlValueAccessor, OnInit {
   readonly label       = input('');
   readonly hint        = input('');
   readonly placeholder = input('');
-  readonly rows        = input(4);
+  readonly type        = input<'text' | 'email' | 'password' | 'number' | 'tel' | 'url'>('text');
   readonly disabled    = input(false);
   readonly readonly    = input(false);
+  readonly prefix      = input('');
+  readonly suffix      = input('');
   readonly errors      = input<Record<string, string>>({});
+
+  readonly prefixTpl = contentChild(LibPrefixDirective, { read: TemplateRef });
+  readonly suffixTpl = contentChild(LibSuffixDirective, { read: TemplateRef });
 
   readonly value     = signal('');
   readonly isFocused = signal(false);
-  private readonly _disabledByForm = signal(false);
-  readonly effectiveDisabled = computed(() => this.disabled() || this._disabledByForm());
 
   private injector     = inject(Injector);
   private errorService = inject(ErrorMessageService);
-  private ngControl: NgControl | null = null;
+
+  private _ngControl: NgControl | null = null;
 
   ngOnInit(): void {
-    this.ngControl = this.injector.get(NgControl, null, { self: true, optional: true } as never);
-    if (this.ngControl) this.ngControl.valueAccessor = this;
+    this._ngControl = this.injector.get(NgControl, null, { self: true, optional: true });
   }
 
-  get control(): AbstractControl | null { return this.ngControl?.control ?? null; }
+  get control(): AbstractControl | null {
+    return this._ngControl?.control ?? null;
+  }
 
   get showErrors(): boolean {
     const ctrl = this.control;
@@ -52,6 +62,9 @@ export class Textarea implements ControlValueAccessor, OnInit {
     return this.errorService.getMessage(key, params as Record<string, unknown>, this.errors());
   }
 
+  private readonly _disabledByForm = signal(false);
+  readonly effectiveDisabled = computed(() => this.disabled() || this._disabledByForm());
+
   onChange: (v: string) => void = () => {};
   onTouched: () => void = () => {};
 
@@ -61,7 +74,7 @@ export class Textarea implements ControlValueAccessor, OnInit {
   setDisabledState(isDisabled: boolean): void { this._disabledByForm.set(isDisabled); }
 
   onInput(event: Event): void {
-    const val = (event.target as HTMLTextAreaElement).value;
+    const val = (event.target as HTMLInputElement).value;
     this.value.set(val);
     this.onChange(val);
   }

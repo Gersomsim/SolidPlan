@@ -1,11 +1,11 @@
 import { Component, inject, input } from '@angular/core';
-import { RADIO_GROUP } from './radio-group.component';
+import { RADIO_GROUP } from './radio-group';
 
 @Component({
   selector: 'lib-radio',
   standalone: true,
   imports: [],
-  templateUrl: './radio.component.html',
+  templateUrl: './radio.html',
 })
 export class Radio {
   readonly value    = input<unknown>(null);

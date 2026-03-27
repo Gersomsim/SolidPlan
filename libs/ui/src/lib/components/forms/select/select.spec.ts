@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Select } from './select.component';
+import { Select } from './select';
 import { ErrorMessageService } from '../../../services/error-message.service';
 import { SelectOption } from '../../../models/select-option.model';
 
