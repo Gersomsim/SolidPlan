@@ -1,0 +1,22 @@
+<div class="flex flex-col gap-1">
+  <label class="flex items-center gap-2 cursor-pointer select-none">
+    <input
+      type="checkbox"
+      class="size-4 rounded accent-primary cursor-pointer disabled:cursor-not-allowed"
+      [checked]="checked()"
+      [disabled]="effectiveDisabled()"
+      (change)="toggle()"
+      (blur)="onTouched()"
+    />
+    @if (label()) {
+      <span class="text-sm text-text-primary dark:text-dark-text">{{ label() }}</span>
+    }
+  </label>
+
+  @if (hint() && !showErrors) {
+    <p class="text-xs text-text-secondary dark:text-dark-text/60 ml-6">{{ hint() }}</p>
+  }
+  @if (showErrors && firstError) {
+    <p data-error class="text-xs text-danger ml-6">{{ firstError }}</p>
+  }
+</div>
