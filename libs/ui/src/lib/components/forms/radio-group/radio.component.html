@@ -1,0 +1,10 @@
+<label class="flex items-center gap-2 cursor-pointer select-none">
+  <input
+    type="radio"
+    class="size-4 accent-primary cursor-pointer disabled:cursor-not-allowed"
+    [checked]="isChecked"
+    [disabled]="disabled() || group.effectiveDisabled()"
+    (change)="select()"
+  />
+  <span class="text-sm text-text-primary dark:text-dark-text">{{ label() }}</span>
+</label>

@@ -1,0 +1,14 @@
+<fieldset class="flex flex-col gap-1 border-0 p-0 m-0">
+  @if (label()) {
+    <legend class="text-sm font-medium text-text-primary dark:text-dark-text mb-1">{{ label() }}</legend>
+  }
+  <div [class]="orientation() === 'horizontal' ? 'flex gap-4' : 'flex flex-col gap-2'">
+    <ng-content />
+  </div>
+  @if (hint() && !showErrors) {
+    <p class="text-xs text-text-secondary dark:text-dark-text/60 mt-1">{{ hint() }}</p>
+  }
+  @if (showErrors && firstError) {
+    <p data-error class="text-xs text-danger mt-1">{{ firstError }}</p>
+  }
+</fieldset>
