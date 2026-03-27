@@ -1,0 +1,80 @@
+<h2>API de componentes de formulario</h2>
+<p class="subtitle">¿Cómo se usará cada componente en los templates? Elige el enfoque que te resulte más natural y mantenible.</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Inputs declarativos</h3>
+      <p>Todo via <code>@Input()</code>. Simple de usar, predecible.</p>
+      <pre style="background:#1e293b;color:#e2e8f0;padding:12px;border-radius:8px;font-size:12px;margin-top:10px;overflow:auto"><code>&lt;lib-input
+  label="Nombre del proyecto"
+  hint="Máximo 100 caracteres"
+  placeholder="Ej: Torre Reforma"
+  [formControl]="nameCtrl"
+  [errors]="{ required: 'Campo obligatorio' }"
+/&gt;
+
+&lt;lib-select
+  label="Estado"
+  hint="Estado actual de la obra"
+  [options]="statusOptions"
+  [formControl]="statusCtrl"
+/&gt;</code></pre>
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>✓ Pros</h4><ul><li>Muy fácil de usar</li><li>Autocompletado en el IDE</li><li>Consistente en todo el proyecto</li></ul></div>
+        <div class="cons"><h4>✗ Contras</h4><ul><li>Menos flexible para casos edge</li><li>Label siempre es texto plano</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Content projection (slots)</h3>
+      <p>Label, hint y actions son <code>ng-content</code> con selectores. Máxima flexibilidad.</p>
+      <pre style="background:#1e293b;color:#e2e8f0;padding:12px;border-radius:8px;font-size:12px;margin-top:10px;overflow:auto"><code>&lt;lib-input [formControl]="nameCtrl"&gt;
+  &lt;ng-template libLabel&gt;
+    Nombre &lt;span class="text-danger"&gt;*&lt;/span&gt;
+  &lt;/ng-template&gt;
+  &lt;ng-template libHint&gt;
+    Máximo &lt;b&gt;100&lt;/b&gt; caracteres
+  &lt;/ng-template&gt;
+&lt;/lib-input&gt;</code></pre>
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>✓ Pros</h4><ul><li>Label puede tener HTML rico</li><li>Slots completamente custom</li></ul></div>
+        <div class="cons"><h4>✗ Contras</h4><ul><li>Verboso para casos comunes</li><li>Más código en cada uso</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Híbrido (recomendado)</h3>
+      <p>Inputs para el 90% de los casos. Content projection para personalización avanzada.</p>
+      <pre style="background:#1e293b;color:#e2e8f0;padding:12px;border-radius:8px;font-size:12px;margin-top:10px;overflow:auto"><code>&lt;!-- Caso común: solo inputs --&gt;
+&lt;lib-input
+  label="Nombre del proyecto"
+  hint="Máximo 100 caracteres"
+  [formControl]="nameCtrl"
+  [errors]="{ required: 'Requerido', maxlength: 'Muy largo' }"
+/&gt;
+
+&lt;!-- Caso avanzado: con slots --&gt;
+&lt;lib-input [formControl]="nameCtrl" label="Nombre"&gt;
+  &lt;ng-template libSuffix&gt;
+    &lt;lib-icon name="search" /&gt;
+  &lt;/ng-template&gt;
+&lt;/lib-input&gt;</code></pre>
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>✓ Pros</h4><ul><li>Simple en casos comunes</li><li>Flexible cuando se necesita</li><li>Gradual: crece con las necesidades</li></ul></div>
+        <div class="cons"><h4>✗ Contras</h4><ul><li>Dos patrones a documentar</li><li>Algo más complejo de implementar</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px">Haz clic en tu opción preferida, o responde en el terminal.</p>
