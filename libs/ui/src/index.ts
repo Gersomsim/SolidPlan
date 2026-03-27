@@ -23,3 +23,15 @@ export { RADIO_GROUP } from './lib/components/forms/radio-group/radio-group.comp
 export { RadioComponent } from './lib/components/forms/radio-group/radio.component';
 export { SelectComponent } from './lib/components/forms/select/select.component';
 export { FileUploadComponent } from './lib/components/forms/file-upload/file-upload.component';
+
+// Models — table
+export type { TableColumn } from './lib/models/table-column.model';
+
+// Directives — table slots
+export { LibCellDirective } from './lib/directives/cell.directive';
+export { LibEmptyStateDirective } from './lib/directives/table-empty-state.directive';
+export { LibLoadingDirective } from './lib/directives/table-loading.directive';
+
+// Display components
+export { TableComponent } from './lib/components/display/table/table.component';
+export type { SortDirection } from './lib/components/display/table/table.component';
