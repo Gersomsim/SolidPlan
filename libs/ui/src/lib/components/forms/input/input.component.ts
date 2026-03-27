@@ -62,7 +62,8 @@ export class InputComponent implements ControlValueAccessor, OnInit {
     return this.errorService.getMessage(key, params as Record<string, unknown>, this.errors());
   }
 
-  readonly hasError = computed(() => this.showErrors);
+  private readonly _disabledByForm = signal(false);
+  readonly effectiveDisabled = computed(() => this.disabled() || this._disabledByForm());
 
   onChange: (v: string) => void = () => {};
   onTouched: () => void = () => {};
@@ -70,7 +71,7 @@ export class InputComponent implements ControlValueAccessor, OnInit {
   writeValue(value: string): void { this.value.set(value ?? ''); }
   registerOnChange(fn: (v: string) => void): void { this.onChange = fn; }
   registerOnTouched(fn: () => void): void { this.onTouched = fn; }
-  setDisabledState(isDisabled: boolean): void { /* handled via disabled input */ }
+  setDisabledState(isDisabled: boolean): void { this._disabledByForm.set(isDisabled); }
 
   onInput(event: Event): void {
     const val = (event.target as HTMLInputElement).value;

@@ -9,18 +9,18 @@
     [class.border-primary]="isFocused() && !showErrors"
     [class.border-danger]="showErrors"
   >
-    @if (prefix()) {
-      <span class="text-text-secondary dark:text-dark-text/60 text-sm shrink-0">{{ prefix() }}</span>
-    }
     @if (prefixTpl()) {
       <ng-template [ngTemplateOutlet]="prefixTpl()!" />
+    }
+    @if (prefix() && !prefixTpl()) {
+      <span class="text-text-secondary dark:text-dark-text/60 text-sm shrink-0">{{ prefix() }}</span>
     }
 
     <input
       class="flex-1 bg-transparent text-sm text-text-primary dark:text-dark-text outline-none placeholder:text-text-secondary disabled:cursor-not-allowed"
       [type]="type()"
       [placeholder]="placeholder()"
-      [disabled]="disabled()"
+      [disabled]="effectiveDisabled()"
       [readOnly]="readonly()"
       [value]="value()"
       (input)="onInput($event)"
