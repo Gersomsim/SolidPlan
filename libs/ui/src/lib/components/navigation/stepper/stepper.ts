@@ -64,7 +64,7 @@ export class Stepper {
   }
 
   stepCircleClass(step: StepItem): string {
-    const base = 'flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold shrink-0 transition-colors focus:outline-none';
+    const base = 'flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold shrink-0 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2';
     const clickable = this.canClick(step) ? 'cursor-pointer' : 'cursor-default';
     switch (step.status) {
       case 'completed': return `${base} ${clickable} bg-success text-white`;
