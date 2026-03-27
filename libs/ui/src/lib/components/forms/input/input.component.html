@@ -1,0 +1,45 @@
+<div class="flex flex-col gap-1">
+  @if (label()) {
+    <label class="text-sm font-medium text-text-primary dark:text-dark-text">{{ label() }}</label>
+  }
+
+  <div
+    class="flex items-center gap-2 rounded-input border px-3 py-2 transition-colors bg-surface dark:bg-dark-surface"
+    [class.border-border]="!showErrors && !isFocused()"
+    [class.border-primary]="isFocused() && !showErrors"
+    [class.border-danger]="showErrors"
+  >
+    @if (prefix()) {
+      <span class="text-text-secondary dark:text-dark-text/60 text-sm shrink-0">{{ prefix() }}</span>
+    }
+    @if (prefixTpl()) {
+      <ng-template [ngTemplateOutlet]="prefixTpl()!" />
+    }
+
+    <input
+      class="flex-1 bg-transparent text-sm text-text-primary dark:text-dark-text outline-none placeholder:text-text-secondary disabled:cursor-not-allowed"
+      [type]="type()"
+      [placeholder]="placeholder()"
+      [disabled]="disabled()"
+      [readOnly]="readonly()"
+      [value]="value()"
+      (input)="onInput($event)"
+      (focus)="isFocused.set(true)"
+      (blur)="isFocused.set(false); onTouched()"
+    />
+
+    @if (suffixTpl()) {
+      <ng-template [ngTemplateOutlet]="suffixTpl()!" />
+    }
+    @if (suffix() && !suffixTpl()) {
+      <span class="text-text-secondary dark:text-dark-text/60 text-sm shrink-0">{{ suffix() }}</span>
+    }
+  </div>
+
+  @if (hint() && !showErrors) {
+    <p data-hint class="text-xs text-text-secondary dark:text-dark-text/60">{{ hint() }}</p>
+  }
+  @if (showErrors && firstError) {
+    <p data-error class="text-xs text-danger">{{ firstError }}</p>
+  }
+</div>
