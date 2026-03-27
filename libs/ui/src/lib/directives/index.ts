@@ -8,6 +8,8 @@ export * from './file-preview.directive';
 export * from './option.directive';
 export * from './prefix.directive';
 export * from './separator.directive';
+export * from './step-content.directive';
+export * from './step-icon.directive';
 export * from './suffix.directive';
 export * from './table-empty-state.directive';
 export * from './table-loading.directive';
