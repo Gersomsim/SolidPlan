@@ -1,15 +1,18 @@
 import {
   Component, input, inject, signal, OnInit, forwardRef, Injector,
+  contentChild, TemplateRef, effect,
 } from '@angular/core';
 import {
   ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl, AbstractControl,
 } from '@angular/forms';
+import { NgTemplateOutlet } from '@angular/common';
 import { ErrorMessageService } from '../../../services/error-message.service';
+import { LibFilePreviewDirective } from '../../../directives/file-preview.directive';
 
 @Component({
   selector: 'lib-file-upload',
   standalone: true,
-  imports: [],
+  imports: [NgTemplateOutlet],
   templateUrl: './file-upload.component.html',
   providers: [
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FileUploadComponent), multi: true },
@@ -24,14 +27,29 @@ export class FileUploadComponent implements ControlValueAccessor, OnInit {
   readonly maxSizeMB   = input(0);
   readonly disabled    = input(false);
   readonly errors      = input<Record<string, string>>({});
+  readonly showPreview = input(false);
 
   readonly files       = signal<File[]>([]);
   readonly isDragging  = signal(false);
   readonly uploadError = signal<string | null>(null);
+  readonly previewUrl  = signal<string | null>(null);
+
+  readonly previewTpl = contentChild(LibFilePreviewDirective, { read: TemplateRef });
 
   private injector     = inject(Injector);
   private errorService = inject(ErrorMessageService);
   private ngControl: NgControl | null = null;
+
+  constructor() {
+    effect(() => {
+      const f = this.files()[0];
+      const next = (f && this.isImageFile(f)) ? URL.createObjectURL(f) : null;
+      // Clean up previous object URL to prevent memory leak
+      const prev = this.previewUrl();
+      if (prev) URL.revokeObjectURL(prev);
+      this.previewUrl.set(next);
+    });
+  }
 
   ngOnInit(): void {
     this.ngControl = this.injector.get(NgControl, null, { self: true, optional: true } as never);
@@ -62,7 +80,7 @@ export class FileUploadComponent implements ControlValueAccessor, OnInit {
   }
   registerOnChange(fn: (v: File | File[] | null) => void): void { this.onChange = fn; }
   registerOnTouched(fn: () => void): void { this.onTouched = fn; }
-  setDisabledState(isDisabled: boolean): void { /* disabled input handles this */ }
+  setDisabledState(_isDisabled: boolean): void { /* disabled input handles this */ }
 
   handleFiles(fileList: File[]): void {
     this.uploadError.set(null);
@@ -103,9 +121,4 @@ export class FileUploadComponent implements ControlValueAccessor, OnInit {
   onDragLeave(): void { this.isDragging.set(false); }
 
   isImageFile(file: File): boolean { return file.type.startsWith('image/'); }
-
-  get previewUrl(): string | null {
-    const f = this.files()[0];
-    return f && this.isImageFile(f) ? URL.createObjectURL(f) : null;
-  }
 }
