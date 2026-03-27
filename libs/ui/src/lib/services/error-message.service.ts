@@ -17,6 +17,12 @@ const DEFAULT_MESSAGES: ErrorMessages = {
 export class ErrorMessageService {
   private messages: ErrorMessages = { ...DEFAULT_MESSAGES };
 
+  /**
+   * Merges the given overrides into the instance-level messages.
+   * Because this service is a root singleton, overrides are permanent
+   * for the app session. Multiple calls accumulate — they do not reset
+   * previous overrides.
+   */
   configure(overrides: Partial<ErrorMessages>): void {
     this.messages = { ...this.messages, ...overrides };
   }
