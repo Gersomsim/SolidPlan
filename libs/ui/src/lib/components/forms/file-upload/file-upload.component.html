@@ -1,0 +1,49 @@
+<div class="flex flex-col gap-1">
+  @if (label()) {
+    <label class="text-sm font-medium text-text-primary dark:text-dark-text">{{ label() }}</label>
+  }
+
+  <div
+    data-dropzone
+    class="rounded-card border-2 border-dashed p-6 text-center transition-colors cursor-pointer"
+    [class.border-primary]="isDragging()"
+    [class.border-border]="!isDragging()"
+    [class.bg-primary\/5]="isDragging()"
+    (click)="fileInput.click()"
+    (drop)="onDrop($event)"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+  >
+    @if (files().length === 0) {
+      <p class="text-sm text-text-secondary dark:text-dark-text/60">
+        Arrastra un archivo o <span class="text-primary font-medium">haz clic para seleccionar</span>
+      </p>
+      @if (hint()) {
+        <p class="text-xs text-text-secondary mt-1">{{ hint() }}</p>
+      }
+    } @else {
+      <ul class="space-y-1">
+        @for (file of files(); track file.name) {
+          <li class="text-sm text-text-primary dark:text-dark-text flex items-center gap-2">
+            <span class="truncate max-w-[200px]">{{ file.name }}</span>
+            <span class="text-text-secondary text-xs shrink-0">({{ (file.size / 1024).toFixed(1) }} KB)</span>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <input
+    #fileInput
+    type="file"
+    class="hidden"
+    [accept]="accept()"
+    [multiple]="multiple()"
+    [disabled]="disabled()"
+    (change)="onFileInput($event)"
+  />
+
+  @if (showErrors && firstError) {
+    <p data-error class="text-xs text-danger">{{ firstError }}</p>
+  }
+</div>
