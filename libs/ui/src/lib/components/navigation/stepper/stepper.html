@@ -1,0 +1,138 @@
+@if (orientation() === 'horizontal') {
+
+  <!-- ── HORIZONTAL ── -->
+  <div>
+    <!-- Step indicator row -->
+    <div class="flex items-start">
+      @for (step of steps(); track step.key; let first = $first; let last = $last; let i = $index) {
+        <div class="flex-1 flex flex-col items-center">
+
+          <!-- Circle + connectors row -->
+          <div class="flex items-center w-full">
+
+            <!-- Left connector (not first) -->
+            @if (!first) {
+              <div [class]="leftConnectorClass(i)"></div>
+            } @else {
+              <div class="flex-1"></div>
+            }
+
+            <!-- Step circle -->
+            <button
+              type="button"
+              [class]="stepCircleClass(step)"
+              [attr.aria-current]="step.key === activeStep() ? 'step' : null"
+              [attr.aria-label]="step.label"
+              (click)="onStepClick(step)"
+            >
+              @if (iconFor(step.key); as slot) {
+                <ng-container [ngTemplateOutlet]="slot.template" />
+              } @else if (step.status === 'completed') {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+              } @else if (step.status === 'error') {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+              } @else {
+                {{ stepIndex(step) }}
+              }
+            </button>
+
+            <!-- Right connector (not last) -->
+            @if (!last) {
+              <div [class]="rightConnectorClass(step)"></div>
+            } @else {
+              <div class="flex-1"></div>
+            }
+
+          </div>
+
+          <!-- Label + description below circle -->
+          <div class="mt-2 text-center px-1">
+            <p
+              class="text-small font-medium transition-colors"
+              [class.text-primary]="step.status === 'active'"
+              [class.text-text-primary]="step.status !== 'active'"
+            >{{ step.label }}</p>
+            @if (step.description) {
+              <p class="text-label text-text-secondary mt-0.5">{{ step.description }}</p>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+
+    <!-- Active step content panel -->
+    @if (activeContent(); as slot) {
+      <div class="mt-6">
+        <ng-container [ngTemplateOutlet]="slot.template" />
+      </div>
+    }
+  </div>
+
+} @else {
+
+  <!-- ── VERTICAL ── -->
+  <div class="flex flex-col">
+    @for (step of steps(); track step.key; let last = $last; let i = $index) {
+      <div class="flex gap-4">
+
+        <!-- Left column: circle + vertical connector -->
+        <div class="flex flex-col items-center">
+          <button
+            type="button"
+            [class]="stepCircleClass(step)"
+            [attr.aria-current]="step.key === activeStep() ? 'step' : null"
+            [attr.aria-label]="step.label"
+            (click)="onStepClick(step)"
+          >
+            @if (iconFor(step.key); as slot) {
+              <ng-container [ngTemplateOutlet]="slot.template" />
+            } @else if (step.status === 'completed') {
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+            } @else if (step.status === 'error') {
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+              </svg>
+            } @else {
+              {{ stepIndex(step) }}
+            }
+          </button>
+
+          <!-- Vertical line to next step -->
+          @if (!last) {
+            <div [class]="verticalConnectorClass(step)"></div>
+          }
+        </div>
+
+        <!-- Right column: label + optional content -->
+        <div class="pb-6" [class.pb-0]="last">
+          <p
+            class="text-small font-medium pt-1 transition-colors"
+            [class.text-primary]="step.status === 'active'"
+            [class.text-text-primary]="step.status !== 'active'"
+          >{{ step.label }}</p>
+          @if (step.description) {
+            <p class="text-label text-text-secondary mt-0.5">{{ step.description }}</p>
+          }
+
+          <!-- Content rendered inline when this step is active -->
+          @if (step.key === activeStep()) {
+            @if (contentFor(step.key); as slot) {
+              <div class="mt-3">
+                <ng-container [ngTemplateOutlet]="slot.template" />
+              </div>
+            }
+          }
+        </div>
+
+      </div>
+    }
+  </div>
+
+}
