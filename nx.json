@@ -1,154 +1,143 @@
 {
-  "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "namedInputs": {
-    "default": [
-      "{projectRoot}/**/*",
-      "sharedGlobals"
-    ],
-    "production": [
-      "default",
-      "!{projectRoot}/.eslintrc.json",
-      "!{projectRoot}/eslint.config.mjs",
-      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
-      "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/jest.config.[jt]s",
-      "!{projectRoot}/src/test-setup.[jt]s",
-      "!{projectRoot}/test-setup.[jt]s"
-    ],
-    "sharedGlobals": []
-  },
-  "projects": {
-    "api": { "tags": ["scope:api"] },
-    "frontend": { "tags": ["scope:app"] },
-    "ui": { "tags": ["scope:ui"] },
-    "util": { "tags": ["scope:util"] }
-  },
-  "dependencyConstraints": [
-    {
-      "sourceTag": "scope:util",
-      "onlyDependOnLibsWithTags": ["scope:util"]
-    },
-    {
-      "sourceTag": "scope:ui",
-      "onlyDependOnLibsWithTags": ["scope:util"]
-    },
-    {
-      "sourceTag": "scope:api",
-      "onlyDependOnLibsWithTags": ["scope:util"]
-    },
-    {
-      "sourceTag": "scope:app",
-      "onlyDependOnLibsWithTags": ["scope:ui", "scope:util", "scope:api"]
-    }
-  ],
-  "plugins": [
-    {
-      "plugin": "@nx/js/typescript",
-      "options": {
-        "typecheck": {
-          "targetName": "typecheck"
-        },
-        "build": {
-          "targetName": "build",
-          "configName": "tsconfig.lib.json",
-          "buildDepsName": "build-deps",
-          "watchDepsName": "watch-deps"
-        }
-      }
-    },
-    {
-      "plugin": "@nx/eslint/plugin",
-      "options": {
-        "targetName": "eslint:lint"
-      }
-    },
-    {
-      "plugin": "@nx/vitest",
-      "options": {
-        "testTargetName": "vitest:test",
-        "ciTargetName": "test-ci",
-        "testMode": "watch"
-      }
-    },
-    {
-      "plugin": "@nx/webpack/plugin",
-      "options": {
-        "buildTargetName": "build",
-        "serveTargetName": "serve",
-        "previewTargetName": "preview",
-        "buildDepsTargetName": "build-deps",
-        "watchDepsTargetName": "watch-deps",
-        "serveStaticTargetName": "serve-static"
-      }
-    },
-    {
-      "plugin": "@nx/jest/plugin",
-      "options": {
-        "targetName": "test"
-      }
-    }
-  ],
-  "nxCloudId": "69c5788ef834f0514562b24f",
-  "analytics": true,
-  "targetDefaults": {
-    "@angular/build:application": {
-      "cache": true,
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "production",
-        "^production"
-      ]
-    },
-    "@nx/eslint:lint": {
-      "cache": true,
-      "inputs": [
-        "default",
-        "{workspaceRoot}/.eslintrc.json",
-        "{workspaceRoot}/.eslintignore",
-        "{workspaceRoot}/eslint.config.mjs"
-      ]
-    },
-    "@angular/build:unit-test": {
-      "cache": true,
-      "inputs": [
-        "default",
-        "^production"
-      ]
-    },
-    "@nx/vitest:test": {
-      "cache": true,
-      "inputs": [
-        "default",
-        "^production"
-      ]
-    },
-    "@nx/js:tsc": {
-      "cache": true,
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "production",
-        "^production"
-      ]
-    }
-  },
-  "generators": {
-    "@nx/angular:application": {
-      "e2eTestRunner": "none",
-      "linter": "eslint",
-      "style": "css",
-      "unitTestRunner": "vitest-angular"
-    },
-    "@nx/angular:library": {
-      "linter": "eslint",
-      "unitTestRunner": "vitest-analog"
-    },
-    "@nx/angular:component": {
-      "style": "css",
-      "inlineStyle": false
-    }
-  }
+	"$schema": "./node_modules/nx/schemas/nx-schema.json",
+	"namedInputs": {
+		"default": ["{projectRoot}/**/*", "sharedGlobals"],
+		"production": [
+			"default",
+			"!{projectRoot}/.eslintrc.json",
+			"!{projectRoot}/eslint.config.mjs",
+			"!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+			"!{projectRoot}/tsconfig.spec.json",
+			"!{projectRoot}/jest.config.[jt]s",
+			"!{projectRoot}/src/test-setup.[jt]s",
+			"!{projectRoot}/test-setup.[jt]s"
+		],
+		"sharedGlobals": []
+	},
+	"projects": {
+		"api": {
+			"tags": ["scope:api"]
+		},
+		"frontend": {
+			"tags": ["scope:app"]
+		},
+		"ui": {
+			"tags": ["scope:ui"]
+		},
+		"util": {
+			"tags": ["scope:util"]
+		}
+	},
+	"dependencyConstraints": [
+		{
+			"sourceTag": "scope:util",
+			"onlyDependOnLibsWithTags": ["scope:util"]
+		},
+		{
+			"sourceTag": "scope:ui",
+			"onlyDependOnLibsWithTags": ["scope:util"]
+		},
+		{
+			"sourceTag": "scope:api",
+			"onlyDependOnLibsWithTags": ["scope:util"]
+		},
+		{
+			"sourceTag": "scope:app",
+			"onlyDependOnLibsWithTags": ["scope:ui", "scope:util", "scope:api"]
+		}
+	],
+	"plugins": [
+		{
+			"plugin": "@nx/js/typescript",
+			"options": {
+				"typecheck": {
+					"targetName": "typecheck"
+				},
+				"build": {
+					"targetName": "build",
+					"configName": "tsconfig.lib.json",
+					"buildDepsName": "build-deps",
+					"watchDepsName": "watch-deps"
+				}
+			}
+		},
+		{
+			"plugin": "@nx/eslint/plugin",
+			"options": {
+				"targetName": "eslint:lint"
+			}
+		},
+		{
+			"plugin": "@nx/vitest",
+			"options": {
+				"testTargetName": "vitest:test",
+				"ciTargetName": "test-ci",
+				"testMode": "watch"
+			}
+		},
+		{
+			"plugin": "@nx/webpack/plugin",
+			"options": {
+				"buildTargetName": "build",
+				"serveTargetName": "serve",
+				"previewTargetName": "preview",
+				"buildDepsTargetName": "build-deps",
+				"watchDepsTargetName": "watch-deps",
+				"serveStaticTargetName": "serve-static"
+			}
+		},
+		{
+			"plugin": "@nx/jest/plugin",
+			"options": {
+				"targetName": "test"
+			}
+		}
+	],
+	"nxCloudId": "69c5788ef834f0514562b24f",
+	"analytics": true,
+	"targetDefaults": {
+		"@angular/build:application": {
+			"cache": true,
+			"dependsOn": ["^build"],
+			"inputs": ["production", "^production"]
+		},
+		"@nx/eslint:lint": {
+			"cache": true,
+			"inputs": [
+				"default",
+				"{workspaceRoot}/.eslintrc.json",
+				"{workspaceRoot}/.eslintignore",
+				"{workspaceRoot}/eslint.config.mjs"
+			]
+		},
+		"@angular/build:unit-test": {
+			"cache": true,
+			"inputs": ["default", "^production"]
+		},
+		"@nx/vitest:test": {
+			"cache": true,
+			"inputs": ["default", "^production"]
+		},
+		"@nx/js:tsc": {
+			"cache": true,
+			"dependsOn": ["^build"],
+			"inputs": ["production", "^production"]
+		}
+	},
+	"generators": {
+		"@nx/angular:application": {
+			"e2eTestRunner": "none",
+			"linter": "eslint",
+			"style": "css",
+			"unitTestRunner": "vitest-angular"
+		},
+		"@nx/angular:library": {
+			"linter": "eslint",
+			"unitTestRunner": "vitest-analog"
+		},
+		"@nx/angular:component": {
+			"style": "css",
+			"inlineStyle": false
+		}
+	}
 }
