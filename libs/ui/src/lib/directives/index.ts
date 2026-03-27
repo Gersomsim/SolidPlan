@@ -3,6 +3,7 @@ export * from './card-footer.directive';
 export * from './card-header.directive';
 export * from './card-prefix.directive';
 export * from './cell.directive';
+export * from './dropdown-item.directive';
 export * from './file-preview.directive';
 export * from './option.directive';
 export * from './prefix.directive';
