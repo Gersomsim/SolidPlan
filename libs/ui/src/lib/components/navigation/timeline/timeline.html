@@ -1,0 +1,135 @@
+@if (orientation() === 'vertical') {
+
+  <!-- ── VERTICAL (default) ── -->
+  <div class="flex flex-col">
+    @for (item of items(); track item.id; let last = $last) {
+
+      @if (itemSlotFor(item.id); as slot) {
+        <!-- Full item override: consumer controls dot, line, and content -->
+        <ng-container
+          [ngTemplateOutlet]="slot.template"
+          [ngTemplateOutletContext]="{ $implicit: item }"
+        />
+
+      } @else {
+        <div class="flex gap-4">
+
+          <!-- Left column: dot + vertical connector -->
+          <div class="flex flex-col items-center">
+            <div
+              [class]="dotClass(item)"
+              [style.backgroundColor]="item.color ?? null"
+            >
+              @if (item.icon) {
+                {{ item.icon }}
+              } @else if (item.status === 'completed') {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+              } @else if (item.status === 'error') {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+              }
+            </div>
+            @if (!last) {
+              <div [class]="vConnectorClass(item)"></div>
+            }
+          </div>
+
+          <!-- Right column: content or content slot -->
+          <div [class]="last ? '' : 'pb-6'">
+            @if (contentSlotFor(item.id); as slot) {
+              <ng-container
+                [ngTemplateOutlet]="slot.template"
+                [ngTemplateOutletContext]="{ $implicit: item }"
+              />
+            } @else {
+              <p class="text-small font-medium text-text-primary pt-1">{{ item.label }}</p>
+              @if (item.description) {
+                <p class="text-label text-text-secondary mt-0.5">{{ item.description }}</p>
+              }
+              @if (item.date) {
+                <p class="text-label text-text-secondary mt-0.5">{{ item.date | date:'mediumDate' }}</p>
+              }
+            }
+          </div>
+
+        </div>
+      }
+
+    }
+  </div>
+
+} @else {
+
+  <!-- ── HORIZONTAL ── -->
+  <div class="flex items-start">
+    @for (item of items(); track item.id; let first = $first; let last = $last; let i = $index) {
+
+      @if (itemSlotFor(item.id); as slot) {
+        <div class="flex-1">
+          <ng-container
+            [ngTemplateOutlet]="slot.template"
+            [ngTemplateOutletContext]="{ $implicit: item }"
+          />
+        </div>
+
+      } @else {
+        <div class="flex-1 flex flex-col items-center">
+
+          <!-- Dot row with half-connectors -->
+          <div class="flex items-center w-full">
+            @if (!first) {
+              <div [class]="hLeftConnectorClass(i)"></div>
+            } @else {
+              <div class="flex-1"></div>
+            }
+            <div
+              [class]="dotClass(item)"
+              [style.backgroundColor]="item.color ?? null"
+            >
+              @if (item.icon) {
+                {{ item.icon }}
+              } @else if (item.status === 'completed') {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+              } @else if (item.status === 'error') {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+              }
+            </div>
+            @if (!last) {
+              <div [class]="hRightConnectorClass(item)"></div>
+            } @else {
+              <div class="flex-1"></div>
+            }
+          </div>
+
+          <!-- Content below dot -->
+          <div class="mt-2 text-center px-1">
+            @if (contentSlotFor(item.id); as slot) {
+              <ng-container
+                [ngTemplateOutlet]="slot.template"
+                [ngTemplateOutletContext]="{ $implicit: item }"
+              />
+            } @else {
+              <p class="text-small font-medium text-text-primary">{{ item.label }}</p>
+              @if (item.description) {
+                <p class="text-label text-text-secondary mt-0.5">{{ item.description }}</p>
+              }
+              @if (item.date) {
+                <p class="text-label text-text-secondary mt-0.5">{{ item.date | date:'mediumDate' }}</p>
+              }
+            }
+          </div>
+
+        </div>
+      }
+
+    }
+  </div>
+
+}
