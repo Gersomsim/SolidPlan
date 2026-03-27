@@ -1,0 +1,33 @@
+<div class="flex flex-col gap-1">
+  @if (label()) {
+    <label class="text-sm font-medium text-text-primary dark:text-dark-text">{{ label() }}</label>
+  }
+
+  <select
+    class="rounded-input border px-3 py-2 text-sm bg-surface dark:bg-dark-surface text-text-primary dark:text-dark-text outline-none transition-colors appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+    [class.border-border]="!showErrors && !isFocused()"
+    [class.border-primary]="isFocused() && !showErrors"
+    [class.border-danger]="showErrors"
+    [disabled]="effectiveDisabled()"
+    [multiple]="multiple()"
+    (change)="onSelectChange($event)"
+    (focus)="isFocused.set(true)"
+    (blur)="isFocused.set(false); onTouched()"
+  >
+    @if (!multiple()) {
+      <option value="" disabled [selected]="!value()">{{ placeholder() }}</option>
+    }
+    @for (option of options(); track option.value) {
+      <option [value]="option.value" [disabled]="option.disabled ?? false" [selected]="isSelected(option)">
+        {{ option.label }}
+      </option>
+    }
+  </select>
+
+  @if (hint() && !showErrors) {
+    <p data-hint class="text-xs text-text-secondary dark:text-dark-text/60">{{ hint() }}</p>
+  }
+  @if (showErrors && firstError) {
+    <p data-error class="text-xs text-danger">{{ firstError }}</p>
+  }
+</div>
