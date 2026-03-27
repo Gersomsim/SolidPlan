@@ -80,6 +80,7 @@ class LinearHost {
   imports: [Stepper, LibStepContentDirective],
   template: `
     <lib-stepper [steps]="steps" [(activeStep)]="activeStep" orientation="vertical">
+      <ng-template libStepContent="info">Info panel</ng-template>
       <ng-template libStepContent="details">Details panel</ng-template>
     </lib-stepper>
   `,
@@ -269,6 +270,20 @@ describe('Stepper — vertical orientation', () => {
     const f = TestBed.createComponent(VerticalHost);
     f.detectChanges();
     expect(f.nativeElement.textContent).toContain('Details panel');
+  });
+
+  it('switches inline content when activeStep changes', () => {
+    const f = TestBed.createComponent(VerticalHost);
+    f.detectChanges();
+    // initially showing 'details' content
+    expect(f.nativeElement.textContent).toContain('Details panel');
+    expect(f.nativeElement.textContent).not.toContain('Info panel');
+    // click the 'info' step button to change activeStep
+    const buttons = f.nativeElement.querySelectorAll<HTMLButtonElement>('button');
+    buttons[0].click(); // 'info' step
+    f.detectChanges();
+    expect(f.nativeElement.textContent).toContain('Info panel');
+    expect(f.nativeElement.textContent).not.toContain('Details panel');
   });
 
   it('does not render content for inactive steps', () => {
