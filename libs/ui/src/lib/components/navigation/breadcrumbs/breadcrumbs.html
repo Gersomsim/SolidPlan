@@ -1,0 +1,40 @@
+<nav aria-label="breadcrumb">
+  <ol class="flex items-center flex-wrap text-sm">
+    @for (item of items(); track item.label; let last = $last) {
+      <li class="flex items-center">
+        @if (last) {
+          @if (item.icon) {
+            <span class="mr-1">{{ item.icon }}</span>
+          }
+          <span class="text-text-primary font-medium" aria-current="page">{{ item.label }}</span>
+        } @else {
+          @if (item.routerLink) {
+            <a
+              [routerLink]="item.routerLink"
+              class="text-text-secondary hover:text-primary transition-colors"
+            >
+              @if (item.icon) {
+                <span class="mr-1">{{ item.icon }}</span>
+              }
+              {{ item.label }}
+            </a>
+          } @else {
+            <span class="text-text-secondary">
+              @if (item.icon) {
+                <span class="mr-1">{{ item.icon }}</span>
+              }
+              {{ item.label }}
+            </span>
+          }
+          <span class="mx-2 text-text-muted select-none" aria-hidden="true">
+            @if (customSeparator(); as slot) {
+              <ng-container [ngTemplateOutlet]="slot.template" />
+            } @else {
+              {{ separatorChar() }}
+            }
+          </span>
+        }
+      </li>
+    }
+  </ol>
+</nav>
