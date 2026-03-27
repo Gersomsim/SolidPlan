@@ -1,5 +1,4 @@
 import { Component, input, computed, ChangeDetectionStrategy } from '@angular/core';
-import { NgClass } from '@angular/common';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'action' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -7,7 +6,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
 @Component({
   selector: 'lib-button',
   standalone: true,
-  imports: [NgClass],
+  imports: [],
   templateUrl: './button.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -17,6 +16,7 @@ export class ButtonComponent {
   readonly type     = input<'button' | 'submit' | 'reset'>('button');
   readonly loading  = input(false);
   readonly disabled = input(false);
+  // TODO: render with @lucide/angular once icon components are available
   readonly iconLeft  = input<string>('');
   readonly iconRight = input<string>('');
 
