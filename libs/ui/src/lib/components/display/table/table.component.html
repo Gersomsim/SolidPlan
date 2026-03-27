@@ -38,12 +38,12 @@
         @if (loadingSlot()) {
           <tr>
             <td [attr.colspan]="columns().length + (selectable() ? 1 : 0)">
-              <ng-container *ngTemplateOutlet="loadingSlot()!.template" />
+              <ng-container [ngTemplateOutlet]="loadingSlot()!.template" />
             </td>
           </tr>
         } @else {
           @for (s of [1, 2, 3, 4, 5]; track s) {
-            <tr data-testid="skeleton-row" class="border-b border-border-light animate-pulse">
+            <tr data-testid="skeleton-row" class="border-b border-border-light animate-pulse h-12">
               @if (selectable()) {
                 <td class="px-3 py-4"><div class="h-4 w-4 rounded bg-border-light"></div></td>
               }
@@ -57,7 +57,7 @@
         @if (emptySlot()) {
           <tr>
             <td [attr.colspan]="columns().length + (selectable() ? 1 : 0)">
-              <ng-container *ngTemplateOutlet="emptySlot()!.template" />
+              <ng-container [ngTemplateOutlet]="emptySlot()!.template" />
             </td>
           </tr>
         } @else {
@@ -73,7 +73,7 @@
       } @else {
         @for (row of data(); track $index; let i = $index) {
           <tr
-            [class]="'border-b border-border-light transition-colors hover:bg-secondary-bg cursor-pointer' + (isRowSelected(row) ? ' bg-primary/10' : '') + (isRowStriped(i) ? ' bg-secondary-bg' : '')"
+            [class]="'border-b border-border-light transition-colors hover:bg-secondary-bg cursor-pointer min-h-[48px]' + (isRowSelected(row) ? ' bg-primary/10' : '') + (isRowStriped(i) ? ' bg-secondary-bg' : '')"
             (click)="onRowClick(row)"
           >
             @if (selectable()) {
@@ -89,7 +89,7 @@
             @for (col of columns(); track col.key) {
               <td [class]="'px-4 py-4 text-text-primary ' + getAlignClass(col)">
                 @if (getCellSlot(col.key); as slot) {
-                  <ng-container *ngTemplateOutlet="slot.template; context: { $implicit: row }" />
+                  <ng-container [ngTemplateOutlet]="slot.template" [ngTemplateOutletContext]="{ $implicit: row }" />
                 } @else {
                   {{ row[col.key] }}
                 }
