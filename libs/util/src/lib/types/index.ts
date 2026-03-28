@@ -4,6 +4,7 @@ export * from './activity-status.type';
 export * from './classification.type';
 export * from './file-type.type';
 export * from './project-member-role.type';
+export * from './project-resource-status.type';
 export * from './project-stage-status.type';
 export * from './project-status.type';
 export * from './resource-status.type';

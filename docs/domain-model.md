@@ -60,6 +60,14 @@ Tenant ────────────────────────�
          ├──< ProjectMember (User↔Project + rol)              │
          │      └── role: ADMIN | SUPERVISOR | RESIDENT | VIEWER
          │                                                    │
+         ├──< ProjectResource (asignación de recurso al proyecto)
+         │      ├── resourceId → Resource (catálogo tenant)   │
+         │      ├── allocation: plannedQty / usedQty / reservedQty
+         │      ├── costingOverride? (precio acordado para este proyecto)
+         │      ├── stageId? → ProjectStage                   │
+         │      ├── activityId? → Activity                    │
+         │      └── status: PLANNED|ORDERED|IN_USE|COMPLETED|CANCELLED
+         │                                                    │
          ├──< ProjectStage (etapas, ordenadas)                │
          │      └── templateId? → StageTemplate               │
          │                                                    │

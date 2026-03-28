@@ -5,6 +5,7 @@ export * from './classification-resource.model';
 export * from './daily-log.model';
 export * from './file.model';
 export * from './project-member.model';
+export * from './project-resource.model';
 export * from './project-stage.model';
 export * from './project.model';
 export * from './resource.model';
