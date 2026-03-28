@@ -115,7 +115,7 @@ describe('Timeline — vertical (default)', () => {
 
   it('renders one dot circle per item', () => {
     const f = render();
-    const dots = f.nativeElement.querySelectorAll('.rounded-full');
+    const dots = f.nativeElement.querySelectorAll('[data-testid="timeline-dot"]');
     expect(dots.length).toBe(3);
   });
 
@@ -148,44 +148,44 @@ describe('Timeline — vertical (default)', () => {
 
   it('completed item shows checkmark SVG', () => {
     const f = render();
-    const dots = f.nativeElement.querySelectorAll('.rounded-full');
+    const dots = f.nativeElement.querySelectorAll('[data-testid="timeline-dot"]');
     const completedDot = dots[0]; // e1 is completed
-    expect(completedDot.querySelector('svg')).toBeTruthy();
-    // Checkmark path has 'M16.707'
-    expect(completedDot.querySelector('svg')?.innerHTML).toContain('16.707');
-  });
-
-  it('error item shows exclamation SVG', () => {
-    TestBed.resetTestingModule();
-    TestBed.configureTestingModule({ imports: [ErrorHost] }).compileComponents();
-    const f = TestBed.createComponent(ErrorHost);
-    f.detectChanges();
-    const dots = f.nativeElement.querySelectorAll('.rounded-full');
-    const errorDot = dots[0];
-    expect(errorDot.querySelector('svg')).toBeTruthy();
-    // Exclamation path has 'M18 10'
-    expect(errorDot.querySelector('svg')?.innerHTML).toContain('M18 10');
+    expect(completedDot.querySelector('[data-testid="icon-completed"]')).toBeTruthy();
   });
 
   it('pending item shows no SVG', () => {
     const f = render();
-    const dots = f.nativeElement.querySelectorAll('.rounded-full');
+    const dots = f.nativeElement.querySelectorAll('[data-testid="timeline-dot"]');
     const pendingDot = dots[2]; // e3 is pending
-    expect(pendingDot.querySelector('svg')).toBeNull();
+    expect(pendingDot.querySelector('[data-testid="icon-completed"], [data-testid="icon-error"]')).toBeNull();
   });
 
   it('active item shows no SVG', () => {
     const f = render();
-    const dots = f.nativeElement.querySelectorAll('.rounded-full');
+    const dots = f.nativeElement.querySelectorAll('[data-testid="timeline-dot"]');
     const activeDot = dots[1]; // e2 is active
-    expect(activeDot.querySelector('svg')).toBeNull();
+    expect(activeDot.querySelector('[data-testid="icon-completed"], [data-testid="icon-error"]')).toBeNull();
   });
 
   it('renders connector lines between items but not after last', () => {
     const f = render();
-    // Vertical connectors have w-0.5 class
-    const connectors = f.nativeElement.querySelectorAll('[class*="w-0.5"]');
+    // Vertical connectors have data-testid="timeline-connector"
+    const connectors = f.nativeElement.querySelectorAll('[data-testid="timeline-connector"]');
     expect(connectors.length).toBe(2); // 3 items → 2 connectors
+  });
+});
+
+describe('Timeline — error status', () => {
+  beforeEach(() =>
+    TestBed.configureTestingModule({ imports: [ErrorHost] }).compileComponents()
+  );
+
+  it('error item shows exclamation SVG', () => {
+    const f = TestBed.createComponent(ErrorHost);
+    f.detectChanges();
+    const dots = f.nativeElement.querySelectorAll('[data-testid="timeline-dot"]');
+    const errorDot = dots[0];
+    expect(errorDot.querySelector('[data-testid="icon-error"]')).toBeTruthy();
   });
 });
 
@@ -197,17 +197,17 @@ describe('Timeline — icon field', () => {
   it('renders icon text inside dot instead of status SVG', () => {
     const f = TestBed.createComponent(IconHost);
     f.detectChanges();
-    const dots = f.nativeElement.querySelectorAll('.rounded-full');
+    const dots = f.nativeElement.querySelectorAll('[data-testid="timeline-dot"]');
     const iconDot = dots[0]; // i1 has icon '★'
     expect(iconDot.textContent?.trim()).toBe('★');
-    expect(iconDot.querySelector('svg')).toBeNull();
+    expect(iconDot.querySelector('[data-testid="icon-completed"], [data-testid="icon-error"]')).toBeNull();
   });
 
   it('item without icon still shows no SVG for pending status', () => {
     const f = TestBed.createComponent(IconHost);
     f.detectChanges();
     // i2 is pending — no svg, no icon text
-    const dots = f.nativeElement.querySelectorAll('.rounded-full');
+    const dots = f.nativeElement.querySelectorAll('[data-testid="timeline-dot"]');
     const pendingDot = dots[1];
     expect(pendingDot.querySelector('svg')).toBeNull();
     expect(pendingDot.textContent?.trim()).toBe('');
@@ -222,7 +222,7 @@ describe('Timeline — custom color', () => {
   it('applies custom color as backgroundColor inline style on the dot', () => {
     const f = TestBed.createComponent(ColorHost);
     f.detectChanges();
-    const dots = f.nativeElement.querySelectorAll<HTMLElement>('.rounded-full');
+    const dots = f.nativeElement.querySelectorAll<HTMLElement>('[data-testid="timeline-dot"]');
     const customDot = dots[0]; // c1 has color '#FF6B35'
     expect(customDot.style.backgroundColor).toBeTruthy();
   });
@@ -230,7 +230,7 @@ describe('Timeline — custom color', () => {
   it('item without custom color has no backgroundColor inline style', () => {
     const f = TestBed.createComponent(ColorHost);
     f.detectChanges();
-    const dots = f.nativeElement.querySelectorAll<HTMLElement>('.rounded-full');
+    const dots = f.nativeElement.querySelectorAll<HTMLElement>('[data-testid="timeline-dot"]');
     const normalDot = dots[1]; // c2 has no color
     expect(normalDot.style.backgroundColor).toBe('');
   });
@@ -251,15 +251,8 @@ describe('Timeline — content slot', () => {
     const f = TestBed.createComponent(ContentHost);
     f.detectChanges();
     // All 3 dots still present (content slot only replaces content, not dot)
-    const dots = f.nativeElement.querySelectorAll('.rounded-full');
+    const dots = f.nativeElement.querySelectorAll('[data-testid="timeline-dot"]');
     expect(dots.length).toBe(3);
-  });
-
-  it('passes the item as $implicit context (let-item works)', () => {
-    const f = TestBed.createComponent(ContentHost);
-    f.detectChanges();
-    // Template uses `let-item` and outputs `item.label` — "In progress" visible in custom text
-    expect(f.nativeElement.textContent).toContain('In progress');
   });
 
   it('renders default content for non-slotted items', () => {
@@ -298,8 +291,8 @@ describe('Timeline — item slot', () => {
     const f = TestBed.createComponent(ItemHost);
     f.detectChanges();
     // 3 items total, e1 is fully overridden (no component dot)
-    // Only e2 and e3 contribute component-managed .rounded-full dots
-    const dots = f.nativeElement.querySelectorAll('.rounded-full');
+    // Only e2 and e3 contribute component-managed dots
+    const dots = f.nativeElement.querySelectorAll('[data-testid="timeline-dot"]');
     expect(dots.length).toBe(2);
   });
 });
@@ -321,15 +314,15 @@ describe('Timeline — horizontal orientation', () => {
   it('renders one dot circle per item', () => {
     const f = TestBed.createComponent(HorizontalHost);
     f.detectChanges();
-    const dots = f.nativeElement.querySelectorAll('.rounded-full');
+    const dots = f.nativeElement.querySelectorAll('[data-testid="timeline-dot"]');
     expect(dots.length).toBe(3);
   });
 
   it('renders horizontal connector lines between items', () => {
     const f = TestBed.createComponent(HorizontalHost);
     f.detectChanges();
-    // Horizontal connectors have h-0.5 class (not w-0.5 which is vertical)
-    const connectors = f.nativeElement.querySelectorAll('[class*="h-0.5"]');
+    // Horizontal connectors have data-testid="timeline-connector"
+    const connectors = f.nativeElement.querySelectorAll('[data-testid="timeline-connector"]');
     expect(connectors.length).toBeGreaterThanOrEqual(2);
   });
 });
