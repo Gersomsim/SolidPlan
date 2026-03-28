@@ -1,0 +1,111 @@
+<div class="min-h-screen flex flex-col bg-background">
+
+  <!-- Navbar -->
+  <header class="bg-surface border-b border-border sticky top-0 z-50 shadow-card">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
+
+      <!-- Brand -->
+      <a routerLink="/" class="flex items-center gap-2.5 no-underline shrink-0">
+        <div class="w-8 h-8 bg-primary rounded-input flex items-center justify-center">
+          <svg class="w-4.5 h-4.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
+          </svg>
+        </div>
+        <span class="text-h4 font-semibold text-primary">Solid Plan</span>
+      </a>
+
+      <!-- Nav links — center -->
+      <nav class="hidden md:flex items-center gap-1 flex-1">
+        <a routerLink="/" class="px-4 py-2 text-small font-medium text-text-secondary hover:text-text-primary hover:bg-secondary-bg rounded-default transition-colors duration-150 no-underline">
+          Inicio
+        </a>
+        <a href="#features" class="px-4 py-2 text-small font-medium text-text-secondary hover:text-text-primary hover:bg-secondary-bg rounded-default transition-colors duration-150 no-underline">
+          Características
+        </a>
+        <a href="#pricing" class="px-4 py-2 text-small font-medium text-text-secondary hover:text-text-primary hover:bg-secondary-bg rounded-default transition-colors duration-150 no-underline">
+          Precios
+        </a>
+      </nav>
+
+      <!-- Auth actions -->
+      <div class="flex items-center gap-2 shrink-0">
+        <a routerLink="/auth/login" class="px-4 py-2 text-small font-medium text-text-primary hover:text-primary hover:bg-secondary-bg rounded-default transition-colors duration-150 no-underline hidden sm:block">
+          Iniciar sesión
+        </a>
+        <a routerLink="/auth/register" class="px-5 py-2 text-small font-semibold text-white bg-primary hover:bg-primary-hover rounded-input shadow-card transition-colors duration-200 no-underline">
+          Registrarse
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="flex-1 animate-fade-in">
+    <router-outlet />
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-surface border-t border-border">
+    <div class="max-w-7xl mx-auto px-6 py-12">
+
+      <!-- Top row: brand + link columns -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 mb-10">
+
+        <!-- Brand -->
+        <div class="col-span-1 sm:col-span-2 md:col-span-1 flex flex-col gap-4">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 bg-primary rounded-input flex items-center justify-center shrink-0">
+              <svg class="w-4.5 h-4.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
+              </svg>
+            </div>
+            <span class="text-body font-semibold text-text-primary">Solid Plan</span>
+          </div>
+          <p class="text-small text-text-secondary leading-relaxed">
+            Gestión de proyectos de construcción. Control, trazabilidad y progreso en un solo lugar.
+          </p>
+        </div>
+
+        <!-- Producto -->
+        <div class="flex flex-col gap-3">
+          <h4 class="text-label font-semibold text-text-primary uppercase tracking-wide">Producto</h4>
+          <a href="#features" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Características</a>
+          <a href="#pricing" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Precios</a>
+          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Changelog</a>
+          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Roadmap</a>
+        </div>
+
+        <!-- Recursos -->
+        <div class="flex flex-col gap-3">
+          <h4 class="text-label font-semibold text-text-primary uppercase tracking-wide">Recursos</h4>
+          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Documentación</a>
+          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Guías</a>
+          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Soporte</a>
+          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Estado del sistema</a>
+        </div>
+
+        <!-- Legal -->
+        <div class="flex flex-col gap-3">
+          <h4 class="text-label font-semibold text-text-primary uppercase tracking-wide">Legal</h4>
+          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Privacidad</a>
+          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Términos de uso</a>
+          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Cookies</a>
+        </div>
+
+      </div>
+
+      <!-- Bottom row: copyright -->
+      <div class="border-t border-border pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-label text-text-secondary">
+          &copy; {{ currentYear }} Solid Plan. Todos los derechos reservados.
+        </p>
+        <p class="text-label text-text-secondary">
+          Hecho para la industria de la construcción.
+        </p>
+      </div>
+
+    </div>
+  </footer>
+
+</div>
