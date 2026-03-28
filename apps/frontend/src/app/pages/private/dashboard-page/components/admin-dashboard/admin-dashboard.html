@@ -1,0 +1,177 @@
+<div class="p-6 space-y-6">
+
+  <!-- Page header -->
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h1 class="text-h2 font-semibold text-text-primary dark:text-dark-text capitalize">
+        Buenos días, Usuario
+      </h1>
+      <p class="text-small text-text-secondary dark:text-dark-text/60 mt-0.5 capitalize">
+        {{ formattedDate }}
+      </p>
+    </div>
+    <button class="bg-primary hover:bg-primary-hover text-white text-small font-semibold px-4 py-2.5 rounded-input shadow-card transition-colors duration-200 flex items-center gap-2 shrink-0">
+      <lib-ui-icon icon="building" [size]="16" />
+      Nuevo proyecto
+    </button>
+  </div>
+
+  <!-- KPI cards -->
+  <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+    <lib-stat-card
+      icon="building"
+      label="Proyectos activos"
+      value="4"
+      sublabel="1 retrasado"
+      color="primary" />
+    <lib-stat-card
+      icon="users"
+      label="Miembros"
+      value="30"
+      sublabel="en 4 proyectos"
+      color="primary" />
+    <lib-stat-card
+      icon="triangle-alert"
+      label="Actividades atrasadas"
+      value="3"
+      sublabel="requieren atención"
+      color="danger" />
+    <lib-stat-card
+      icon="calendar-days"
+      label="Bitácoras esta semana"
+      value="12"
+      sublabel="última hace 1 día"
+      color="success" />
+  </div>
+
+  <!-- Mid row: projects table + overdue activities -->
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+    <!-- Projects table -->
+    <div class="xl:col-span-2 bg-surface dark:bg-dark-surface border border-border dark:border-white/10 rounded-card shadow-card overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-border dark:border-white/10">
+        <h3 class="text-h4 font-semibold text-text-primary dark:text-dark-text">Proyectos recientes</h3>
+        <button class="text-small font-medium text-primary dark:text-primary-light hover:text-primary-hover transition-colors duration-150 flex items-center gap-1">
+          Ver todos
+          <lib-ui-icon icon="arrow-right" [size]="14" />
+        </button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="bg-background dark:bg-dark-background border-b border-border dark:border-white/10">
+              <th class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase px-6 py-3 text-left">Proyecto</th>
+              <th class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase px-4 py-3 text-left hidden md:table-cell">Etapa</th>
+              <th class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase px-4 py-3 text-left">Estado</th>
+              <th class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase px-4 py-3 text-left hidden lg:table-cell w-40">Progreso</th>
+              <th class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase px-4 py-3 text-left hidden lg:table-cell">Límite</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (project of projects; track project.id) {
+              <tr class="border-b border-border dark:border-white/10 last:border-0 hover:bg-hover-row dark:hover:bg-white/5 transition-colors duration-150 cursor-pointer">
+                <td class="px-6 py-3.5">
+                  <p class="text-small font-medium text-text-primary dark:text-dark-text">{{ project.name }}</p>
+                  <p class="text-label text-text-secondary dark:text-dark-text/60 flex items-center gap-1 mt-0.5">
+                    <lib-ui-icon icon="map-pin" [size]="11" />
+                    {{ project.location }}
+                  </p>
+                </td>
+                <td class="px-4 py-3.5 hidden md:table-cell">
+                  <span class="text-small text-text-secondary dark:text-dark-text/70">{{ project.stage }}</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <lib-badge
+                    [variant]="statusBadgeVariant(project.status)"
+                    [label]="statusLabel(project.status)"
+                    size="sm" />
+                </td>
+                <td class="px-4 py-3.5 hidden lg:table-cell">
+                  <div class="flex items-center gap-2">
+                    <div class="flex-1 h-1.5 bg-secondary-bg dark:bg-white/10 rounded-badge overflow-hidden">
+                      <div
+                        class="h-full rounded-badge transition-all duration-500"
+                        [class]="progressBarClass(project.progress)"
+                        [style.width.%]="project.progress">
+                      </div>
+                    </div>
+                    <span class="text-label text-text-secondary dark:text-dark-text/60 w-8 text-right shrink-0">{{ project.progress }}%</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 hidden lg:table-cell">
+                  <span class="text-small text-text-secondary dark:text-dark-text/60">{{ formatDate(project.endDate) }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Overdue activities -->
+    <lib-card title="Actividades atrasadas" subtitle="Requieren atención inmediata">
+      <div class="flex flex-col gap-3">
+        @for (activity of overdueActivities; track activity.name) {
+          <div class="flex items-start gap-3 p-3 bg-danger/5 dark:bg-danger/10 border border-danger/20 rounded-default">
+            <div class="w-8 h-8 bg-danger/10 rounded-input flex items-center justify-center shrink-0 mt-0.5">
+              <lib-ui-icon icon="triangle-alert" [size]="16" class="text-danger" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-small font-medium text-text-primary dark:text-dark-text leading-snug">
+                {{ activity.name }}
+              </p>
+              <p class="text-label text-text-secondary dark:text-dark-text/60 mt-0.5 truncate">
+                {{ activity.project }}
+              </p>
+              <div class="flex items-center justify-between mt-1.5">
+                <span class="text-label text-text-secondary dark:text-dark-text/60">
+                  {{ activity.assignedRole }}
+                </span>
+                <span class="text-label font-semibold text-danger">+{{ activity.daysLate }} días</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </lib-card>
+
+  </div>
+
+  <!-- Recent logs -->
+  <div class="bg-surface dark:bg-dark-surface border border-border dark:border-white/10 rounded-card shadow-card overflow-hidden">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-border dark:border-white/10">
+      <h3 class="text-h4 font-semibold text-text-primary dark:text-dark-text">Bitácoras recientes</h3>
+      <button class="text-small font-medium text-primary dark:text-primary-light hover:text-primary-hover transition-colors duration-150 flex items-center gap-1">
+        Ver todas
+        <lib-ui-icon icon="arrow-right" [size]="14" />
+      </button>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-border dark:divide-white/10">
+      @for (log of recentLogs; track log.project) {
+        <div class="p-5 hover:bg-hover-row dark:hover:bg-white/5 transition-colors duration-150 cursor-pointer">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-label font-medium text-text-secondary dark:text-dark-text/60 uppercase tracking-wide">
+              {{ formatShortDate(log.date) }}
+            </span>
+            <lib-badge variant="in-progress" label="Bitácora" size="sm" />
+          </div>
+          <p class="text-small font-medium text-text-primary dark:text-dark-text leading-snug">
+            {{ log.project }}
+          </p>
+          <p class="text-small text-text-secondary dark:text-dark-text/60 mt-1.5 leading-relaxed line-clamp-2">
+            {{ log.summary }}
+          </p>
+          <div class="flex items-center gap-2 mt-3 pt-3 border-t border-border dark:border-white/10">
+            <div class="w-6 h-6 bg-primary/15 dark:bg-primary-light/15 rounded-full flex items-center justify-center shrink-0">
+              <span class="text-primary dark:text-primary-light font-semibold" style="font-size: 9px">
+                {{ log.author[0] }}
+              </span>
+            </div>
+            <span class="text-label text-text-secondary dark:text-dark-text/60">{{ log.author }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+</div>

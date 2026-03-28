@@ -51,3 +51,4 @@ export type IconType =
 	| 'send'
 	| 'mail'
 	| 'link'
+	| 'calendar'

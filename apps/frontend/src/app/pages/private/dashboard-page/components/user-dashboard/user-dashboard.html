@@ -1,0 +1,174 @@
+<div class="p-6 space-y-6">
+
+  <!-- Page header -->
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h1 class="text-h2 font-semibold text-text-primary dark:text-dark-text">
+        Buenos días, Usuario
+      </h1>
+      <p class="text-small text-text-secondary dark:text-dark-text/60 mt-0.5 capitalize">
+        {{ formattedDate }}
+      </p>
+    </div>
+    @if (overdueCount > 0) {
+      <div class="flex items-center gap-2 bg-danger/10 border border-danger/25 rounded-input px-3 py-2 shrink-0">
+        <lib-ui-icon icon="triangle-alert" [size]="16" class="text-danger" />
+        <span class="text-small font-medium text-danger">{{ overdueCount }} actividad{{ overdueCount > 1 ? 'es' : '' }} atrasada{{ overdueCount > 1 ? 's' : '' }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- KPI cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+    <lib-stat-card
+      icon="building"
+      label="Mis proyectos"
+      [value]="myProjects.length"
+      sublabel="con rol asignado"
+      color="primary" />
+    <lib-stat-card
+      icon="chart-area"
+      label="Actividades pendientes"
+      [value]="myActivities.length"
+      sublabel="asignadas a mi rol"
+      color="accent" />
+    <lib-stat-card
+      icon="triangle-alert"
+      label="Atrasadas"
+      [value]="overdueCount"
+      sublabel="requieren atención"
+      [color]="overdueCount > 0 ? 'danger' : 'success'" />
+  </div>
+
+  <!-- Quick actions -->
+  <div class="bg-surface dark:bg-dark-surface border border-border dark:border-white/10 rounded-card p-5 shadow-card">
+    <p class="text-label font-medium text-text-secondary dark:text-dark-text/60 uppercase tracking-wide mb-3">Acciones rápidas</p>
+    <div class="flex flex-wrap gap-3">
+      <button class="bg-accent hover:bg-accent-hover text-white text-small font-semibold px-4 py-2.5 rounded-input shadow-card transition-colors duration-200 flex items-center gap-2">
+        <lib-ui-icon icon="file" [size]="16" />
+        Registrar bitácora
+      </button>
+      <button class="bg-primary hover:bg-primary-hover text-white text-small font-semibold px-4 py-2.5 rounded-input shadow-card transition-colors duration-200 flex items-center gap-2">
+        <lib-ui-icon icon="calendar-days" [size]="16" />
+        Ver cronograma
+      </button>
+      <button class="bg-secondary-bg hover:bg-border dark:bg-white/10 dark:hover:bg-white/15 text-text-primary dark:text-dark-text text-small font-medium px-4 py-2.5 rounded-input transition-colors duration-200 flex items-center gap-2">
+        <lib-ui-icon icon="chart-area" [size]="16" />
+        Mis actividades
+      </button>
+    </div>
+  </div>
+
+  <!-- Main content grid -->
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+    <!-- My projects -->
+    <lib-card title="Mis proyectos" subtitle="Proyectos donde tengo un rol asignado">
+      <div class="flex flex-col gap-4">
+        @for (project of myProjects; track project.id) {
+          <div class="border border-border dark:border-white/10 rounded-default p-4 hover:shadow-hover transition-shadow duration-200 cursor-pointer">
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <div class="flex-1 min-w-0">
+                <p class="text-small font-medium text-text-primary dark:text-dark-text leading-snug">{{ project.name }}</p>
+                <p class="text-label text-text-secondary dark:text-dark-text/60 flex items-center gap-1 mt-0.5">
+                  <lib-ui-icon icon="map-pin" [size]="11" />
+                  {{ project.location }}
+                </p>
+              </div>
+              <lib-badge [variant]="statusBadgeVariant(project.status)" [label]="statusLabel(project.status)" size="sm" />
+            </div>
+            <div class="flex items-center justify-between text-label mb-2">
+              <div class="flex items-center gap-1.5">
+                <span class="bg-primary/10 dark:bg-primary-light/10 text-primary dark:text-primary-light font-medium px-2 py-0.5 rounded-badge uppercase text-xs">
+                  {{ roleLabel(project.role) }}
+                </span>
+                <span class="text-text-secondary dark:text-dark-text/60">· Etapa: {{ project.stage }}</span>
+              </div>
+              <span class="text-text-secondary dark:text-dark-text/60">{{ project.progress }}%</span>
+            </div>
+            <div class="h-1.5 bg-secondary-bg dark:bg-white/10 rounded-badge overflow-hidden">
+              <div
+                class="h-full rounded-badge transition-all duration-500"
+                [class]="progressBarClass(project.progress)"
+                [style.width.%]="project.progress">
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </lib-card>
+
+    <!-- My activities -->
+    <lib-card title="Mis actividades" subtitle="Asignadas a mi rol en los proyectos">
+      <div class="flex flex-col gap-3">
+        @for (activity of myActivities; track activity.id) {
+          <div
+            class="border rounded-default p-4 transition-colors duration-150 cursor-pointer"
+            [class.border-danger/30]="activity.status === 'delayed'"
+            [class.bg-danger/5]="activity.status === 'delayed'"
+            [class.dark:bg-danger/10]="activity.status === 'delayed'"
+            [class.border-border]="activity.status !== 'delayed'"
+            [class.dark:border-white/10]="activity.status !== 'delayed'"
+            [class.hover:bg-hover-row]="activity.status !== 'delayed'"
+            [class.dark:hover:bg-white/5]="activity.status !== 'delayed'">
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <p class="text-small font-medium text-text-primary dark:text-dark-text leading-snug flex-1">
+                {{ activity.name }}
+              </p>
+              <lib-badge [variant]="statusBadgeVariant(activity.status)" [label]="statusLabel(activity.status)" size="sm" />
+            </div>
+            <p class="text-label text-text-secondary dark:text-dark-text/60 truncate mb-2">
+              {{ activity.project }}
+            </p>
+            <div class="flex items-center justify-between text-label">
+              <div class="flex items-center gap-1 text-text-secondary dark:text-dark-text/60">
+                <lib-ui-icon icon="calendar-days" [size]="11" />
+                {{ formatDate(activity.dueDate) }}
+              </div>
+              <span class="text-text-secondary dark:text-dark-text/60">{{ activity.progress }}%</span>
+            </div>
+            <div class="h-1 bg-secondary-bg dark:bg-white/10 rounded-badge overflow-hidden mt-2">
+              <div
+                class="h-full rounded-badge transition-all duration-500"
+                [class]="progressBarClass(activity.progress)"
+                [style.width.%]="activity.progress">
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </lib-card>
+
+  </div>
+
+  <!-- My recent logs -->
+  <div class="bg-surface dark:bg-dark-surface border border-border dark:border-white/10 rounded-card shadow-card overflow-hidden">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-border dark:border-white/10">
+      <h3 class="text-h4 font-semibold text-text-primary dark:text-dark-text">Mis bitácoras recientes</h3>
+      <button class="text-small font-medium text-primary dark:text-primary-light hover:text-primary-hover transition-colors duration-150 flex items-center gap-1">
+        Ver todas
+        <lib-ui-icon icon="arrow-right" [size]="14" />
+      </button>
+    </div>
+    <div class="divide-y divide-border dark:divide-white/10">
+      @for (log of myLogs; track log.project) {
+        <div class="flex items-start gap-4 px-6 py-4 hover:bg-hover-row dark:hover:bg-white/5 transition-colors duration-150 cursor-pointer">
+          <div class="w-10 h-10 bg-primary/10 dark:bg-primary-light/10 rounded-default flex flex-col items-center justify-center shrink-0">
+            <span class="text-label font-bold text-primary dark:text-primary-light leading-none">
+              {{ formatShortDate(log.date).split(' ')[0] }}
+            </span>
+            <span class="text-primary dark:text-primary-light uppercase leading-none" style="font-size: 9px; font-weight: 600">
+              {{ formatShortDate(log.date).split(' ')[1] }}
+            </span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-small font-medium text-text-primary dark:text-dark-text">{{ log.project }}</p>
+            <p class="text-small text-text-secondary dark:text-dark-text/60 mt-0.5 leading-relaxed">{{ log.summary }}</p>
+          </div>
+          <lib-badge variant="in-progress" label="Bitácora" size="sm" />
+        </div>
+      }
+    </div>
+  </div>
+
+</div>

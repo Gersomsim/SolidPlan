@@ -1,1 +1,27 @@
-<p>dashboard-page works!</p>
+<!-- Dev toggle — visible solo en desarrollo para preview de ambas vistas -->
+<div class="flex items-center gap-1 absolute top-3 right-4 z-10 bg-surface dark:bg-dark-surface border border-border dark:border-white/10 rounded-input p-1 shadow-card">
+  <button
+    (click)="setView('admin')"
+    class="text-label font-medium px-3 py-1 rounded-input transition-colors duration-150"
+    [class.bg-primary]="view() === 'admin'"
+    [class.text-white]="view() === 'admin'"
+    [class.text-text-secondary]="view() !== 'admin'"
+    [class.dark:text-dark-text/60]="view() !== 'admin'">
+    Admin
+  </button>
+  <button
+    (click)="setView('user')"
+    class="text-label font-medium px-3 py-1 rounded-input transition-colors duration-150"
+    [class.bg-primary]="view() === 'user'"
+    [class.text-white]="view() === 'user'"
+    [class.text-text-secondary]="view() !== 'user'"
+    [class.dark:text-dark-text/60]="view() !== 'user'">
+    Usuario
+  </button>
+</div>
+
+@if (view() === 'admin') {
+  <app-admin-dashboard />
+} @else {
+  <app-user-dashboard />
+}

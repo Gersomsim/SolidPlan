@@ -7,6 +7,7 @@ import {
 	LucideArrowUp,
 	LucideBan,
 	LucideBuilding,
+	LucideCalendar,
 	LucideCalendarDays,
 	LucideChartArea,
 	LucideChartCandlestick,
@@ -121,6 +122,7 @@ export class Icon {
 			send: LucideSend,
 			mail: LucideMail,
 			link: LucideLink,
+			calendar: LucideCalendar,
 		}
 
 		return dic[this.icon()]
