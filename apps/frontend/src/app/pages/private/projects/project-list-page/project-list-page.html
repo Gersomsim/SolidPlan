@@ -1,1 +1,201 @@
-<p>project-list-page works!</p>
+<div class="p-6 space-y-6">
+
+  <!-- Page header -->
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h1 class="text-h2 font-semibold text-text-primary dark:text-dark-text">Proyectos</h1>
+      <p class="text-small text-text-secondary dark:text-dark-text/60 mt-0.5">
+        {{ stats().total }} proyectos en total · {{ stats().active }} activos
+      </p>
+    </div>
+    <button class="bg-primary hover:bg-primary-hover text-white text-small font-semibold px-4 py-2.5 rounded-input shadow-card transition-colors duration-200 flex items-center gap-2 shrink-0">
+      <lib-ui-icon icon="building" [size]="16" />
+      Nuevo proyecto
+    </button>
+  </div>
+
+  <!-- KPI strip -->
+  <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+    <lib-stat-card icon="building" label="Total proyectos" [value]="stats().total" sublabel="en el tenant" color="primary" />
+    <lib-stat-card icon="chart-area" label="En progreso" [value]="stats().active" sublabel="obras activas" color="primary" />
+    <lib-stat-card
+      icon="triangle-alert"
+      label="Retrasados"
+      [value]="stats().delayed"
+      [sublabel]="stats().delayed > 0 ? 'requieren atención' : 'todo en orden'"
+      [color]="stats().delayed > 0 ? 'danger' : 'success'" />
+    <lib-stat-card icon="check" label="Completados" [value]="stats().completed" sublabel="entregados" color="success" />
+  </div>
+
+  <!-- Filter bar -->
+  <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+
+    <!-- Search -->
+    <div class="relative flex-1 min-w-0 max-w-xs">
+      <div class="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary dark:text-dark-text/50 pointer-events-none">
+        <lib-ui-icon icon="search" [size]="15" />
+      </div>
+      <input
+        type="text"
+        placeholder="Buscar proyecto, código, ciudad..."
+        [value]="searchQuery()"
+        (input)="onSearch($event)"
+        class="w-full h-9 pl-9 pr-4 text-small bg-surface dark:bg-dark-surface border border-border dark:border-white/15 rounded-input text-text-primary dark:text-dark-text placeholder:text-text-secondary dark:placeholder:text-dark-text/40 focus:outline-none focus:border-primary dark:focus:border-primary-light transition-colors duration-150" />
+    </div>
+
+    <!-- Status pills -->
+    <div class="flex items-center gap-1.5 overflow-x-auto shrink-0">
+      @for (f of statusFilters; track f.value) {
+        <button [class]="filterPillClass(f.value)" (click)="setFilter(f.value)">
+          {{ f.label }}
+        </button>
+      }
+    </div>
+
+    <!-- View toggle -->
+    <div class="flex items-center gap-0.5 bg-secondary-bg dark:bg-white/10 rounded-input p-1 shrink-0 ml-auto sm:ml-0">
+      <button [class]="viewToggleClass('grid')" (click)="setViewMode('grid')" title="Cuadrícula">
+        <svg class="w-4 h-4" viewBox="0 0 16 16" fill="currentColor">
+          <rect x="1" y="1" width="6" height="6" rx="1"/>
+          <rect x="9" y="1" width="6" height="6" rx="1"/>
+          <rect x="1" y="9" width="6" height="6" rx="1"/>
+          <rect x="9" y="9" width="6" height="6" rx="1"/>
+        </svg>
+      </button>
+      <button [class]="viewToggleClass('list')" (click)="setViewMode('list')" title="Lista">
+        <lib-ui-icon icon="menu" [size]="16" />
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Empty state -->
+  @if (filteredProjects().length === 0) {
+    <lib-empty-state
+      icon="search"
+      title="Sin resultados"
+      description="No hay proyectos que coincidan con tu búsqueda. Prueba con otro término o limpia los filtros.">
+      <button
+        (click)="setFilter('ALL')"
+        class="bg-secondary-bg hover:bg-border dark:bg-white/10 dark:hover:bg-white/15 text-text-primary dark:text-dark-text text-small font-medium px-4 py-2 rounded-input transition-colors duration-150">
+        Limpiar filtros
+      </button>
+    </lib-empty-state>
+  }
+
+  <!-- Grid view -->
+  @if (filteredProjects().length > 0 && viewMode() === 'grid') {
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+      @for (project of filteredProjects(); track project.id) {
+        <app-project-card [project]="project" />
+      }
+    </div>
+  }
+
+  <!-- List view -->
+  @if (filteredProjects().length > 0 && viewMode() === 'list') {
+    <div class="bg-surface dark:bg-dark-surface border border-border dark:border-white/10 rounded-card shadow-card overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="bg-background dark:bg-dark-background border-b border-border dark:border-white/10">
+              <th class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase px-5 py-3 text-left">Proyecto</th>
+              <th class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase px-4 py-3 text-left hidden md:table-cell">Estado</th>
+              <th class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase px-4 py-3 text-left hidden lg:table-cell">Etapa actual</th>
+              <th class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase px-4 py-3 text-left hidden lg:table-cell w-36">Avance</th>
+              <th class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase px-4 py-3 text-left hidden xl:table-cell">Presupuesto</th>
+              <th class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase px-4 py-3 text-left hidden xl:table-cell">Fin est.</th>
+              <th class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase px-4 py-3 text-center hidden md:table-cell">Equipo</th>
+              <th class="w-12 px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (project of filteredProjects(); track project.id) {
+              <tr class="border-b border-border dark:border-white/10 last:border-0 hover:bg-hover-row dark:hover:bg-white/5 transition-colors duration-150 cursor-pointer">
+
+                <!-- Project name + code -->
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-3">
+                    <div class="w-1 h-8 rounded-full shrink-0"
+                      [style.background-color]="project.status === 'IN_PROGRESS' ? '#1E3A5F' : project.status === 'DELAYED' ? '#C53030' : project.status === 'COMPLETED' ? '#2F855A' : project.status === 'HALTED' ? '#F59E0B' : '#718096'">
+                    </div>
+                    <div>
+                      <p class="text-small font-medium text-text-primary dark:text-dark-text">{{ project.name }}</p>
+                      <p class="text-label text-text-secondary dark:text-dark-text/60 flex items-center gap-1 mt-0.5">
+                        <lib-ui-icon icon="map-pin" [size]="11" />
+                        {{ project.city }}
+                        <span class="text-border dark:text-white/20 mx-0.5">·</span>
+                        <code class="font-mono">{{ project.code }}</code>
+                      </p>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Status -->
+                <td class="px-4 py-3.5 hidden md:table-cell">
+                  <lib-badge
+                    [variant]="statusBadgeVariant(project.status)"
+                    [label]="statusLabel(project.status)"
+                    [color]="statusBadgeColor(project.status)"
+                    size="sm" />
+                </td>
+
+                <!-- Stage -->
+                <td class="px-4 py-3.5 hidden lg:table-cell">
+                  <p class="text-small text-text-secondary dark:text-dark-text/70">{{ project.currentStageName }}</p>
+                  <p class="text-label text-text-secondary dark:text-dark-text/50 mt-0.5">{{ project.completedStages }}/{{ project.totalStages }} etapas</p>
+                </td>
+
+                <!-- Progress -->
+                <td class="px-4 py-3.5 hidden lg:table-cell">
+                  <div class="flex items-center gap-2">
+                    <div class="flex-1 h-1.5 bg-secondary-bg dark:bg-white/10 rounded-badge overflow-hidden">
+                      <div
+                        class="h-full rounded-badge"
+                        [style.width.%]="project.overallProgress"
+                        [class]="project.overallProgress <= 30 ? 'bg-danger' : project.overallProgress <= 65 ? 'bg-accent' : 'bg-success'"
+                        style="transition: width 0.5s ease">
+                      </div>
+                    </div>
+                    <span class="text-label text-text-secondary dark:text-dark-text/60 w-8 text-right shrink-0">{{ project.overallProgress }}%</span>
+                  </div>
+                </td>
+
+                <!-- Budget -->
+                <td class="px-4 py-3.5 hidden xl:table-cell">
+                  <span class="text-small text-text-secondary dark:text-dark-text/70 font-medium">
+                    {{ formatBudget(project.budget.amount, project.budget.currency) }}
+                  </span>
+                </td>
+
+                <!-- End date -->
+                <td class="px-4 py-3.5 hidden xl:table-cell">
+                  <span class="text-small text-text-secondary dark:text-dark-text/60">
+                    {{ formatDate(project.estimatedEndDate) }}
+                  </span>
+                </td>
+
+                <!-- Team -->
+                <td class="px-4 py-3.5 hidden md:table-cell text-center">
+                  <span class="text-small text-text-secondary dark:text-dark-text/60 flex items-center justify-center gap-1">
+                    <lib-ui-icon icon="users" [size]="12" />
+                    {{ project.memberCount }}
+                  </span>
+                </td>
+
+                <!-- Action -->
+                <td class="px-4 py-3.5 text-right">
+                  <button class="p-1.5 rounded-input text-text-secondary dark:text-dark-text/60 hover:text-primary dark:hover:text-primary-light hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors duration-150">
+                    <lib-ui-icon icon="arrow-right" [size]="16" />
+                  </button>
+                </td>
+
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+</div>

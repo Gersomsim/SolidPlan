@@ -1,4 +1,4 @@
-import { RoleScope } from '../types';
+import { RoleScope } from '../types/role-scope.type';
 
 /**
  * Rol del sistema (para control de permisos granular).

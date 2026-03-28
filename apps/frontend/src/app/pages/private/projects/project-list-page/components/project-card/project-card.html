@@ -1,0 +1,71 @@
+<article
+  [routerLink]="['/system/projects', project().id]"
+  [style.border-top]="'3px solid ' + statusTopColor()"
+  class="bg-surface dark:bg-dark-surface border border-border dark:border-white/10 rounded-card shadow-card hover:shadow-hover transition-shadow duration-200 flex flex-col overflow-hidden cursor-pointer group h-full">
+
+  <!-- Main content -->
+  <div class="p-5 flex-1 flex flex-col gap-4">
+
+    <!-- Code + status badge -->
+    <div class="flex items-start justify-between gap-3">
+      <code class="text-label font-mono text-text-secondary dark:text-dark-text/60 bg-secondary-bg dark:bg-white/10 px-2 py-0.5 rounded-input leading-5">
+        {{ project().code }}
+      </code>
+      <lib-badge
+        [variant]="statusBadgeVariant()"
+        [label]="statusLabel()"
+        [color]="statusBadgeColor()"
+        size="sm" />
+    </div>
+
+    <!-- Name + location -->
+    <div>
+      <h3 class="text-h4 font-semibold text-text-primary dark:text-dark-text leading-snug group-hover:text-primary dark:group-hover:text-primary-light transition-colors duration-150 mb-1">
+        {{ project().name }}
+      </h3>
+      <p class="text-small text-text-secondary dark:text-dark-text/60 flex items-center gap-1">
+        <lib-ui-icon icon="map-pin" [size]="12" />
+        {{ project().city }}
+      </p>
+    </div>
+
+    <!-- Stage + progress -->
+    <div class="flex flex-col gap-2 mt-auto">
+      <div class="flex items-center justify-between text-label">
+        <span class="text-text-secondary dark:text-dark-text/60">
+          Etapa {{ stageDisplay() }} · {{ project().currentStageName }}
+        </span>
+        <span class="font-semibold text-text-primary dark:text-dark-text">
+          {{ project().overallProgress }}%
+        </span>
+      </div>
+      <lib-progress-bar [value]="project().overallProgress" />
+    </div>
+
+  </div>
+
+  <!-- Card footer -->
+  <div class="px-5 py-3.5 border-t border-border dark:border-white/10 bg-background dark:bg-dark-background">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3 text-label text-text-secondary dark:text-dark-text/60">
+        <span class="flex items-center gap-1.5">
+          <lib-ui-icon icon="building" [size]="12" />
+          {{ formattedBudget() }}
+        </span>
+        <span class="hidden sm:flex items-center gap-1.5">
+          <lib-ui-icon icon="calendar-days" [size]="12" />
+          {{ formattedEndDate() }}
+        </span>
+        <span class="flex items-center gap-1.5">
+          <lib-ui-icon icon="users" [size]="12" />
+          {{ project().memberCount }}
+        </span>
+      </div>
+      <span class="text-label font-medium text-primary dark:text-primary-light flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        Ver
+        <lib-ui-icon icon="arrow-right" [size]="14" />
+      </span>
+    </div>
+  </div>
+
+</article>

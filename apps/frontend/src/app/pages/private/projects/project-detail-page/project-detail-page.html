@@ -1,1 +1,113 @@
-<p>project-detail-page works!</p>
+<div class="flex flex-col min-h-full">
+
+  <!-- Sticky header section -->
+  <div class="bg-surface dark:bg-dark-surface border-b border-border dark:border-white/10 sticky top-0 z-20 transition-colors duration-200">
+
+    <!-- Breadcrumbs + actions -->
+    <div class="px-6 pt-4 flex items-start justify-between gap-4">
+      <nav class="flex items-center gap-1.5 text-label text-text-secondary dark:text-dark-text/60">
+        <a routerLink="/system/projects" class="hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">
+          Proyectos
+        </a>
+        <lib-ui-icon icon="chevron-right" [size]="14" />
+        <span class="text-text-primary dark:text-dark-text font-medium">{{ project.code }}</span>
+      </nav>
+      <div class="flex items-center gap-2 shrink-0">
+        <button class="bg-secondary-bg hover:bg-border dark:bg-white/10 dark:hover:bg-white/15 text-text-primary dark:text-dark-text text-small font-medium px-3.5 py-2 rounded-input transition-colors duration-150">
+          Editar
+        </button>
+        <button class="bg-primary hover:bg-primary-hover text-white text-small font-semibold px-3.5 py-2 rounded-input shadow-card transition-colors duration-200 flex items-center gap-1.5">
+          <lib-ui-icon icon="calendar-days" [size]="15" />
+          Ver cronograma
+        </button>
+      </div>
+    </div>
+
+    <!-- Project header -->
+    <div class="px-6 pt-3 pb-4">
+      <div class="flex items-start gap-4">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-3 mb-1.5 flex-wrap">
+            <code class="text-label font-mono text-text-secondary dark:text-dark-text/60 bg-secondary-bg dark:bg-white/10 px-2 py-0.5 rounded-input leading-5">
+              {{ project.code }}
+            </code>
+            <lib-badge
+              [variant]="statusBadgeVariant"
+              [label]="statusLabel"
+              [color]="statusBadgeColor" />
+          </div>
+          <h1 class="text-h2 font-semibold text-text-primary dark:text-dark-text leading-tight mb-1">
+            {{ project.name }}
+          </h1>
+          <p class="text-small text-text-secondary dark:text-dark-text/60 flex items-center gap-1">
+            <lib-ui-icon icon="map-pin" [size]="13" />
+            {{ project.city }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Project info strip -->
+      <div class="flex items-center flex-wrap gap-x-6 gap-y-2 mt-4 pt-4 border-t border-border dark:border-white/10">
+        <div class="flex items-center gap-1.5 text-label text-text-secondary dark:text-dark-text/60">
+          <lib-ui-icon icon="building" [size]="13" />
+          <span>Presupuesto:</span>
+          <span class="text-text-primary dark:text-dark-text font-medium">{{ formatBudget() }}</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-label text-text-secondary dark:text-dark-text/60">
+          <lib-ui-icon icon="calendar-days" [size]="13" />
+          <span>Inicio:</span>
+          <span class="text-text-primary dark:text-dark-text font-medium">{{ formatDate(project.estimatedStartDate) }}</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-label text-text-secondary dark:text-dark-text/60">
+          <lib-ui-icon icon="calendar-days" [size]="13" />
+          <span>Fin est.:</span>
+          <span class="text-text-primary dark:text-dark-text font-medium">{{ formatDate(project.estimatedEndDate) }}</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-label text-text-secondary dark:text-dark-text/60">
+          <lib-ui-icon icon="map-pin" [size]="13" />
+          <span>Área:</span>
+          <span class="text-text-primary dark:text-dark-text font-medium">{{ project.totalAreaM2 | number }} m²</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-label text-text-secondary dark:text-dark-text/60">
+          <lib-ui-icon icon="users" [size]="13" />
+          <span class="text-text-primary dark:text-dark-text font-medium">{{ project.memberCount }} miembros</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-label text-text-secondary dark:text-dark-text/60">
+          <lib-ui-icon icon="chart-area" [size]="13" />
+          <span class="text-text-primary dark:text-dark-text font-medium">{{ project.activityCount }} actividades</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage pipeline -->
+    <div class="px-6 pb-4 overflow-x-auto">
+      <div class="min-w-max">
+        <lib-stepper
+          [steps]="stageSteps()"
+          orientation="horizontal"
+          [linear]="false" />
+      </div>
+    </div>
+
+    <!-- Tab navigation -->
+    <nav class="flex items-center px-6 overflow-x-auto border-t border-border dark:border-white/10">
+      @for (tab of tabs; track tab.route) {
+        <a
+          [routerLink]="tab.route"
+          routerLinkActive
+          #rl="routerLinkActive"
+          [class]="tabClass(rl.isActive)">
+          <lib-ui-icon [icon]="$any(tab.icon)" [size]="15" />
+          {{ tab.label }}
+        </a>
+      }
+    </nav>
+
+  </div>
+
+  <!-- Tab content -->
+  <div class="flex-1 bg-background dark:bg-dark-background">
+    <router-outlet />
+  </div>
+
+</div>
