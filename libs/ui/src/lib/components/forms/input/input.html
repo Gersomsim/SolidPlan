@@ -3,12 +3,7 @@
     <label class="text-sm font-medium text-text-primary dark:text-dark-text">{{ label() }}</label>
   }
 
-  <div
-    class="flex items-center gap-2 rounded-input border px-3 py-2 transition-colors bg-surface dark:bg-dark-surface"
-    [class.border-border]="!showErrors && !isFocused()"
-    [class.border-primary]="isFocused() && !showErrors"
-    [class.border-danger]="showErrors"
-  >
+  <div [class]="'flex items-center gap-2 rounded-input border px-3 py-2 transition-colors bg-surface dark:bg-dark-surface ' + wrapperBorderClass">
     @if (prefixTpl()) {
       <ng-template [ngTemplateOutlet]="prefixTpl()!" />
     }

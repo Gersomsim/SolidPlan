@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 /* ============================================================
    SOLID PLAN — Design System (Tailwind v4)
    Construction Project Manager
@@ -40,9 +42,22 @@
      COLORES — Dark mode
      ---------------------------------------------------------- */
 
-  --color-dark-background:  #1A202C;
-  --color-dark-surface:     #2D3748;
-  --color-dark-text:        #E2E8F0;
+  --color-dark-background:        #0F172A;  /* Fondo app dark */
+  --color-dark-surface:           #1E293B;  /* Cards, modals dark */
+  --color-dark-surface-elevated:  #293548;  /* Dropdowns, popovers dark */
+  --color-dark-border:            #334155;  /* Bordes dark */
+  --color-dark-text:              #F1F5F9;  /* Texto principal dark */
+  --color-dark-secondary-bg:      rgba(255,255,255,0.08); /* Fondo secondary button dark */
+  --color-dark-hover-row:         rgba(255,255,255,0.04); /* Hover filas tabla dark */
+  --color-dark-primary:           #3B82F6;  /* Botón primary dark */
+  --color-dark-primary-hover:     #2563EB;  /* Hover botón primary dark */
+
+  /* ----------------------------------------------------------
+     COLORES — Links
+     ---------------------------------------------------------- */
+
+  --color-link:       #3B82F6;  /* Color único de enlaces — funciona en light y dark */
+  --color-link-hover: #2563EB;  /* Hover de enlaces */
 
   /* ----------------------------------------------------------
      COLORES — Badges de estado

@@ -31,8 +31,8 @@ export class Tabs {
 
   readonly tabBarClass = computed(() =>
     this.orientation() === 'vertical'
-      ? 'flex flex-col border-r border-border min-w-[160px] shrink-0'
-      : 'flex flex-row border-b border-border'
+      ? 'flex flex-col border-r border-border dark:border-dark-border min-w-[160px] shrink-0'
+      : 'flex flex-row border-b border-border dark:border-dark-border'
   );
 
   readonly panelClass = computed(() =>
@@ -44,18 +44,18 @@ export class Tabs {
     const base = 'flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors focus:outline-none whitespace-nowrap';
 
     if (tab.disabled()) {
-      return `${base} text-text-muted cursor-not-allowed opacity-50`;
+      return `${base} text-text-muted dark:text-dark-text/30 cursor-not-allowed opacity-50`;
     }
 
     if (this.orientation() === 'vertical') {
       return isActive
-        ? `${base} border-l-2 border-primary text-primary bg-primary/5 cursor-pointer`
-        : `${base} border-l-2 border-transparent text-text-secondary hover:text-text-primary hover:bg-hover-row cursor-pointer`;
+        ? `${base} border-l-2 border-primary dark:border-dark-primary text-primary dark:text-dark-primary bg-primary/5 dark:bg-dark-primary/10 cursor-pointer`
+        : `${base} border-l-2 border-transparent text-text-secondary dark:text-dark-text/60 hover:text-text-primary dark:hover:text-dark-text hover:bg-hover-row dark:hover:bg-dark-hover-row cursor-pointer`;
     }
 
     return isActive
-      ? `${base} border-b-2 border-primary text-primary cursor-pointer`
-      : `${base} border-b-2 border-transparent text-text-secondary hover:text-text-primary cursor-pointer`;
+      ? `${base} border-b-2 border-primary dark:border-dark-primary text-primary dark:text-dark-primary cursor-pointer`
+      : `${base} border-b-2 border-transparent text-text-secondary dark:text-dark-text/60 hover:text-text-primary dark:hover:text-dark-text cursor-pointer`;
   }
 
   onTabClick(tab: Tab): void {

@@ -6,12 +6,12 @@
           @if (item.icon) {
             <span class="mr-1">{{ item.icon }}</span>
           }
-          <span class="text-text-primary font-medium" aria-current="page">{{ item.label }}</span>
+          <span class="text-text-primary dark:text-dark-text font-medium" aria-current="page">{{ item.label }}</span>
         } @else {
           @if (item.routerLink) {
             <a
               [routerLink]="item.routerLink"
-              class="text-text-secondary hover:text-primary transition-colors"
+              class="text-text-secondary dark:text-dark-text/60 hover:text-primary dark:hover:text-primary-light transition-colors"
             >
               @if (item.icon) {
                 <span class="mr-1">{{ item.icon }}</span>
@@ -19,14 +19,14 @@
               {{ item.label }}
             </a>
           } @else {
-            <span class="text-text-secondary">
+            <span class="text-text-secondary dark:text-dark-text/60">
               @if (item.icon) {
                 <span class="mr-1">{{ item.icon }}</span>
               }
               {{ item.label }}
             </span>
           }
-          <span class="mx-2 text-text-muted select-none" aria-hidden="true">
+          <span class="mx-2 text-text-muted dark:text-dark-text/30 select-none" aria-hidden="true">
             @if (customSeparator(); as slot) {
               <ng-container [ngTemplateOutlet]="slot.template" />
             } @else {

@@ -24,10 +24,10 @@ export class Button {
 
   readonly variantClasses = computed(() => {
     const map: Record<ButtonVariant, string> = {
-      primary:   'bg-primary hover:bg-primary-hover text-white',
-      secondary: 'bg-secondary-bg text-text-primary hover:bg-border',
+      primary:   'bg-primary hover:bg-primary-hover text-white dark:bg-dark-primary dark:hover:bg-dark-primary-hover',
+      secondary: 'bg-secondary-bg text-text-primary hover:bg-border dark:bg-dark-secondary-bg dark:text-dark-text dark:hover:bg-white/10',
       action:    'bg-accent hover:bg-accent-hover text-white',
-      ghost:     'bg-transparent text-text-primary border border-transparent hover:border-border',
+      ghost:     'bg-transparent text-text-primary border border-transparent hover:border-border dark:text-dark-text dark:hover:border-dark-border',
       danger:    'bg-danger hover:opacity-90 text-white',
     };
     return map[this.variant()];

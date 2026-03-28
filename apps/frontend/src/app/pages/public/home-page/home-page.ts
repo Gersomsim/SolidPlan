@@ -1,12 +1,12 @@
 import { Component } from '@angular/core'
 import { RouterLink } from '@angular/router'
 
-import { Badge, Card, Icon } from '@org/ui'
+import { Badge, Card, Icon, Link } from '@org/ui'
 import { LibCardPrefixDirective } from '@org/ui'
 
 @Component({
 	selector: 'app-home-page',
-	imports: [RouterLink, Icon, Card, Badge, LibCardPrefixDirective],
+	imports: [RouterLink, Icon, Card, Badge, Link, LibCardPrefixDirective],
 	templateUrl: './home-page.html',
 	styleUrl: './home-page.css',
 })

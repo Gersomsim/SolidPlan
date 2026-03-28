@@ -43,7 +43,7 @@ export class Card {
   readonly containerClasses = computed(() => {
     const classes = [
       'relative overflow-hidden rounded-card bg-surface text-text-primary dark:bg-dark-surface dark:text-dark-text',
-      this.bordered() ? 'border border-border' : '',
+      this.bordered() ? 'border border-border dark:border-dark-border' : '',
       this.elevated() ? 'shadow-card' : '',
     ];
     return classes.filter(Boolean).join(' ');

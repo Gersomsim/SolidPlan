@@ -10,13 +10,13 @@
 
 <ng-template #panel>
   <div
-    class="min-w-[160px] rounded-card border border-border bg-surface shadow-hover py-1 z-50"
+    class="min-w-[160px] rounded-card border border-border dark:border-dark-border bg-surface dark:bg-dark-surface-elevated shadow-hover py-1 z-50"
     (mouseenter)="onPanelMouseEnter()"
     (mouseleave)="onPanelMouseLeave()"
   >
     @for (item of items(); track item.label) {
       @if (item.divider) {
-        <hr class="my-1 border-border" />
+        <hr class="my-1 border-border dark:border-dark-border" />
       } @else if (customItemSlot(); as slot) {
         <div
           role="menuitem"

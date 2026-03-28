@@ -56,6 +56,12 @@ export class Stepper {
     return targetIdx <= activeIdx;
   }
 
+  stepLabelClass(step: StepItem): string {
+    return step.status === 'active'
+      ? 'text-small font-medium transition-colors text-primary dark:text-dark-primary'
+      : 'text-small font-medium transition-colors text-text-primary dark:text-dark-text';
+  }
+
   onStepClick(step: StepItem): void {
     if (!this.canClick(step)) return;
     if (step.key === this.activeStep()) return;
@@ -70,7 +76,7 @@ export class Stepper {
       case 'completed': return `${base} ${clickable} bg-success text-white`;
       case 'active':    return `${base} cursor-default bg-primary text-white`;
       case 'error':     return `${base} ${clickable} bg-danger text-white`;
-      default:          return `${base} ${clickable} bg-secondary-bg text-text-secondary border border-border`;
+      default:          return `${base} ${clickable} bg-secondary-bg dark:bg-dark-secondary-bg text-text-secondary dark:text-dark-text/60 border border-border dark:border-dark-border`;
     }
   }
 
@@ -79,19 +85,19 @@ export class Stepper {
     const colored = prev?.status === 'completed';
     return colored
       ? 'flex-1 h-0.5 bg-success self-center transition-colors'
-      : 'flex-1 h-0.5 bg-border self-center transition-colors';
+      : 'flex-1 h-0.5 bg-border dark:bg-dark-border self-center transition-colors';
   }
 
   rightConnectorClass(step: StepItem): string {
     return step.status === 'completed'
       ? 'flex-1 h-0.5 bg-success self-center transition-colors'
-      : 'flex-1 h-0.5 bg-border self-center transition-colors';
+      : 'flex-1 h-0.5 bg-border dark:bg-dark-border self-center transition-colors';
   }
 
   verticalConnectorClass(step: StepItem): string {
     const base = 'w-0.5 flex-1 min-h-6 my-1 transition-colors';
     return step.status === 'completed'
       ? `${base} bg-success`
-      : `${base} bg-border`;
+      : `${base} bg-border dark:bg-dark-border`;
   }
 }

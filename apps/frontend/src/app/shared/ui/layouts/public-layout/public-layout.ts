@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core'
 import { RouterLink, RouterOutlet } from '@angular/router'
 
-import { Icon, ThemeService } from '@org/ui'
+import { Icon, Link, ThemeService } from '@org/ui'
 
 @Component({
   selector: 'app-public-layout',
-  imports: [RouterOutlet, RouterLink, Icon],
+  imports: [RouterOutlet, RouterLink, Icon, Link],
   templateUrl: './public-layout.html',
 })
 export class PublicLayout {

@@ -42,6 +42,12 @@ export class Select implements ControlValueAccessor, OnInit {
 
   get control(): AbstractControl | null { return this.ngControl?.control ?? null; }
 
+  get wrapperBorderClass(): string {
+    if (this.showErrors) return 'border-danger';
+    if (this.isFocused()) return 'border-primary dark:border-dark-primary';
+    return 'border-border dark:border-dark-border';
+  }
+
   get showErrors(): boolean {
     const ctrl = this.control;
     return !!(ctrl?.invalid && ctrl?.touched);

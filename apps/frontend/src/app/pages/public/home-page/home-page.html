@@ -15,15 +15,11 @@
     </p>
 
     <div class="flex flex-col sm:flex-row items-center gap-3 animate-slide-in-up delay-150">
-      <a routerLink="/auth/register"
-         class="px-6 py-3 text-small font-semibold text-white bg-primary hover:bg-primary-hover rounded-input shadow-card transition-colors duration-200 no-underline flex items-center gap-2">
+      <lib-link variant="primary" size="lg" routerLink="/auth/register">
         Empezar gratis
         <lib-ui-icon icon="arrow-right" [size]="16" />
-      </a>
-      <a href="#features"
-         class="px-6 py-3 text-small font-medium text-text-primary dark:text-dark-text bg-secondary-bg dark:bg-white/10 hover:bg-border dark:hover:bg-white/15 rounded-input transition-colors duration-200 no-underline">
-        Ver características
-      </a>
+      </lib-link>
+      <lib-link variant="secondary" size="lg" href="#features">Ver características</lib-link>
     </div>
 
     <p class="text-label text-text-secondary dark:text-dark-text/60 animate-fade-in delay-300">
@@ -146,10 +142,9 @@
                   </li>
                 }
               </ul>
-              <a [routerLink]="plan.ctaLink"
-                 class="w-full text-center px-5 py-2.5 rounded-input text-small font-semibold bg-primary text-white hover:bg-primary-hover shadow-card transition-colors duration-200 no-underline">
+              <lib-link variant="primary" [fullWidth]="true" [routerLink]="plan.ctaLink">
                 {{ plan.cta }}
-              </a>
+              </lib-link>
             </div>
           </lib-card>
         }
@@ -175,10 +170,9 @@
                 </li>
               }
             </ul>
-            <a [routerLink]="plan.ctaLink"
-               class="w-full text-center px-5 py-2.5 rounded-input text-small font-semibold bg-white text-primary hover:bg-secondary-bg transition-colors duration-200 no-underline">
+            <lib-link variant="white" [fullWidth]="true" [routerLink]="plan.ctaLink">
               {{ plan.cta }}
-            </a>
+            </lib-link>
           </div>
         }
 
@@ -198,11 +192,10 @@
       Únete a las constructoras que ya gestionan sus obras con Solid Plan. Empieza hoy, sin compromiso.
     </p>
     <div class="flex flex-col sm:flex-row items-center gap-3">
-      <a routerLink="/auth/register"
-         class="px-6 py-3 text-small font-semibold text-primary bg-white hover:bg-secondary-bg rounded-input shadow-card transition-colors duration-200 no-underline flex items-center gap-2">
+      <lib-link variant="white" size="lg" routerLink="/auth/register">
         Crear cuenta gratis
         <lib-ui-icon icon="arrow-right" [size]="16" />
-      </a>
+      </lib-link>
       <a routerLink="/auth/login"
          class="px-6 py-3 text-small font-medium text-white/80 hover:text-white border border-white/30 hover:border-white/60 rounded-input transition-colors duration-200 no-underline">
         Ya tengo cuenta

@@ -1,1 +1,59 @@
-<p>login-page works!</p>
+<div class="min-h-[calc(100vh-4rem)] bg-background dark:bg-dark-background flex items-center justify-center px-4 py-12 transition-colors duration-200">
+  <div class="w-full max-w-md flex flex-col gap-6 animate-slide-in-up">
+
+    <!-- Brand header -->
+    <div class="flex flex-col items-center gap-3 text-center">
+      <div class="w-12 h-12 bg-primary rounded-card flex items-center justify-center shadow-card">
+        <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
+        </svg>
+      </div>
+      <div class="flex flex-col gap-1">
+        <h1 class="text-h3 font-semibold text-text-primary dark:text-dark-text">Bienvenido de vuelta</h1>
+        <p class="text-small text-text-secondary dark:text-dark-text/70">Ingresa tus credenciales para continuar</p>
+      </div>
+    </div>
+
+    <!-- Form card -->
+    <lib-card [bordered]="true" [elevated]="true" padding="lg">
+      <form class="flex flex-col gap-5">
+
+        <!-- Email -->
+        <lib-input
+          label="Correo electrónico"
+          type="email"
+          placeholder="juan@constructora.com"
+        />
+
+        <!-- Password -->
+        <div class="flex flex-col gap-1.5">
+          <lib-input
+            label="Contraseña"
+            type="password"
+            placeholder="••••••••"
+          />
+          <div class="flex justify-end">
+            <lib-link routerLink="/auth/forgot-password" variant="link" underline="hover">
+              <span class="text-label">¿Olvidaste tu contraseña?</span>
+            </lib-link>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <lib-button variant="primary" size="lg" type="submit" class="w-full mt-1">
+          Iniciar sesión
+        </lib-button>
+
+      </form>
+    </lib-card>
+
+    <!-- Register link -->
+    <p class="text-center text-small text-text-secondary dark:text-dark-text/70">
+      ¿No tienes cuenta?
+      <lib-link routerLink="/auth/register" variant="link" underline="hover">
+        Regístrate gratis
+      </lib-link>
+    </p>
+
+  </div>
+</div>

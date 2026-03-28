@@ -46,12 +46,12 @@
                 [ngTemplateOutletContext]="{ $implicit: item }"
               />
             } @else {
-              <p class="text-small font-medium text-text-primary pt-1">{{ item.label }}</p>
+              <p class="text-small font-medium text-text-primary dark:text-dark-text pt-1">{{ item.label }}</p>
               @if (item.description) {
-                <p class="text-label text-text-secondary mt-0.5">{{ item.description }}</p>
+                <p class="text-label text-text-secondary dark:text-dark-text/60 mt-0.5">{{ item.description }}</p>
               }
               @if (item.date) {
-                <p class="text-label text-text-secondary mt-0.5">{{ item.date | date:'mediumDate' }}</p>
+                <p class="text-label text-text-secondary dark:text-dark-text/60 mt-0.5">{{ item.date | date:'mediumDate' }}</p>
               }
             }
           </div>

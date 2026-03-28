@@ -4,10 +4,7 @@
   }
 
   <textarea
-    class="rounded-input border px-3 py-2 text-sm bg-surface dark:bg-dark-surface text-text-primary dark:text-dark-text placeholder:text-text-secondary outline-none transition-colors resize-y disabled:cursor-not-allowed disabled:opacity-50"
-    [class.border-border]="!showErrors && !isFocused()"
-    [class.border-primary]="isFocused() && !showErrors"
-    [class.border-danger]="showErrors"
+    [class]="'rounded-input border px-3 py-2 text-sm bg-surface dark:bg-dark-surface text-text-primary dark:text-dark-text placeholder:text-text-secondary outline-none transition-colors resize-y disabled:cursor-not-allowed disabled:opacity-50 ' + wrapperBorderClass"
     [rows]="rows()"
     [placeholder]="placeholder()"
     [disabled]="effectiveDisabled()"

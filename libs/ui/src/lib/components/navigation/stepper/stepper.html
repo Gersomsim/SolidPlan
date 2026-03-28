@@ -51,13 +51,9 @@
 
           <!-- Label + description below circle -->
           <div class="mt-2 text-center px-1">
-            <p
-              class="text-small font-medium transition-colors"
-              [class.text-primary]="step.status === 'active'"
-              [class.text-text-primary]="step.status !== 'active'"
-            >{{ step.label }}</p>
+            <p [class]="stepLabelClass(step)">{{ step.label }}</p>
             @if (step.description) {
-              <p class="text-label text-text-secondary mt-0.5">{{ step.description }}</p>
+              <p class="text-label text-text-secondary dark:text-dark-text/60 mt-0.5">{{ step.description }}</p>
             }
           </div>
 
@@ -112,13 +108,9 @@
 
         <!-- Right column: label + optional content -->
         <div [class]="last ? '' : 'pb-6'">
-          <p
-            class="text-small font-medium pt-1 transition-colors"
-            [class.text-primary]="step.status === 'active'"
-            [class.text-text-primary]="step.status !== 'active'"
-          >{{ step.label }}</p>
+          <p [class]="stepLabelClass(step) + ' pt-1'">{{ step.label }}</p>
           @if (step.description) {
-            <p class="text-label text-text-secondary mt-0.5">{{ step.description }}</p>
+            <p class="text-label text-text-secondary dark:text-dark-text/60 mt-0.5">{{ step.description }}</p>
           }
 
           <!-- Content rendered inline when this step is active -->

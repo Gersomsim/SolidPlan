@@ -5,10 +5,7 @@
 
   <div
     data-dropzone
-    class="rounded-card border-2 border-dashed p-6 text-center transition-colors cursor-pointer"
-    [class.border-primary]="isDragging()"
-    [class.border-border]="!isDragging()"
-    [class.bg-primary\/5]="isDragging()"
+    [class]="dropzoneClass"
     (click)="fileInput.click()"
     (drop)="onDrop($event)"
     (dragover)="onDragOver($event)"

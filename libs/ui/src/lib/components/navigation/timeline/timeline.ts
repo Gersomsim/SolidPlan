@@ -40,25 +40,25 @@ export class Timeline {
       case 'completed': return `${base} bg-success text-white`;
       case 'active':    return `${base} bg-primary text-white`;
       case 'error':     return `${base} bg-danger text-white`;
-      default:          return `${base} bg-secondary-bg text-text-secondary border border-border`;
+      default:          return `${base} bg-secondary-bg dark:bg-dark-secondary-bg text-text-secondary dark:text-dark-text/60 border border-border dark:border-dark-border`;
     }
   }
 
   vConnectorClass(item: TimelineItem): string {
     const base = 'w-0.5 flex-1 min-h-6 my-1 transition-colors';
-    return item.status === 'completed' ? `${base} bg-success` : `${base} bg-border`;
+    return item.status === 'completed' ? `${base} bg-success` : `${base} bg-border dark:bg-dark-border`;
   }
 
   hLeftConnectorClass(index: number): string {
     const prev = this.items()[index - 1];
     return prev?.status === 'completed'
       ? 'flex-1 h-0.5 bg-success self-center transition-colors'
-      : 'flex-1 h-0.5 bg-border self-center transition-colors';
+      : 'flex-1 h-0.5 bg-border dark:bg-dark-border self-center transition-colors';
   }
 
   hRightConnectorClass(item: TimelineItem): string {
     return item.status === 'completed'
       ? 'flex-1 h-0.5 bg-success self-center transition-colors'
-      : 'flex-1 h-0.5 bg-border self-center transition-colors';
+      : 'flex-1 h-0.5 bg-border dark:bg-dark-border self-center transition-colors';
   }
 }

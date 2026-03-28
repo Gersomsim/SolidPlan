@@ -126,7 +126,7 @@ export class Dropdown {
 
   itemClasses(item: DropdownItem): string {
     const base = 'flex w-full items-center px-4 py-2 text-sm text-left transition-colors';
-    if (item.disabled) return `${base} text-text-muted cursor-not-allowed opacity-50`;
-    return `${base} text-text-primary hover:bg-hover-row cursor-pointer`;
+    if (item.disabled) return `${base} text-text-muted dark:text-dark-text/40 cursor-not-allowed opacity-50`;
+    return `${base} text-text-primary dark:text-dark-text hover:bg-hover-row dark:hover:bg-dark-hover-row cursor-pointer`;
   }
 }

@@ -65,6 +65,12 @@ export class FileUpload implements ControlValueAccessor, OnInit {
 
   get control(): AbstractControl | null { return this.ngControl?.control ?? null; }
 
+  get dropzoneClass(): string {
+    const base = 'rounded-card border-2 border-dashed p-6 text-center transition-colors cursor-pointer dark:bg-dark-surface';
+    if (this.isDragging()) return `${base} border-primary dark:border-dark-primary bg-primary/5`;
+    return `${base} border-border dark:border-dark-border`;
+  }
+
   get showErrors(): boolean {
     const ctrl = this.control;
     return !!(ctrl?.invalid && ctrl?.touched) || this.uploadError() !== null;

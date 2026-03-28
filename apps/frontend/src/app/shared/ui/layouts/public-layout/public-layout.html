@@ -16,15 +16,9 @@
 
       <!-- Nav links — center -->
       <nav class="hidden md:flex items-center gap-1 flex-1">
-        <a routerLink="/" class="px-4 py-2 text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text hover:bg-secondary-bg dark:hover:bg-white/10 rounded-default transition-colors duration-150 no-underline">
-          Inicio
-        </a>
-        <a href="#features" class="px-4 py-2 text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text hover:bg-secondary-bg dark:hover:bg-white/10 rounded-default transition-colors duration-150 no-underline">
-          Características
-        </a>
-        <a href="#pricing" class="px-4 py-2 text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text hover:bg-secondary-bg dark:hover:bg-white/10 rounded-default transition-colors duration-150 no-underline">
-          Precios
-        </a>
+        <lib-link variant="nav" routerLink="/">Inicio</lib-link>
+        <lib-link variant="nav" href="#features">Características</lib-link>
+        <lib-link variant="nav" href="#pricing">Precios</lib-link>
       </nav>
 
       <!-- Right side: theme toggle + auth actions -->
@@ -45,12 +39,8 @@
         <div class="w-px h-4 bg-border dark:bg-white/10 mx-1"></div>
 
         <!-- Auth actions -->
-        <a routerLink="/auth/login" class="px-4 py-2 text-small font-medium text-text-primary dark:text-dark-text hover:text-primary dark:hover:text-primary-light hover:bg-secondary-bg dark:hover:bg-white/10 rounded-default transition-colors duration-150 no-underline hidden sm:block">
-          Iniciar sesión
-        </a>
-        <a routerLink="/auth/register" class="px-5 py-2 text-small font-semibold text-white bg-primary hover:bg-primary-hover rounded-input shadow-card transition-colors duration-200 no-underline">
-          Registrarse
-        </a>
+        <lib-link variant="nav" routerLink="/auth/login" class="hidden sm:block">Iniciar sesión</lib-link>
+        <lib-link variant="primary" size="sm" routerLink="/auth/register">Registrarse</lib-link>
       </div>
 
     </div>
@@ -86,27 +76,27 @@
         <!-- Producto -->
         <div class="flex flex-col gap-3">
           <h4 class="text-label font-semibold text-text-primary dark:text-dark-text uppercase tracking-wide">Producto</h4>
-          <a href="#features" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Características</a>
-          <a href="#pricing" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Precios</a>
-          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Changelog</a>
-          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Roadmap</a>
+          <lib-link variant="muted" underline="never" href="#features">Características</lib-link>
+          <lib-link variant="muted" underline="never" href="#pricing">Precios</lib-link>
+          <lib-link variant="muted" underline="never" href="#">Changelog</lib-link>
+          <lib-link variant="muted" underline="never" href="#">Roadmap</lib-link>
         </div>
 
         <!-- Recursos -->
         <div class="flex flex-col gap-3">
           <h4 class="text-label font-semibold text-text-primary dark:text-dark-text uppercase tracking-wide">Recursos</h4>
-          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Documentación</a>
-          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Guías</a>
-          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Soporte</a>
-          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Estado del sistema</a>
+          <lib-link variant="muted" underline="never" href="#">Documentación</lib-link>
+          <lib-link variant="muted" underline="never" href="#">Guías</lib-link>
+          <lib-link variant="muted" underline="never" href="#">Soporte</lib-link>
+          <lib-link variant="muted" underline="never" href="#">Estado del sistema</lib-link>
         </div>
 
         <!-- Legal -->
         <div class="flex flex-col gap-3">
           <h4 class="text-label font-semibold text-text-primary dark:text-dark-text uppercase tracking-wide">Legal</h4>
-          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Privacidad</a>
-          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Términos de uso</a>
-          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Cookies</a>
+          <lib-link variant="muted" underline="never" href="#">Privacidad</lib-link>
+          <lib-link variant="muted" underline="never" href="#">Términos de uso</lib-link>
+          <lib-link variant="muted" underline="never" href="#">Cookies</lib-link>
         </div>
 
       </div>

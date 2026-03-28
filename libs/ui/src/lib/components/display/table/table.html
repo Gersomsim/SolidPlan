@@ -1,4 +1,4 @@
-<div class="w-full overflow-x-auto rounded-card border border-border">
+<div class="w-full overflow-x-auto rounded-card border border-border dark:border-dark-border">
   <table class="w-full border-collapse text-sm">
 
     <thead
@@ -6,7 +6,7 @@
       [class.top-0]="stickyHeader()"
       [class.z-10]="stickyHeader()"
     >
-      <tr class="bg-background text-text-secondary border-b border-border">
+      <tr class="bg-background dark:bg-dark-background text-text-secondary dark:text-dark-text/60 border-b border-border dark:border-dark-border">
         @if (selectable()) {
           <th class="w-9 px-3 py-3 text-left">
             <input
@@ -44,12 +44,12 @@
           </tr>
         } @else {
           @for (s of [1, 2, 3, 4, 5]; track s) {
-            <tr data-testid="skeleton-row" class="border-b border-border animate-pulse h-12">
+            <tr data-testid="skeleton-row" class="border-b border-border dark:border-dark-border animate-pulse h-12">
               @if (selectable()) {
-                <td class="px-3 py-4"><div class="h-4 w-4 rounded bg-border"></div></td>
+                <td class="px-3 py-4"><div class="h-4 w-4 rounded bg-border dark:bg-dark-border"></div></td>
               }
               @for (col of columns(); track col.key) {
-                <td class="px-4 py-4"><div class="h-4 rounded bg-border w-3/4"></div></td>
+                <td class="px-4 py-4"><div class="h-4 rounded bg-border dark:bg-dark-border w-3/4"></div></td>
               }
             </tr>
           }
@@ -65,7 +65,7 @@
           <tr>
             <td
               [attr.colspan]="columns().length + (selectable() ? 1 : 0)"
-              class="px-4 py-8 text-center text-text-muted"
+              class="px-4 py-8 text-center text-text-muted dark:text-dark-text/50"
             >
               {{ emptyMessage() }}
             </td>
@@ -74,7 +74,7 @@
       } @else {
         @for (row of data(); track $index; let i = $index) {
           <tr
-            [class]="'border-b border-border transition-colors hover:bg-hover-row cursor-pointer min-h-[48px]' + (isRowSelected(row) ? ' bg-primary/10' : '') + (isRowStriped(i) ? ' bg-hover-row' : '')"
+            [class]="'border-b border-border dark:border-dark-border transition-colors hover:bg-hover-row dark:hover:bg-dark-hover-row cursor-pointer min-h-[48px]' + (isRowSelected(row) ? ' bg-primary/10 dark:bg-dark-primary/10' : '') + (isRowStriped(i) ? ' bg-hover-row dark:bg-dark-hover-row' : '')"
             (click)="onRowClick(row)"
           >
             @if (selectable()) {
@@ -88,7 +88,7 @@
               </td>
             }
             @for (col of columns(); track col.key) {
-              <td [class]="'px-4 py-4 text-text-primary ' + getAlignClass(col)">
+              <td [class]="'px-4 py-4 text-text-primary dark:text-dark-text ' + getAlignClass(col)">
                 @if (getCellSlot(col.key); as slot) {
                   <ng-container [ngTemplateOutlet]="slot.template" [ngTemplateOutletContext]="{ $implicit: row }" />
                 } @else {

@@ -4,10 +4,7 @@
   }
 
   <select
-    class="rounded-input border px-3 py-2 text-sm bg-surface dark:bg-dark-surface text-text-primary dark:text-dark-text outline-none transition-colors appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-    [class.border-border]="!showErrors && !isFocused()"
-    [class.border-primary]="isFocused() && !showErrors"
-    [class.border-danger]="showErrors"
+    [class]="'rounded-input border px-3 py-2 text-sm bg-surface dark:bg-dark-surface text-text-primary dark:text-dark-text outline-none transition-colors appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ' + wrapperBorderClass"
     [disabled]="effectiveDisabled()"
     [multiple]="multiple()"
     (change)="onSelectChange($event)"

@@ -43,7 +43,7 @@
 
   @if (footerSlot()) {
     <footer
-      [class]="'border-t border-border bg-background dark:bg-dark-background ' + footerPaddingClass()"
+      [class]="'border-t border-border dark:border-dark-border bg-background dark:bg-dark-background ' + footerPaddingClass()"
     >
       <ng-container [ngTemplateOutlet]="footerSlot()!.template" />
     </footer>
