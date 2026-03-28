@@ -1,1 +1,396 @@
-<p>project-members works!</p>
+<!-- ── Stats ─────────────────────────────────────────────────── -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+  <lib-stat-card
+    icon="users"
+    label="Total miembros"
+    [value]="stats().total"
+    color="primary"
+  />
+  <lib-stat-card
+    icon="shield-check"
+    label="Administradores"
+    [value]="stats().adminCount"
+    color="primary"
+  />
+  <lib-stat-card
+    icon="user"
+    label="En obra"
+    [value]="stats().fieldCount"
+    color="primary"
+  />
+  <lib-stat-card
+    icon="eye-closed"
+    label="Espectadores"
+    [value]="stats().viewerCount"
+    color="primary"
+  />
+</div>
+
+<!-- ── Toolbar ────────────────────────────────────────────────── -->
+<div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between mb-4">
+  <!-- Search -->
+  <div class="relative flex-1 max-w-sm">
+    <lib-ui-icon icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" [size]="16" />
+    <input
+      type="text"
+      placeholder="Buscar por nombre o correo..."
+      (input)="onSearch($event)"
+      class="w-full pl-9 pr-4 py-2 rounded-input border border-border bg-surface text-small text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:bg-dark-surface dark:border-dark-border dark:text-dark-text dark:placeholder:text-dark-text/40"
+    />
+  </div>
+
+  <div class="flex items-center gap-3 flex-wrap">
+    <!-- Role filter pills -->
+    <div class="flex flex-wrap gap-2">
+      <button [class]="rolePillClass('ALL')"        (click)="roleFilter.set('ALL')">Todos</button>
+      <button [class]="rolePillClass('ADMIN')"      (click)="roleFilter.set('ADMIN')">Admin</button>
+      <button [class]="rolePillClass('SUPERVISOR')" (click)="roleFilter.set('SUPERVISOR')">Supervisor</button>
+      <button [class]="rolePillClass('RESIDENT')"   (click)="roleFilter.set('RESIDENT')">Residente</button>
+      <button [class]="rolePillClass('VIEWER')"     (click)="roleFilter.set('VIEWER')">Espectador</button>
+    </div>
+
+    <!-- Add button -->
+    <button
+      (click)="openAdd()"
+      [disabled]="stats().availableCount === 0"
+      class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed text-white text-small font-medium rounded-input transition-colors whitespace-nowrap shrink-0"
+    >
+      <lib-ui-icon icon="user-plus" [size]="16" />
+      Agregar miembro
+    </button>
+  </div>
+</div>
+
+<!-- ── Members table ──────────────────────────────────────────── -->
+@if (filteredMembers().length === 0) {
+  <lib-card [elevated]="true" [bordered]="true" padding="none">
+    <div class="py-16">
+      <lib-empty-state
+        icon="users"
+        title="Sin miembros"
+        description="No se encontraron miembros con los filtros aplicados."
+      />
+    </div>
+  </lib-card>
+} @else {
+  <lib-card [elevated]="true" [bordered]="true" padding="none">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[680px]">
+        <thead>
+          <tr class="border-b border-border/60 dark:border-dark-border/60">
+            <th class="px-5 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">Miembro</th>
+            <th class="px-5 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">Rol</th>
+            <th class="px-5 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">Asignado el</th>
+            <th class="px-5 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">Asignado por</th>
+            <th class="px-5 py-3 w-24"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (member of filteredMembers(); track member.id) {
+            <tr class="border-b border-border/40 dark:border-dark-border/40 hover:bg-hover-row dark:hover:bg-dark-hover-row transition-colors group">
+
+              <!-- Avatar + name + email -->
+              <td class="px-5 py-3.5">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-9 h-9 rounded-full flex items-center justify-center text-white text-small font-bold shrink-0"
+                    [style.background-color]="member.user.avatarBg"
+                  >
+                    {{ member.user.initials }}
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-small font-medium text-text-primary dark:text-dark-text truncate">{{ member.user.name }}</p>
+                    <p class="text-label text-text-secondary dark:text-dark-text/50 truncate">{{ member.user.email }}</p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Role -->
+              <td class="px-5 py-3.5">
+                <div class="flex items-center gap-2">
+                  <lib-badge
+                    [variant]="roleBadgeVariant(member.role)"
+                    [label]="roleLabel(member.role)"
+                    size="sm"
+                  />
+                </div>
+                <p class="text-label text-text-secondary/60 dark:text-dark-text/40 mt-0.5">{{ roleDescription(member.role) }}</p>
+              </td>
+
+              <!-- Assigned at -->
+              <td class="px-5 py-3.5">
+                <span class="text-small text-text-secondary dark:text-dark-text/60">
+                  {{ member.assignedAt | date:'dd MMM yyyy' }}
+                </span>
+              </td>
+
+              <!-- Assigned by -->
+              <td class="px-5 py-3.5">
+                <span class="text-small text-text-secondary dark:text-dark-text/60">
+                  {{ member.assignedByName }}
+                </span>
+              </td>
+
+              <!-- Actions -->
+              <td class="px-4 py-3.5">
+                <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    (click)="openEditRole(member, $event)"
+                    class="flex items-center justify-center w-7 h-7 rounded-default text-text-secondary hover:text-primary hover:bg-primary/10 dark:text-dark-text/50 dark:hover:text-primary-light transition-colors"
+                    title="Cambiar rol"
+                  >
+                    <lib-ui-icon icon="user-pen" [size]="14" />
+                  </button>
+                  <button
+                    (click)="openConfirmRemove(member, $event)"
+                    class="flex items-center justify-center w-7 h-7 rounded-default text-text-secondary hover:text-danger hover:bg-danger/10 dark:text-dark-text/50 transition-colors"
+                    title="Eliminar del proyecto"
+                  >
+                    <lib-ui-icon icon="user-minus" [size]="14" />
+                  </button>
+                </div>
+              </td>
+
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer count -->
+    <div class="px-5 py-3 border-t border-border/40 dark:border-dark-border/40 flex items-center justify-between">
+      <span class="text-label text-text-secondary dark:text-dark-text/50">
+        {{ filteredMembers().length }} {{ filteredMembers().length === 1 ? 'miembro' : 'miembros' }}
+      </span>
+      @if (stats().availableCount > 0) {
+        <span class="text-label text-text-secondary dark:text-dark-text/50">
+          {{ stats().availableCount }} usuarios del tenant sin asignar
+        </span>
+      }
+    </div>
+  </lib-card>
+}
+
+<!-- ── Add member modal ───────────────────────────────────────── -->
+<lib-modal
+  [open]="addOpen()"
+  size="sm"
+  (closed)="closeAdd()"
+>
+  <div modal-header class="flex items-center gap-3">
+    <lib-ui-icon icon="user-plus" [size]="16" class="text-primary dark:text-primary-light shrink-0" />
+    <span class="text-body font-semibold text-text-primary dark:text-dark-text">Agregar miembro al proyecto</span>
+  </div>
+
+  <div [formGroup]="addForm" class="flex flex-col gap-5 p-6">
+    <lib-select
+      formControlName="userId"
+      label="Usuario *"
+      placeholder="Selecciona un usuario"
+      [options]="userOptions()"
+      [errors]="{ required: 'Selecciona un usuario' }"
+    />
+
+    <!-- Role selector as clickable cards -->
+    <div>
+      <p class="text-label font-medium text-text-secondary dark:text-dark-text/70 mb-2">Rol en el proyecto *</p>
+      <div class="grid grid-cols-2 gap-2">
+        @for (opt of roleOptions; track opt.value) {
+          @let isSelected = addForm.get('role')?.value === opt.value;
+          <button
+            type="button"
+            (click)="addForm.get('role')?.setValue($any(opt.value))"
+            class="flex items-start gap-3 px-3.5 py-3 rounded-card border text-left transition-all cursor-pointer"
+            [class.border-primary]="isSelected"
+            [class.bg-primary\/5]="isSelected"
+            [class.dark:bg-primary-light\/5]="isSelected"
+            [class.dark:border-primary-light]="isSelected"
+            [class.border-border]="!isSelected"
+            [class.dark:border-dark-border]="!isSelected"
+            [class.hover:border-primary\/40]="!isSelected"
+            [class.hover:bg-hover-row]="!isSelected"
+          >
+            <!-- Radio indicator -->
+            <div
+              class="mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
+              [class.border-primary]="isSelected"
+              [class.dark:border-primary-light]="isSelected"
+              [class.border-border]="!isSelected"
+              [class.dark:border-dark-border]="!isSelected"
+            >
+              @if (isSelected) {
+                <div class="w-2 h-2 rounded-full bg-primary dark:bg-primary-light"></div>
+              }
+            </div>
+            <!-- Content -->
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 mb-0.5">
+                <lib-ui-icon [icon]="roleIcon(opt.value)" [size]="12" class="text-text-secondary dark:text-dark-text/50 shrink-0" />
+                <p class="text-small font-semibold text-text-primary dark:text-dark-text">{{ opt.label }}</p>
+              </div>
+              <p class="text-label text-text-secondary dark:text-dark-text/50 leading-snug">{{ roleDescription(opt.value) }}</p>
+            </div>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-end gap-2 pt-1">
+      <button
+        type="button"
+        (click)="closeAdd()"
+        class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        (click)="onAddSubmit()"
+        [disabled]="addSaving() || addSavedOk()"
+        class="flex items-center gap-2 px-4 py-2 rounded-input bg-primary hover:bg-primary-hover disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+      >
+        @if (addSaving()) {
+          <lib-ui-icon icon="loader-circle" [size]="15" />
+          Guardando...
+        } @else if (addSavedOk()) {
+          <lib-ui-icon icon="check" [size]="15" />
+          Agregado
+        } @else {
+          <lib-ui-icon icon="user-plus" [size]="15" />
+          Agregar miembro
+        }
+      </button>
+    </div>
+  </div>
+</lib-modal>
+
+<!-- ── Edit role modal ────────────────────────────────────────── -->
+<lib-modal
+  [open]="editOpen()"
+  size="sm"
+  (closed)="closeEdit()"
+>
+  <div modal-header class="flex items-center gap-3">
+    @if (editMember()) {
+      <div
+        class="w-7 h-7 rounded-full flex items-center justify-center text-white text-label font-bold shrink-0"
+        [style.background-color]="editMember()!.user.avatarBg"
+      >
+        {{ editMember()!.user.initials }}
+      </div>
+      <div class="min-w-0">
+        <span class="text-body font-semibold text-text-primary dark:text-dark-text truncate block">{{ editMember()!.user.name }}</span>
+        <span class="text-label text-text-secondary dark:text-dark-text/50">Cambiar rol en el proyecto</span>
+      </div>
+    }
+  </div>
+
+  @if (editMember()) {
+    <div [formGroup]="editForm" class="flex flex-col gap-5 p-6">
+      <lib-select
+        formControlName="role"
+        label="Nuevo rol *"
+        [options]="roleOptions"
+        [errors]="{ required: 'Selecciona un rol' }"
+      />
+
+      <!-- Role description hint -->
+      <div class="flex items-start gap-2.5 px-4 py-3 rounded-card bg-secondary-bg/60 dark:bg-white/5 border border-border dark:border-dark-border">
+        <lib-ui-icon [icon]="roleIcon(editForm.get('role')?.value ?? '')" [size]="14" class="text-text-secondary dark:text-dark-text/50 shrink-0 mt-0.5" />
+        <p class="text-small text-text-secondary dark:text-dark-text/60">{{ roleDescription(editForm.get('role')?.value ?? '') }}</p>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-1">
+        <button
+          type="button"
+          (click)="closeEdit()"
+          class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          (click)="onEditSubmit()"
+          [disabled]="editSaving()"
+          class="flex items-center gap-2 px-4 py-2 rounded-input bg-primary hover:bg-primary-hover disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+        >
+          @if (editSaving()) {
+            <lib-ui-icon icon="loader-circle" [size]="15" />
+            Guardando...
+          } @else {
+            <lib-ui-icon icon="check" [size]="15" />
+            Guardar cambios
+          }
+        </button>
+      </div>
+    </div>
+  }
+</lib-modal>
+
+<!-- ── Remove confirmation modal ──────────────────────────────── -->
+<lib-modal
+  [open]="removeOpen()"
+  size="sm"
+  (closed)="closeConfirmRemove()"
+>
+  <div modal-header class="flex items-center gap-3">
+    <lib-ui-icon icon="user-minus" [size]="16" class="text-danger shrink-0" />
+    <span class="text-body font-semibold text-text-primary dark:text-dark-text">Eliminar miembro del proyecto</span>
+  </div>
+
+  @if (removeCandidate()) {
+    <div class="flex flex-col gap-5 p-6">
+
+      <!-- Member preview -->
+      <div class="flex items-center gap-3 px-4 py-3.5 rounded-card border border-border dark:border-dark-border bg-secondary-bg/50 dark:bg-white/5">
+        <div
+          class="w-10 h-10 rounded-full flex items-center justify-center text-white text-small font-bold shrink-0"
+          [style.background-color]="removeCandidate()!.user.avatarBg"
+        >
+          {{ removeCandidate()!.user.initials }}
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="text-small font-semibold text-text-primary dark:text-dark-text">{{ removeCandidate()!.user.name }}</p>
+          <p class="text-label text-text-secondary dark:text-dark-text/50">{{ removeCandidate()!.user.email }}</p>
+        </div>
+        <lib-badge [variant]="roleBadgeVariant(removeCandidate()!.role)" [label]="roleLabel(removeCandidate()!.role)" size="sm" />
+      </div>
+
+      <!-- Warning -->
+      <div class="flex items-start gap-2.5 px-4 py-3 rounded-card bg-danger/5 border border-danger/20">
+        <lib-ui-icon icon="triangle-alert" [size]="14" class="text-danger shrink-0 mt-0.5" />
+        <div>
+          <p class="text-small font-medium text-danger">Este miembro perderá acceso al proyecto.</p>
+          <p class="text-label text-text-secondary dark:text-dark-text/60 mt-1">
+            Próximamente no será posible eliminar miembros con actividades asignadas. Esta validación se aplicará desde el servidor.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2">
+        <button
+          type="button"
+          (click)="closeConfirmRemove()"
+          class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          (click)="confirmRemove()"
+          [disabled]="removing()"
+          class="flex items-center gap-2 px-4 py-2 rounded-input bg-danger hover:bg-danger/90 disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+        >
+          @if (removing()) {
+            <lib-ui-icon icon="loader-circle" [size]="15" />
+            Eliminando...
+          } @else {
+            <lib-ui-icon icon="user-minus" [size]="15" />
+            Sí, eliminar
+          }
+        </button>
+      </div>
+    </div>
+  }
+</lib-modal>
