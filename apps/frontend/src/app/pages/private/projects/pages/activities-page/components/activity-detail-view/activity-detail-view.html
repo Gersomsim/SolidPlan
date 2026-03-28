@@ -1,0 +1,284 @@
+<!-- ── Layout wrapper (adapts for modal vs page) ─────────────── -->
+<div [class]="isPage() ? 'flex gap-8' : 'flex gap-6 p-6'">
+
+  <!-- ══ MAIN COLUMN ══════════════════════════════════════════ -->
+  <div class="flex-1 min-w-0 flex flex-col gap-6">
+
+    <!-- Header meta row -->
+    <div class="flex flex-wrap items-center gap-3">
+      <!-- Code pill -->
+      <span class="font-mono text-small font-semibold px-3 py-1 rounded-badge bg-primary/10 text-primary dark:bg-primary-light/10 dark:text-primary-light">
+        {{ activity().code }}
+      </span>
+
+      <!-- Status badge -->
+      <lib-badge
+        [variant]="statusBadgeVariant()"
+        [label]="statusLabel()"
+        size="sm"
+      />
+
+      <!-- Critical path indicator -->
+      @if (activity().isCriticalPath) {
+        <span class="flex items-center gap-1 px-2.5 py-1 rounded-badge bg-accent/10 text-accent text-xs font-medium uppercase tracking-wide">
+          <lib-ui-icon icon="zap" [size]="11" />
+          Ruta crítica
+        </span>
+      }
+
+      <!-- Open in page link (always visible when projectId is available) -->
+      @if (projectId()) {
+        <div class="ml-auto flex items-center gap-3">
+          <a
+            [routerLink]="['/system/projects', projectId(), 'activities', activity().id, 'edit']"
+            class="flex items-center gap-1.5 text-small text-text-secondary hover:text-primary dark:text-dark-text/50 dark:hover:text-primary-light transition-colors"
+          >
+            <lib-ui-icon icon="user-pen" [size]="14" />
+            Editar
+          </a>
+          <span class="text-border dark:text-dark-border">·</span>
+          <a
+            [routerLink]="['/system/projects', projectId(), 'activities', activity().id]"
+            class="flex items-center gap-1.5 text-small text-text-secondary hover:text-primary dark:text-dark-text/50 dark:hover:text-primary-light transition-colors"
+          >
+            <lib-ui-icon icon="external-link" [size]="14" />
+            Abrir en página
+          </a>
+        </div>
+      }
+    </div>
+
+    <!-- Title -->
+    <div>
+      <h1 [class]="isPage() ? 'text-h2 font-bold text-text-primary dark:text-dark-text' : 'text-h3 font-bold text-text-primary dark:text-dark-text'">
+        {{ activity().name }}
+      </h1>
+    </div>
+
+    <!-- Description -->
+    @if (activity().description) {
+      <div>
+        <h3 class="text-label font-semibold text-text-secondary uppercase tracking-wider mb-2">Descripción</h3>
+        <p class="text-body text-text-primary dark:text-dark-text leading-relaxed">
+          {{ activity().description }}
+        </p>
+      </div>
+    }
+
+    <!-- Sub-activities -->
+    <div>
+      <h3 class="text-label font-semibold text-text-secondary uppercase tracking-wider mb-3">
+        Sub-actividades
+        @if (children().length > 0) {
+          <span class="ml-1.5 text-xs font-medium px-1.5 py-0.5 rounded-badge bg-secondary-bg dark:bg-white/10 text-text-secondary dark:text-dark-text/60">
+            {{ children().length }}
+          </span>
+        }
+      </h3>
+        <div class="flex flex-col divide-y divide-border dark:divide-dark-border rounded-default border border-border dark:border-dark-border overflow-hidden">
+          @for (child of children(); track child.id) {
+            <a
+              [routerLink]="projectId() ? ['/system/projects', projectId(), 'activities', child.id] : null"
+              class="flex items-center gap-3 px-4 py-3 bg-surface dark:bg-dark-surface hover:bg-hover-row dark:hover:bg-dark-hover-row transition-colors group/child"
+              [class.cursor-pointer]="projectId()"
+            >
+              <!-- Status icon -->
+              @if (child.status === 'COMPLETED') {
+                <div class="w-5 h-5 rounded-full bg-success/15 flex items-center justify-center shrink-0">
+                  <lib-ui-icon icon="check" [size]="11" class="text-success" />
+                </div>
+              } @else if (child.status === 'BLOCKED') {
+                <div class="w-5 h-5 rounded-full bg-danger/15 flex items-center justify-center shrink-0">
+                  <lib-ui-icon icon="x" [size]="11" class="text-danger" />
+                </div>
+              } @else if (child.status === 'IN_PROGRESS') {
+                <div class="w-5 h-5 rounded-full bg-accent/15 flex items-center justify-center shrink-0">
+                  <lib-ui-icon icon="loader" [size]="11" class="text-accent" />
+                </div>
+              } @else {
+                <div class="w-5 h-5 rounded-full bg-secondary-bg dark:bg-white/10 flex items-center justify-center shrink-0">
+                  <span class="w-2 h-2 rounded-full bg-border dark:bg-dark-border"></span>
+                </div>
+              }
+
+              <!-- Code + Name -->
+              <span class="font-mono text-xs text-text-secondary shrink-0">{{ child.code }}</span>
+              <span class="flex-1 text-small text-text-primary dark:text-dark-text group-hover/child:text-primary dark:group-hover/child:text-primary-light truncate transition-colors">{{ child.name }}</span>
+
+              <!-- Progress -->
+              @if (child.progressType === 'PERCENTAGE') {
+                <div class="flex items-center gap-2 w-28 shrink-0">
+                  <lib-progress-bar [value]="child.progress" size="xs" color="auto" class="flex-1" />
+                  <span class="text-xs text-text-secondary dark:text-dark-text/60 w-8 text-right">{{ child.progress }}%</span>
+                </div>
+              } @else if (child.progressState) {
+                <span
+                  class="text-xs font-medium px-2 py-0.5 rounded-badge uppercase tracking-wide"
+                  [style.background-color]="(child.progressStateColor ?? '#718096') + '26'"
+                  [style.color]="child.progressStateColor ?? '#718096'"
+                >{{ child.progressState }}</span>
+              }
+
+              <!-- Status badge -->
+              <lib-badge [variant]="childStatusVariant(child.status)" [label]="childStatusLabel(child.status)" size="sm" />
+
+              <!-- External link hint -->
+              @if (projectId()) {
+                <lib-ui-icon icon="external-link" [size]="13" class="text-text-secondary/0 group-hover/child:text-text-secondary dark:group-hover/child:text-dark-text/40 transition-colors shrink-0" />
+              }
+            </a>
+          }
+
+          <!-- ── Add sub-activity row ──────────────────────── -->
+          @if (addingChild()) {
+            <!-- Input inline -->
+            <div class="flex items-center gap-2 px-4 py-2.5 bg-primary/5 dark:bg-primary-light/5" [class.border-t]="children().length > 0" [class.border-border]="children().length > 0" [class.dark:border-dark-border]="children().length > 0">
+              <div class="w-5 h-5 rounded-full bg-primary/15 dark:bg-primary-light/15 flex items-center justify-center shrink-0">
+                <lib-ui-icon icon="plus" [size]="11" class="text-primary dark:text-primary-light" />
+              </div>
+              <input
+                #titleInput
+                type="text"
+                placeholder="Título de la sub-actividad..."
+                [value]="newChildTitle()"
+                (input)="newChildTitle.set($any($event.target).value)"
+                (keydown)="onTitleKeydown($event)"
+                class="flex-1 bg-transparent text-small text-text-primary dark:text-dark-text placeholder:text-text-secondary/60 dark:placeholder:text-dark-text/40 focus:outline-none"
+              />
+              <button
+                (click)="confirmAdding()"
+                [disabled]="!newChildTitle().trim()"
+                class="px-3 py-1 rounded-input bg-primary text-white text-xs font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary-hover"
+              >
+                Agregar
+              </button>
+              <button
+                (click)="cancelAdding()"
+                class="flex items-center justify-center w-6 h-6 rounded text-text-secondary hover:text-danger hover:bg-danger/10 dark:text-dark-text/50 dark:hover:text-danger transition-colors"
+              >
+                <lib-ui-icon icon="x" [size]="14" />
+              </button>
+            </div>
+          } @else {
+            <!-- Trigger -->
+            <button
+              (click)="startAdding()"
+              class="w-full flex items-center gap-2 px-4 py-2.5 text-small text-text-secondary dark:text-dark-text/50 hover:text-primary dark:hover:text-primary-light hover:bg-primary/5 dark:hover:bg-primary-light/5 transition-colors group/add"
+              [class.border-t]="children().length > 0"
+              [class.border-border]="children().length > 0"
+              [class.dark:border-dark-border]="children().length > 0"
+            >
+              <lib-ui-icon icon="plus" [size]="14" class="transition-transform group-hover/add:scale-110" />
+              Agregar sub-actividad
+            </button>
+          }
+        </div>
+    </div>
+
+    <!-- Dependencies placeholder -->
+    <div>
+      <h3 class="text-label font-semibold text-text-secondary uppercase tracking-wider mb-3">Dependencias</h3>
+      <div class="flex items-center gap-3 px-4 py-3 rounded-default border border-dashed border-border dark:border-dark-border text-text-secondary dark:text-dark-text/50 text-small">
+        <lib-ui-icon icon="link" [size]="16" />
+        Sin dependencias configuradas
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ PROPERTIES SIDEBAR ═══════════════════════════════════ -->
+  <div [class]="isPage() ? 'w-72 shrink-0' : 'w-60 shrink-0'">
+    <div
+      [class]="isPage()
+        ? 'sticky top-6 flex flex-col gap-0 rounded-card border border-border dark:border-dark-border bg-surface dark:bg-dark-surface overflow-hidden'
+        : 'flex flex-col gap-0 rounded-card border border-border dark:border-dark-border bg-background dark:bg-dark-background overflow-hidden'"
+    >
+
+      <!-- Properties header -->
+      <div class="px-4 py-3 border-b border-border dark:border-dark-border bg-secondary-bg/60 dark:bg-white/5">
+        <span class="text-label font-semibold text-text-secondary uppercase tracking-wider">Propiedades</span>
+      </div>
+
+      <!-- Property rows -->
+      <div class="divide-y divide-border dark:divide-dark-border">
+
+        <!-- Estado -->
+        <div class="px-4 py-3 flex items-center justify-between gap-2">
+          <span class="text-small text-text-secondary dark:text-dark-text/60 shrink-0">Estado</span>
+          <lib-badge [variant]="statusBadgeVariant()" [label]="statusLabel()" size="sm" />
+        </div>
+
+        <!-- Progreso -->
+        <div class="px-4 py-3">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-small text-text-secondary dark:text-dark-text/60">Progreso</span>
+            <span class="text-small font-semibold text-text-primary dark:text-dark-text">{{ progressPercent() }}%</span>
+          </div>
+          <lib-progress-bar [value]="progressPercent()" size="sm" color="auto" />
+        </div>
+
+        <!-- Categoría -->
+        <div class="px-4 py-3 flex items-center justify-between gap-2">
+          <span class="text-small text-text-secondary dark:text-dark-text/60 shrink-0">Categoría</span>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full shrink-0" [style.background-color]="activity().categoryColor"></span>
+            <span class="text-small font-medium text-text-primary dark:text-dark-text">{{ activity().category }}</span>
+          </div>
+        </div>
+
+        <!-- Rol asignado -->
+        <div class="px-4 py-3 flex items-center justify-between gap-2">
+          <span class="text-small text-text-secondary dark:text-dark-text/60 shrink-0">Rol asignado</span>
+          <span class="font-mono text-xs font-semibold px-2.5 py-1 rounded-badge bg-secondary-bg dark:bg-white/10 text-secondary dark:text-dark-text/70">
+            {{ activity().assignedRole }}
+          </span>
+        </div>
+
+        <!-- Fecha inicio -->
+        <div class="px-4 py-3 flex items-center justify-between gap-2">
+          <span class="text-small text-text-secondary dark:text-dark-text/60 shrink-0">Inicio</span>
+          <span class="text-small font-medium text-text-primary dark:text-dark-text">
+            {{ activity().startDate | date:'dd MMM yyyy' }}
+          </span>
+        </div>
+
+        <!-- Fecha fin -->
+        <div class="px-4 py-3 flex items-center justify-between gap-2">
+          <span class="text-small text-text-secondary dark:text-dark-text/60 shrink-0">Fin estimado</span>
+          <span class="text-small font-medium text-text-primary dark:text-dark-text">
+            {{ activity().endDate | date:'dd MMM yyyy' }}
+          </span>
+        </div>
+
+        <!-- Duración -->
+        <div class="px-4 py-3 flex items-center justify-between gap-2">
+          <span class="text-small text-text-secondary dark:text-dark-text/60 shrink-0">Duración</span>
+          <span class="text-small font-semibold text-text-primary dark:text-dark-text">{{ activity().durationDays }} días</span>
+        </div>
+
+        <!-- Ruta crítica -->
+        <div class="px-4 py-3 flex items-center justify-between gap-2">
+          <span class="text-small text-text-secondary dark:text-dark-text/60 shrink-0">Ruta crítica</span>
+          @if (activity().isCriticalPath) {
+            <span class="flex items-center gap-1 text-xs font-medium text-accent">
+              <lib-ui-icon icon="zap" [size]="12" />
+              Sí
+            </span>
+          } @else {
+            <span class="text-small text-text-secondary dark:text-dark-text/40">No</span>
+          }
+        </div>
+
+        <!-- Tipo de progreso -->
+        <div class="px-4 py-3 flex items-center justify-between gap-2">
+          <span class="text-small text-text-secondary dark:text-dark-text/60 shrink-0">Medición</span>
+          <span class="text-small text-text-primary dark:text-dark-text font-medium">
+            {{ activity().progressType === 'PERCENTAGE' ? 'Porcentaje' : 'Estado' }}
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

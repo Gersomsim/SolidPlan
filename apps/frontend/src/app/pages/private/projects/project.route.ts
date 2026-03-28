@@ -41,6 +41,16 @@ export const projectRoutes: Routes = [
 				loadComponent: () =>
 					import('./pages/project-members/project-members').then(m => m.ProjectMembers),
 			},
+			{
+				path: 'activities/:activityId',
+				loadComponent: () =>
+					import('./pages/activity-detail-page/activity-detail-page').then(m => m.ActivityDetailPage),
+			},
+			{
+				path: 'activities/:activityId/edit',
+				loadComponent: () =>
+					import('./pages/activity-edit-page/activity-edit-page').then(m => m.ActivityEditPage),
+			},
 		],
 	},
 ]

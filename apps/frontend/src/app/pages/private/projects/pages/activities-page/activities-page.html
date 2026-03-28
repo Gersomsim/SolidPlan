@@ -1,1 +1,284 @@
-<p>activities-page works!</p>
+<!-- ── Stats ─────────────────────────────────────────────────── -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+  <lib-stat-card
+    icon="chart-area"
+    label="Total actividades"
+    [value]="stats().total"
+    color="primary"
+  />
+  <lib-stat-card
+    icon="circle-check"
+    label="Completadas"
+    [value]="stats().completed"
+    color="success"
+  />
+  <lib-stat-card
+    icon="loader"
+    label="En progreso"
+    [value]="stats().inProgress"
+    color="primary"
+  />
+  <lib-stat-card
+    icon="triangle-alert"
+    label="Bloqueadas"
+    [value]="stats().blocked"
+    color="danger"
+  />
+</div>
+
+<!-- ── Toolbar ────────────────────────────────────────────────── -->
+<lib-card [elevated]="true" [bordered]="true" padding="sm" class="mb-5 block">
+  <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+    <!-- Search -->
+    <div class="relative flex-1 max-w-sm">
+      <lib-ui-icon icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" [size]="16" />
+      <input
+        type="text"
+        placeholder="Buscar actividad o código..."
+        (input)="onSearch($event)"
+        class="w-full pl-9 pr-4 py-2 rounded-input border border-border bg-surface text-small text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:bg-dark-surface dark:border-dark-border dark:text-dark-text dark:placeholder:text-dark-text/40"
+      />
+    </div>
+
+    <!-- Status filters -->
+    <div class="flex flex-wrap gap-2">
+      <button [class]="statusFilterPillClass('ALL')" (click)="statusFilter.set('ALL')">Todos</button>
+      <button [class]="statusFilterPillClass('IN_PROGRESS')" (click)="statusFilter.set('IN_PROGRESS')">En progreso</button>
+      <button [class]="statusFilterPillClass('PENDING')" (click)="statusFilter.set('PENDING')">Pendientes</button>
+      <button [class]="statusFilterPillClass('BLOCKED')" (click)="statusFilter.set('BLOCKED')">Bloqueadas</button>
+      <button [class]="statusFilterPillClass('COMPLETED')" (click)="statusFilter.set('COMPLETED')">Completadas</button>
+    </div>
+
+    <!-- Add button -->
+    <button class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-white text-small font-medium rounded-input transition-colors whitespace-nowrap shrink-0">
+      <lib-ui-icon icon="plus" [size]="16" />
+      Nueva actividad
+    </button>
+  </div>
+</lib-card>
+
+<!-- ── Activity Tree Table ────────────────────────────────────── -->
+<lib-card [elevated]="true" [bordered]="true" padding="none">
+  @if (visibleRows().length === 0) {
+    <div class="py-16">
+      <lib-empty-state
+        icon="chart-area"
+        title="Sin actividades"
+        description="No se encontraron actividades con los filtros aplicados."
+      />
+    </div>
+  } @else {
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[900px]">
+        <!-- Header -->
+        <thead>
+          <tr class="border-b border-border dark:border-dark-border">
+            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider w-[320px]">
+              Actividad
+            </th>
+            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">
+              Categoría
+            </th>
+            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">
+              Rol
+            </th>
+            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">
+              Inicio
+            </th>
+            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">
+              Fin
+            </th>
+            <th class="px-4 py-3 text-center text-label font-semibold text-text-secondary uppercase tracking-wider w-20">
+              Días
+            </th>
+            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider w-40">
+              Progreso
+            </th>
+            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">
+              Estado
+            </th>
+            <th class="px-4 py-3 w-10"></th>
+          </tr>
+        </thead>
+
+        <!-- Body -->
+        <tbody>
+          @for (row of visibleRows(); track row.id) {
+            <tr
+              class="border-b border-border/50 dark:border-dark-border/50 hover:bg-hover-row dark:hover:bg-dark-hover-row transition-colors group cursor-pointer"
+              [class.bg-secondary-bg]="row.depth === 0"
+              [class.dark:bg-dark-surface-elevated]="row.depth === 0"
+              (click)="openActivity(row)"
+            >
+              <!-- Activity name + expand -->
+              <td class="py-3" [class]="rowDepthPadding(row.depth)">
+                <div class="flex items-center gap-2 min-w-0">
+                  <!-- Expand toggle -->
+                  @if (row.hasChildren) {
+                    <button
+                      class="flex items-center justify-center w-5 h-5 rounded text-text-secondary hover:text-primary hover:bg-primary/10 dark:hover:text-primary-light transition-colors shrink-0"
+                      (click)="toggleExpand(row.id, $event)"
+                    >
+                      <lib-ui-icon icon="chevron-right" [size]="14" [class]="expandIconClass(isExpanded(row.id))" />
+                    </button>
+                  } @else {
+                    <span class="w-5 shrink-0 flex justify-center">
+                      @if (row.depth > 0) {
+                        <span class="w-1.5 h-1.5 rounded-full bg-border dark:bg-dark-border"></span>
+                      }
+                    </span>
+                  }
+
+                  <!-- Code + Name -->
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                      <span class="font-mono text-xs text-text-secondary shrink-0">{{ row.code }}</span>
+                      @if (row.isCriticalPath) {
+                        <span title="Ruta crítica">
+                          <lib-ui-icon icon="zap" [size]="12" class="text-accent" />
+                        </span>
+                      }
+                    </div>
+                    <p
+                      class="text-small truncate"
+                      [class.font-semibold]="row.depth === 0"
+                      [class.font-medium]="row.depth === 1"
+                      [class.text-text-primary]="row.depth <= 1"
+                      [class.dark:text-dark-text]="row.depth <= 1"
+                      [class.text-text-secondary]="row.depth === 2"
+                    >
+                      {{ row.name }}
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Category -->
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="w-2 h-2 rounded-full shrink-0"
+                    [style.background-color]="row.categoryColor"
+                  ></span>
+                  <span class="text-small text-text-secondary dark:text-dark-text/70 whitespace-nowrap">{{ row.category }}</span>
+                </div>
+              </td>
+
+              <!-- Role -->
+              <td class="px-4 py-3">
+                <span class="inline-block px-2 py-0.5 rounded-badge bg-secondary-bg text-secondary text-label font-medium dark:bg-dark-secondary-bg dark:text-dark-text/70">
+                  {{ row.assignedRole }}
+                </span>
+              </td>
+
+              <!-- Start date -->
+              <td class="px-4 py-3">
+                <span class="text-small text-text-secondary dark:text-dark-text/70 whitespace-nowrap">
+                  {{ row.startDate | date:'dd/MM/yy' }}
+                </span>
+              </td>
+
+              <!-- End date -->
+              <td class="px-4 py-3">
+                <span class="text-small text-text-secondary dark:text-dark-text/70 whitespace-nowrap">
+                  {{ row.endDate | date:'dd/MM/yy' }}
+                </span>
+              </td>
+
+              <!-- Duration -->
+              <td class="px-4 py-3 text-center">
+                <span class="text-small font-medium text-text-primary dark:text-dark-text">
+                  {{ row.durationDays }}d
+                </span>
+              </td>
+
+              <!-- Progress -->
+              <td class="px-4 py-3">
+                @if (row.progressType === 'PERCENTAGE') {
+                  <div class="flex items-center gap-2">
+                    <lib-progress-bar [value]="row.progress" size="sm" color="auto" class="flex-1" />
+                    <span class="text-label font-medium text-text-secondary dark:text-dark-text/70 shrink-0 w-9 text-right">
+                      {{ row.progress }}%
+                    </span>
+                  </div>
+                } @else {
+                  <span
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-badge text-xs font-medium uppercase tracking-wide"
+                    [style.background-color]="(row.progressStateColor ?? '#718096') + '26'"
+                    [style.color]="row.progressStateColor ?? '#718096'"
+                  >
+                    {{ row.progressState }}
+                  </span>
+                }
+              </td>
+
+              <!-- Status -->
+              <td class="px-4 py-3">
+                <lib-badge
+                  [variant]="statusBadgeVariant(row.status)"
+                  [label]="statusLabel(row.status)"
+                  size="sm"
+                />
+              </td>
+
+              <!-- Actions -->
+              <td class="px-3 py-3">
+                <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                  <a
+                    [routerLink]="['/system/projects', projectId(), 'activities', row.id, 'edit']"
+                    (click)="$event.stopPropagation()"
+                    class="flex items-center justify-center w-7 h-7 rounded-default text-text-secondary hover:text-primary hover:bg-primary/10 dark:hover:text-primary-light transition-colors"
+                    title="Editar"
+                  >
+                    <lib-ui-icon icon="user-pen" [size]="15" />
+                  </a>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer summary -->
+    <div class="flex items-center justify-between px-6 py-3 border-t border-border dark:border-dark-border bg-background dark:bg-dark-background/50">
+      <span class="text-small text-text-secondary dark:text-dark-text/60">
+        {{ visibleRows().length }} actividades mostradas
+      </span>
+      <div class="flex items-center gap-4">
+        <span class="flex items-center gap-1.5 text-label text-text-secondary dark:text-dark-text/60">
+          <lib-ui-icon icon="zap" [size]="13" class="text-accent" />
+          {{ stats().criticalPath }} en ruta crítica
+        </span>
+      </div>
+    </div>
+  }
+</lib-card>
+
+<!-- ── Activity detail modal ─────────────────────────────────── -->
+<lib-modal
+  [open]="modalOpen()"
+  size="xl"
+  (closed)="closeModal()"
+>
+  <!-- Custom header with code + title + open-in-page link -->
+  <div modal-header class="flex items-center gap-3 min-w-0">
+    @if (selectedActivity()) {
+      <span class="font-mono text-small font-semibold px-2.5 py-1 rounded-badge bg-primary/10 text-primary dark:bg-primary-light/10 dark:text-primary-light shrink-0">
+        {{ selectedActivity()!.code }}
+      </span>
+      <span class="text-body font-semibold text-text-primary dark:text-dark-text truncate">
+        {{ selectedActivity()!.name }}
+      </span>
+    }
+  </div>
+
+  <!-- Body -->
+  @if (selectedActivity()) {
+    <app-activity-detail-view
+      [activity]="selectedActivity()!"
+      layout="modal"
+      [projectId]="projectId()"
+    />
+  }
+</lib-modal>

@@ -1,0 +1,419 @@
+@if (activity(); as act) {
+  <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-0">
+
+    <!-- ── Sticky header ─────────────────────────────────────── -->
+    <div class="sticky top-0 z-20 bg-background dark:bg-dark-background border-b border-border dark:border-dark-border -mx-6 px-6 py-4 mb-8 flex items-center justify-between gap-4">
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 min-w-0">
+        <a
+          [routerLink]="['/system/projects', projectId(), 'activities']"
+          class="text-small text-text-secondary hover:text-primary dark:text-dark-text/50 dark:hover:text-primary-light transition-colors whitespace-nowrap"
+        >Actividades</a>
+        <lib-ui-icon icon="chevron-right" [size]="13" class="text-border dark:text-dark-border shrink-0" />
+        <a
+          [routerLink]="['/system/projects', projectId(), 'activities', activityId()]"
+          class="font-mono text-small font-semibold text-text-secondary hover:text-primary dark:text-dark-text/60 dark:hover:text-primary-light transition-colors whitespace-nowrap"
+        >{{ act.code }}</a>
+        <lib-ui-icon icon="chevron-right" [size]="13" class="text-border dark:text-dark-border shrink-0" />
+        <span class="text-small font-medium text-text-primary dark:text-dark-text truncate">Editar actividad</span>
+      </nav>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-3 shrink-0">
+        @if (saved()) {
+          <span class="flex items-center gap-1.5 text-small text-success font-medium">
+            <lib-ui-icon icon="circle-check" [size]="16" />
+            Guardado
+          </span>
+        }
+        <button
+          type="button"
+          (click)="onCancel()"
+          class="px-4 py-2 rounded-input border border-border dark:border-dark-border text-small font-medium text-text-secondary hover:text-text-primary hover:bg-secondary-bg dark:text-dark-text/60 dark:hover:text-dark-text dark:hover:bg-white/10 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="saving()"
+          class="flex items-center gap-2 px-5 py-2 rounded-input bg-primary hover:bg-primary-hover disabled:opacity-60 text-white text-small font-medium transition-colors"
+        >
+          @if (saving()) {
+            <lib-ui-icon icon="loader-circle" [size]="15" class="animate-spin" />
+            Guardando...
+          } @else {
+            <lib-ui-icon icon="circle-check" [size]="15" />
+            Guardar cambios
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Two-column body ───────────────────────────────────── -->
+    <div class="flex gap-6 items-start">
+
+      <!-- ══ MAIN COLUMN ══════════════════════════════════════ -->
+      <div class="flex-1 min-w-0 flex flex-col gap-6">
+
+        <!-- ─ Información general ─────────────────────────── -->
+        <lib-card [elevated]="true" padding="lg">
+          <div class="flex items-center gap-2 mb-6">
+            <lib-ui-icon icon="file" [size]="18" class="text-primary dark:text-primary-light" />
+            <h3 class="text-h4 font-semibold text-text-primary dark:text-dark-text">Información general</h3>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <lib-input
+              formControlName="code"
+              label="Código de referencia"
+              placeholder="Ej: ARQ-01, EST-03"
+              hint="Identificador único de la actividad"
+            />
+            <lib-select
+              formControlName="category"
+              label="Categoría"
+              [options]="categoryOptions"
+              placeholder="Selecciona una categoría"
+            />
+          </div>
+
+          <div class="mb-4">
+            <lib-input
+              formControlName="name"
+              label="Nombre de la actividad"
+              placeholder="Describe brevemente la actividad"
+              [errors]="{ required: 'El nombre es obligatorio' }"
+            />
+          </div>
+
+          <lib-textarea
+            formControlName="description"
+            label="Descripción"
+            placeholder="Detalla el alcance, especificaciones técnicas o cualquier información relevante..."
+            [rows]="4"
+            hint="Opcional — aparece en el detalle de la actividad"
+          />
+        </lib-card>
+
+        <!-- ─ Cronograma ──────────────────────────────────── -->
+        <lib-card [elevated]="true" padding="lg">
+          <div class="flex items-center gap-2 mb-6">
+            <lib-ui-icon icon="calendar" [size]="18" class="text-primary dark:text-primary-light" />
+            <h3 class="text-h4 font-semibold text-text-primary dark:text-dark-text">Cronograma</h3>
+          </div>
+
+          <!-- Planned dates -->
+          <p class="text-label font-semibold text-text-secondary uppercase tracking-wider mb-3">Fechas planificadas</p>
+          <div class="grid grid-cols-3 gap-4 mb-6">
+            <!-- Start date (native — lib-input no soporta type=date) -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-medium text-text-primary dark:text-dark-text">Fecha inicio</label>
+              <input
+                type="date"
+                formControlName="startDate"
+                class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary-light transition-colors"
+              />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-medium text-text-primary dark:text-dark-text">Fecha fin</label>
+              <input
+                type="date"
+                formControlName="endDate"
+                class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary-light transition-colors"
+              />
+            </div>
+            <lib-input
+              formControlName="durationDays"
+              label="Duración (días)"
+              type="number"
+              hint="Se recalcula al cambiar fechas"
+            />
+          </div>
+
+          <!-- Actual dates -->
+          <p class="text-label font-semibold text-text-secondary uppercase tracking-wider mb-3">Fechas reales</p>
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-medium text-text-primary dark:text-dark-text">Inicio real</label>
+              <input
+                type="date"
+                formControlName="actualStartDate"
+                class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary-light transition-colors"
+              />
+              <p class="text-xs text-text-secondary dark:text-dark-text/60">Opcional — registrar cuando inicia la ejecución</p>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-medium text-text-primary dark:text-dark-text">Fin real</label>
+              <input
+                type="date"
+                formControlName="actualEndDate"
+                class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary-light transition-colors"
+              />
+              <p class="text-xs text-text-secondary dark:text-dark-text/60">Opcional — registrar cuando concluye la ejecución</p>
+            </div>
+          </div>
+
+          <!-- Critical path -->
+          <div class="flex items-center gap-3 p-3 rounded-default border border-border dark:border-dark-border bg-background dark:bg-dark-background">
+            <lib-ui-icon icon="zap" [size]="18" class="text-accent shrink-0" />
+            <div class="flex-1">
+              <p class="text-small font-medium text-text-primary dark:text-dark-text">Ruta crítica</p>
+              <p class="text-xs text-text-secondary dark:text-dark-text/60">Activa si esta actividad afecta directamente la fecha de término del proyecto</p>
+            </div>
+            <lib-checkbox formControlName="isCriticalPath" />
+          </div>
+        </lib-card>
+
+        <!-- ─ Medición ────────────────────────────────────── -->
+        <lib-card [elevated]="true" padding="lg">
+          <div class="flex items-center gap-2 mb-6">
+            <lib-ui-icon icon="chart-area" [size]="18" class="text-primary dark:text-primary-light" />
+            <h3 class="text-h4 font-semibold text-text-primary dark:text-dark-text">Medición</h3>
+          </div>
+
+          <div class="grid grid-cols-4 gap-4">
+            <lib-select
+              formControlName="unit"
+              label="Unidad de medida"
+              [options]="unitOptions"
+            />
+            <lib-input
+              formControlName="plannedQuantity"
+              label="Cantidad planificada"
+              type="number"
+              hint="Volumen o cantidad total a ejecutar"
+            />
+            <lib-input
+              formControlName="actualQuantity"
+              label="Cantidad ejecutada"
+              type="number"
+              hint="Cantidad registrada a la fecha"
+            />
+            <lib-input
+              formControlName="unitPrice"
+              label="Precio unitario"
+              type="number"
+              prefix="$"
+              hint="Costo por unidad (opcional)"
+            />
+          </div>
+
+          <!-- Cost preview -->
+          <div class="mt-4 p-3 rounded-default bg-secondary-bg dark:bg-white/5 flex items-center justify-between">
+            <span class="text-small text-text-secondary dark:text-dark-text/60">Costo estimado total</span>
+            <span class="text-body font-semibold text-text-primary dark:text-dark-text">
+              ${{ (form.get('plannedQuantity')!.value * form.get('unitPrice')!.value) | number: '1.2-2' }}
+            </span>
+          </div>
+        </lib-card>
+
+        <!-- ─ Dependencias ────────────────────────────────── -->
+        <lib-card [elevated]="true" padding="lg">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-2">
+              <lib-ui-icon icon="link" [size]="18" class="text-primary dark:text-primary-light" />
+              <h3 class="text-h4 font-semibold text-text-primary dark:text-dark-text">Dependencias</h3>
+              @if (dependencies().length > 0) {
+                <span class="ml-1 px-1.5 py-0.5 rounded-badge bg-secondary-bg dark:bg-white/10 text-xs font-medium text-text-secondary dark:text-dark-text/60">
+                  {{ dependencies().length }}
+                </span>
+              }
+            </div>
+            <button
+              type="button"
+              (click)="addDependency()"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-input border border-border dark:border-dark-border text-small font-medium text-text-secondary hover:text-primary hover:border-primary/50 dark:text-dark-text/60 dark:hover:text-primary-light transition-colors"
+            >
+              <lib-ui-icon icon="plus" [size]="14" />
+              Agregar dependencia
+            </button>
+          </div>
+
+          @if (dependencies().length === 0) {
+            <div class="flex items-center gap-3 px-4 py-4 rounded-default border border-dashed border-border dark:border-dark-border text-text-secondary dark:text-dark-text/50 text-small">
+              <lib-ui-icon icon="link" [size]="16" />
+              Sin dependencias — esta actividad no depende de ninguna otra
+            </div>
+          } @else {
+            <div class="flex flex-col gap-0 rounded-default border border-border dark:border-dark-border overflow-hidden">
+              <!-- Header -->
+              <div class="grid grid-cols-[1fr_180px_100px_40px] gap-3 px-4 py-2 bg-secondary-bg dark:bg-white/5 border-b border-border dark:border-dark-border">
+                <span class="text-label font-semibold text-text-secondary uppercase tracking-wider">Actividad predecesora</span>
+                <span class="text-label font-semibold text-text-secondary uppercase tracking-wider">Tipo</span>
+                <span class="text-label font-semibold text-text-secondary uppercase tracking-wider">Lag (días)</span>
+                <span></span>
+              </div>
+              <!-- Rows -->
+              @for (dep of dependencies(); track dep.uid) {
+                <div class="grid grid-cols-[1fr_180px_100px_40px] gap-3 px-4 py-3 items-center border-b border-border/50 dark:border-dark-border/50 last:border-b-0">
+                  <select
+                    class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                    [value]="dep.targetActivityId"
+                    (change)="updateDependency(dep.uid, 'targetActivityId', $any($event.target).value)"
+                  >
+                    <option value="" disabled>Selecciona actividad...</option>
+                    @for (opt of activityOptions(); track opt.value) {
+                      <option [value]="opt.value">{{ opt.label }}</option>
+                    }
+                  </select>
+                  <select
+                    class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                    [value]="dep.type"
+                    (change)="updateDependency(dep.uid, 'type', $any($event.target).value)"
+                  >
+                    @for (opt of dependencyTypeOptions; track opt.value) {
+                      <option [value]="opt.value">{{ opt.label }}</option>
+                    }
+                  </select>
+                  <input
+                    type="number"
+                    [value]="dep.lagDays"
+                    (change)="updateDependency(dep.uid, 'lagDays', +$any($event.target).value)"
+                    placeholder="0"
+                    class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                  />
+                  <button
+                    type="button"
+                    (click)="removeDependency(dep.uid)"
+                    class="flex items-center justify-center w-8 h-8 rounded-default text-text-secondary hover:text-danger hover:bg-danger/10 transition-colors"
+                  >
+                    <lib-ui-icon icon="trash-2" [size]="15" />
+                  </button>
+                </div>
+              }
+            </div>
+            <p class="mt-2 text-xs text-text-secondary dark:text-dark-text/50">
+              Lag positivo = retraso · Lag negativo = adelanto
+            </p>
+          }
+        </lib-card>
+
+      </div>
+
+      <!-- ══ SIDEBAR ══════════════════════════════════════════ -->
+      <div class="w-80 shrink-0 flex flex-col gap-6 sticky top-24">
+
+        <!-- ─ Estado y progreso ───────────────────────────── -->
+        <lib-card [elevated]="true" padding="md">
+          <div class="flex items-center gap-2 mb-5">
+            <lib-ui-icon icon="chart-area" [size]="17" class="text-primary dark:text-primary-light" />
+            <h3 class="text-small font-semibold text-text-primary dark:text-dark-text">Estado y progreso</h3>
+          </div>
+
+          <div class="flex flex-col gap-5">
+            <!-- Status -->
+            <lib-select
+              formControlName="status"
+              label="Estado"
+              [options]="statusOptions"
+            />
+
+            <!-- Progress type -->
+            <div>
+              <lib-radio-group
+                formControlName="progressType"
+                label="Tipo de medición de avance"
+                orientation="horizontal"
+              >
+                <lib-radio value="PERCENTAGE" label="Porcentaje" />
+                <lib-radio value="STATE"      label="Estado" />
+              </lib-radio-group>
+            </div>
+
+            <!-- Progress % -->
+            @if (progressType === 'PERCENTAGE') {
+              <div class="flex flex-col gap-2">
+                <label class="text-sm font-medium text-text-primary dark:text-dark-text">
+                  Avance: <span class="text-primary dark:text-primary-light font-bold">{{ form.get('progress')!.value }}%</span>
+                </label>
+                <input
+                  type="range"
+                  formControlName="progress"
+                  min="0"
+                  max="100"
+                  step="5"
+                  class="w-full h-2 rounded-badge bg-secondary-bg dark:bg-white/10 appearance-none cursor-pointer accent-primary"
+                />
+                <div class="flex justify-between text-xs text-text-secondary dark:text-dark-text/50">
+                  <span>0%</span>
+                  <span>50%</span>
+                  <span>100%</span>
+                </div>
+              </div>
+            } @else {
+              <div class="p-3 rounded-default bg-secondary-bg dark:bg-white/5 text-small text-text-secondary dark:text-dark-text/60">
+                <lib-ui-icon icon="circle-alert" [size]="14" class="inline mr-1.5" />
+                Los estados de actividad se configuran desde la sección de estados del tenant.
+              </div>
+            }
+          </div>
+        </lib-card>
+
+        <!-- ─ Asignación ──────────────────────────────────── -->
+        <lib-card [elevated]="true" padding="md">
+          <div class="flex items-center gap-2 mb-5">
+            <lib-ui-icon icon="users" [size]="17" class="text-primary dark:text-primary-light" />
+            <h3 class="text-small font-semibold text-text-primary dark:text-dark-text">Asignación</h3>
+          </div>
+
+          <div class="flex flex-col gap-4">
+            <lib-select
+              formControlName="assignedRole"
+              label="Rol responsable"
+              [options]="roleOptions"
+              placeholder="Selecciona un rol"
+              hint="La actividad se asigna a un rol, no a un usuario directamente"
+            />
+            <lib-select
+              formControlName="parentId"
+              label="Actividad padre"
+              [options]="parentOptions()"
+              hint="Opcional — ubica esta actividad en el árbol del cronograma"
+            />
+          </div>
+        </lib-card>
+
+        <!-- ─ Resumen de datos ────────────────────────────── -->
+        <div class="rounded-default border border-border dark:border-dark-border bg-surface dark:bg-dark-surface overflow-hidden">
+          <div class="px-4 py-3 border-b border-border dark:border-dark-border bg-secondary-bg/60 dark:bg-white/5">
+            <span class="text-label font-semibold text-text-secondary uppercase tracking-wider">Registro</span>
+          </div>
+          <div class="divide-y divide-border dark:divide-dark-border">
+            <div class="flex justify-between px-4 py-2.5">
+              <span class="text-small text-text-secondary dark:text-dark-text/60">ID interno</span>
+              <span class="font-mono text-xs text-text-primary dark:text-dark-text">{{ act.id }}</span>
+            </div>
+            <div class="flex justify-between px-4 py-2.5">
+              <span class="text-small text-text-secondary dark:text-dark-text/60">Nivel</span>
+              <span class="text-small font-medium text-text-primary dark:text-dark-text">
+                {{ act.parentId ? 'Sub-actividad' : 'Actividad raíz' }}
+              </span>
+            </div>
+            <div class="flex justify-between px-4 py-2.5">
+              <span class="text-small text-text-secondary dark:text-dark-text/60">Tipo de avance original</span>
+              <span class="text-small font-medium text-text-primary dark:text-dark-text">{{ act.progressType }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </form>
+
+} @else {
+  <!-- Not found -->
+  <div class="flex flex-col items-center justify-center py-24 text-center">
+    <div class="w-16 h-16 rounded-full bg-secondary-bg dark:bg-white/10 flex items-center justify-center mb-4">
+      <lib-ui-icon icon="search" [size]="28" class="text-text-secondary dark:text-dark-text/40" />
+    </div>
+    <h2 class="text-h3 font-semibold text-text-primary dark:text-dark-text mb-2">Actividad no encontrada</h2>
+    <a
+      [routerLink]="['/system/projects', projectId(), 'activities']"
+      class="flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover text-white text-small font-medium rounded-input transition-colors"
+    >
+      <lib-ui-icon icon="arrow-left" [size]="15" />
+      Volver a actividades
+    </a>
+  </div>
+}
