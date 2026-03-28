@@ -57,3 +57,4 @@ export type IconType =
 	| 'external-link'
 	| 'plus'
 	| 'zap'
+	| 'info'

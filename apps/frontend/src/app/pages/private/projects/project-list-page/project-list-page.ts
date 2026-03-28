@@ -1,5 +1,7 @@
 import { Component, computed, signal } from '@angular/core'
 
+import { RouterLink } from '@angular/router'
+
 import { Badge, BadgeVariant, EmptyState, Icon, StatCard } from '@org/ui'
 import { ProjectStatus } from '@org/util'
 
@@ -116,7 +118,7 @@ const MOCK_PROJECTS: ProjectListItem[] = [
 
 @Component({
 	selector: 'app-project-list-page',
-	imports: [Badge, EmptyState, Icon, ProjectCard, StatCard],
+	imports: [Badge, EmptyState, Icon, ProjectCard, RouterLink, StatCard],
 	templateUrl: './project-list-page.html',
 })
 export class ProjectListPage {

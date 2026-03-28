@@ -7,6 +7,16 @@ export const projectRoutes: Routes = [
 			import('./project-list-page/project-list-page').then(m => m.ProjectListPage),
 	},
 	{
+		path: 'new',
+		loadComponent: () =>
+			import('./project-form-page/project-form-page').then(m => m.ProjectFormPage),
+	},
+	{
+		path: ':id/edit',
+		loadComponent: () =>
+			import('./project-form-page/project-form-page').then(m => m.ProjectFormPage),
+	},
+	{
 		path: ':id',
 		loadComponent: () =>
 			import('./project-detail-page/project-detail-page').then(m => m.ProjectDetailPage),

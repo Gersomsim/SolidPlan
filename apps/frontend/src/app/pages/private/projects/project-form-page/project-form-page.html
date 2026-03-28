@@ -1,0 +1,380 @@
+<!-- ── Sticky header ──────────────────────────────────────── -->
+<div class="sticky top-0 z-30 bg-surface dark:bg-dark-surface border-b border-border dark:border-dark-border shadow-card">
+  <div class="flex items-center justify-between gap-4 px-6 py-3">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-1.5 text-label text-text-secondary dark:text-dark-text/60 min-w-0">
+      <a
+        routerLink="/system/projects"
+        class="hover:text-text-primary dark:hover:text-dark-text transition-colors no-underline shrink-0"
+      >
+        Proyectos
+      </a>
+      <lib-ui-icon icon="chevron-right" [size]="14" />
+      <span class="text-text-primary dark:text-dark-text font-medium truncate">
+        {{ isEdit() ? 'Editar proyecto' : 'Nuevo proyecto' }}
+      </span>
+    </nav>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-2 shrink-0">
+      <a
+        routerLink="/system/projects"
+        class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
+      >
+        Cancelar
+      </a>
+      <button
+        (click)="onSave()"
+        [disabled]="saving() || saved()"
+        class="flex items-center gap-2 px-4 py-2 rounded-input bg-primary hover:bg-primary-hover disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+      >
+        @if (saving()) {
+          <lib-ui-icon icon="loader" [size]="15" />
+          Guardando...
+        } @else if (saved()) {
+          <lib-ui-icon icon="check" [size]="15" />
+          Guardado
+        } @else {
+          <lib-ui-icon icon="check" [size]="15" />
+          {{ isEdit() ? 'Guardar cambios' : 'Crear proyecto' }}
+        }
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Page title ─────────────────────────────────────────── -->
+<div class="px-6 pt-6 pb-2">
+  <h1 class="text-h2 font-bold text-text-primary dark:text-dark-text">
+    {{ isEdit() ? 'Editar proyecto' : 'Nuevo proyecto' }}
+  </h1>
+  <p class="text-small text-text-secondary dark:text-dark-text/60 mt-1">
+    {{ isEdit() ? 'Modifica los datos del proyecto.' : 'Completa la información para registrar el nuevo proyecto.' }}
+  </p>
+</div>
+
+<!-- ── Form layout ────────────────────────────────────────── -->
+<div [formGroup]="form" class="flex gap-6 px-6 pb-10 pt-4 items-start">
+
+  <!-- ══ MAIN COLUMN ══════════════════════════════════════ -->
+  <div class="flex-1 min-w-0 flex flex-col gap-6">
+
+    <!-- ── Identidad ───────────────────────────────────── -->
+    <lib-card [elevated]="true" [bordered]="true" padding="md">
+      <div class="mb-4">
+        <h2 class="text-body font-semibold text-text-primary dark:text-dark-text">Información general</h2>
+        <p class="text-small text-text-secondary dark:text-dark-text/60 mt-0.5">Datos básicos de identificación del proyecto.</p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4 mb-4">
+        <lib-input
+          formControlName="code"
+          label="Código"
+          placeholder="OBR-2025-001"
+          [errors]="{ required: 'El código es obligatorio' }"
+        />
+        <div class="col-span-2">
+          <lib-input
+            formControlName="name"
+            label="Nombre del proyecto"
+            placeholder="Torre Residencial El Pinar"
+            [errors]="{ required: 'El nombre es obligatorio' }"
+          />
+        </div>
+      </div>
+
+      <lib-textarea
+        formControlName="description"
+        label="Descripción"
+        placeholder="Describe el alcance, objetivos y características principales del proyecto..."
+        [rows]="3"
+      />
+    </lib-card>
+
+    <!-- ── Ubicación ────────────────────────────────────── -->
+    <lib-card [elevated]="true" [bordered]="true" padding="md">
+      <div class="mb-4">
+        <h2 class="text-body font-semibold text-text-primary dark:text-dark-text">Ubicación</h2>
+        <p class="text-small text-text-secondary dark:text-dark-text/60 mt-0.5">Dirección física del proyecto.</p>
+      </div>
+
+      <div class="flex flex-col gap-4">
+        <lib-input
+          formControlName="street"
+          label="Calle y número"
+          placeholder="Av. Constitución 1234"
+        />
+
+        <div class="grid grid-cols-2 gap-4">
+          <lib-input
+            formControlName="commune"
+            label="Colonia / Municipio"
+            placeholder="San Pedro Garza García"
+          />
+          <lib-input
+            formControlName="city"
+            label="Ciudad"
+            placeholder="Monterrey"
+          />
+        </div>
+
+        <div class="grid grid-cols-3 gap-4">
+          <lib-input
+            formControlName="country"
+            label="País"
+            placeholder="México"
+          />
+          <lib-input
+            formControlName="postalCode"
+            label="Código postal"
+            placeholder="66220"
+          />
+          <div></div>
+        </div>
+
+        <!-- Coordinates -->
+        <div>
+          <p class="text-label font-medium text-text-secondary dark:text-dark-text/60 mb-2">Coordenadas (opcional)</p>
+          <div class="grid grid-cols-2 gap-4">
+            <lib-input
+              formControlName="lat"
+              type="number"
+              label="Latitud"
+              placeholder="25.6714"
+            />
+            <lib-input
+              formControlName="lon"
+              type="number"
+              label="Longitud"
+              placeholder="-100.3096"
+            />
+          </div>
+        </div>
+      </div>
+    </lib-card>
+
+    <!-- ── Cronograma ───────────────────────────────────── -->
+    <lib-card [elevated]="true" [bordered]="true" padding="md">
+      <div class="mb-4">
+        <h2 class="text-body font-semibold text-text-primary dark:text-dark-text">Cronograma</h2>
+        <p class="text-small text-text-secondary dark:text-dark-text/60 mt-0.5">Fechas planificadas y reales del proyecto.</p>
+      </div>
+
+      <div class="flex flex-col gap-5">
+        <div>
+          <p class="text-label font-medium text-text-secondary dark:text-dark-text/60 mb-2 uppercase tracking-wider">Fechas planificadas</p>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Inicio estimado</label>
+              <input
+                type="date"
+                formControlName="estimatedStartDate"
+                class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+              />
+            </div>
+            <div>
+              <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Fin estimado</label>
+              <input
+                type="date"
+                formControlName="estimatedEndDate"
+                class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="text-label font-medium text-text-secondary dark:text-dark-text/60 mb-2 uppercase tracking-wider">Fechas reales</p>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Inicio real</label>
+              <input
+                type="date"
+                formControlName="actualStartDate"
+                class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+              />
+            </div>
+            <div>
+              <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Fin real</label>
+              <input
+                type="date"
+                formControlName="actualEndDate"
+                class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </lib-card>
+
+    <!-- ── Presupuesto ──────────────────────────────────── -->
+    <lib-card [elevated]="true" [bordered]="true" padding="md">
+      <div class="mb-4">
+        <h2 class="text-body font-semibold text-text-primary dark:text-dark-text">Presupuesto</h2>
+        <p class="text-small text-text-secondary dark:text-dark-text/60 mt-0.5">Monto total contratado o estimado del proyecto.</p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4">
+        <div class="col-span-2">
+          <lib-input
+            formControlName="budgetAmount"
+            type="number"
+            label="Monto"
+            placeholder="45000000"
+          />
+        </div>
+        <lib-select
+          formControlName="budgetCurrency"
+          label="Moneda"
+          [options]="currencyOptions"
+        />
+      </div>
+    </lib-card>
+
+    <!-- ── Etapas (create only) ─────────────────────────── -->
+    @if (!isEdit()) {
+      <lib-card [elevated]="true" [bordered]="true" padding="md">
+        <div class="mb-4">
+          <h2 class="text-body font-semibold text-text-primary dark:text-dark-text">Etapas del proyecto</h2>
+          <p class="text-small text-text-secondary dark:text-dark-text/60 mt-0.5">Define las etapas del cronograma. Puedes reordenarlas o agregar más.</p>
+        </div>
+
+        <div class="flex flex-col divide-y divide-border dark:divide-dark-border border border-border dark:border-dark-border rounded-default overflow-hidden mb-3">
+          @for (stage of stages(); track stage.uid) {
+            <div class="flex items-center gap-3 px-4 py-2.5 bg-surface dark:bg-dark-surface">
+              <!-- Order badge -->
+              <span class="w-6 h-6 rounded-badge bg-primary/10 text-primary dark:bg-primary-light/10 dark:text-primary-light text-xs font-bold flex items-center justify-center shrink-0">
+                {{ stage.order }}
+              </span>
+
+              <!-- Name input -->
+              <input
+                type="text"
+                [value]="stage.name"
+                (input)="updateStageName(stage.uid, $any($event.target).value)"
+                placeholder="Nombre de la etapa..."
+                class="flex-1 bg-transparent text-small text-text-primary dark:text-dark-text placeholder:text-text-secondary/50 dark:placeholder:text-dark-text/30 focus:outline-none"
+              />
+
+              <!-- Reorder buttons -->
+              <div class="flex items-center gap-0.5">
+                <button
+                  type="button"
+                  (click)="moveStage(stage.uid, 'up')"
+                  class="w-6 h-6 flex items-center justify-center rounded text-text-secondary dark:text-dark-text/50 hover:text-primary hover:bg-primary/10 transition-colors disabled:opacity-30"
+                  [disabled]="stage.order === 1"
+                >
+                  <lib-ui-icon icon="chevron-up" [size]="13" />
+                </button>
+                <button
+                  type="button"
+                  (click)="moveStage(stage.uid, 'down')"
+                  class="w-6 h-6 flex items-center justify-center rounded text-text-secondary dark:text-dark-text/50 hover:text-primary hover:bg-primary/10 transition-colors disabled:opacity-30"
+                  [disabled]="stage.order === stages().length"
+                >
+                  <lib-ui-icon icon="chevron-down" [size]="13" />
+                </button>
+              </div>
+
+              <!-- Remove -->
+              <button
+                type="button"
+                (click)="removeStage(stage.uid)"
+                class="w-6 h-6 flex items-center justify-center rounded text-text-secondary dark:text-dark-text/50 hover:text-danger hover:bg-danger/10 transition-colors"
+              >
+                <lib-ui-icon icon="x" [size]="13" />
+              </button>
+            </div>
+          }
+
+          <!-- Add stage trigger -->
+          <button
+            type="button"
+            (click)="addStage()"
+            class="w-full flex items-center gap-2 px-4 py-2.5 text-small text-text-secondary dark:text-dark-text/50 hover:text-primary dark:hover:text-primary-light hover:bg-primary/5 dark:hover:bg-primary-light/5 transition-colors"
+          >
+            <lib-ui-icon icon="plus" [size]="14" />
+            Agregar etapa
+          </button>
+        </div>
+
+        <p class="text-label text-text-secondary dark:text-dark-text/50">
+          Las etapas pueden editarse en detalle después de crear el proyecto.
+        </p>
+      </lib-card>
+    }
+
+    <!-- ── Metadata ─────────────────────────────────────── -->
+    <lib-card [elevated]="true" [bordered]="true" padding="md">
+      <div class="mb-4">
+        <h2 class="text-body font-semibold text-text-primary dark:text-dark-text">Metadata</h2>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <lib-input
+          formControlName="totalArea"
+          type="number"
+          label="Superficie total (m²)"
+          placeholder="4200"
+        />
+        <lib-input
+          formControlName="tags"
+          label="Etiquetas"
+          placeholder="residencial, torre, monterrey"
+          hint="Separadas por coma"
+        />
+      </div>
+    </lib-card>
+
+  </div>
+
+  <!-- ══ SIDEBAR ══════════════════════════════════════════ -->
+  <div class="w-80 shrink-0">
+    <div class="sticky top-[65px] flex flex-col gap-4">
+
+      <!-- Estado (edit only) -->
+      @if (isEdit()) {
+        <lib-card [elevated]="true" [bordered]="true" padding="md">
+          <h3 class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase tracking-wider mb-3">Estado</h3>
+          <lib-select
+            formControlName="status"
+            label="Estado del proyecto"
+            [options]="statusOptions"
+          />
+        </lib-card>
+      }
+
+      <!-- Stakeholders -->
+      <lib-card [elevated]="true" [bordered]="true" padding="md">
+        <h3 class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase tracking-wider mb-3">Responsables</h3>
+        <div class="flex flex-col gap-4">
+          <lib-input
+            formControlName="ownerId"
+            label="Propietario / Cliente"
+            placeholder="ID o nombre del propietario"
+          />
+          <lib-input
+            formControlName="managerId"
+            label="Director de obra"
+            placeholder="ID o nombre del director"
+          />
+        </div>
+      </lib-card>
+
+      <!-- Tips -->
+      <div class="rounded-card border border-primary/20 dark:border-primary-light/20 bg-primary/5 dark:bg-primary-light/5 p-4">
+        <div class="flex items-start gap-2.5">
+          <lib-ui-icon icon="info" [size]="15" class="text-primary dark:text-primary-light shrink-0 mt-0.5" />
+          <div>
+            <p class="text-label font-semibold text-primary dark:text-primary-light mb-1">Información</p>
+            <p class="text-label text-text-secondary dark:text-dark-text/60 leading-relaxed">
+              Los miembros del equipo, actividades y bitácoras se configuran después de crear el proyecto.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

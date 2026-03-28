@@ -1,6 +1,7 @@
 import { Component, computed } from '@angular/core'
+import { inject } from '@angular/core'
 import { DecimalPipe } from '@angular/common'
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router'
+import { RouterLink, RouterLinkActive, RouterOutlet, ActivatedRoute } from '@angular/router'
 
 import { Badge, BadgeVariant, Icon, Stepper, StepItem } from '@org/ui'
 import { ProjectStageStatus, ProjectStatus } from '@org/util'
@@ -112,6 +113,9 @@ const MOCK_STAGES: MockStage[] = [
 	templateUrl: './project-detail-page.html',
 })
 export class ProjectDetailPage {
+	private readonly route = inject(ActivatedRoute)
+
+	readonly projectId = computed(() => this.route.snapshot.params['id'] ?? '')
 	readonly project = MOCK_PROJECT
 
 	readonly stageSteps = computed<StepItem[]>(() =>

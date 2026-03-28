@@ -58,6 +58,7 @@ import {
 	LucideCircleCheck,
 	LucideEllipsisVertical,
 	LucideExternalLink,
+	LucideInfo,
 	LucidePlus,
 	LucideZap,
 } from '@lucide/angular'
@@ -133,6 +134,7 @@ export class Icon {
 			'external-link': LucideExternalLink,
 			plus: LucidePlus,
 			zap: LucideZap,
+			info: LucideInfo,
 		}
 
 		return dic[this.icon()]

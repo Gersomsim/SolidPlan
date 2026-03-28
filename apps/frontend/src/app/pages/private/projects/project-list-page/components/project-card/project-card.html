@@ -61,10 +61,20 @@
           {{ project().memberCount }}
         </span>
       </div>
-      <span class="text-label font-medium text-primary dark:text-primary-light flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-        Ver
-        <lib-ui-icon icon="arrow-right" [size]="14" />
-      </span>
+      <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <a
+          [routerLink]="['/system/projects', project().id, 'edit']"
+          (click)="$event.stopPropagation()"
+          class="flex items-center justify-center w-7 h-7 rounded-default text-text-secondary hover:text-primary hover:bg-primary/10 dark:text-dark-text/50 dark:hover:text-primary-light transition-colors"
+          title="Editar proyecto"
+        >
+          <lib-ui-icon icon="user-pen" [size]="14" />
+        </a>
+        <span class="text-label font-medium text-primary dark:text-primary-light flex items-center gap-0.5">
+          Ver
+          <lib-ui-icon icon="arrow-right" [size]="14" />
+        </span>
+      </div>
     </div>
   </div>
 

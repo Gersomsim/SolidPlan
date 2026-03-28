@@ -19,11 +19,12 @@
 				<span class="text-text-primary dark:text-dark-text font-medium">{{ project.code }}</span>
 			</nav>
 			<div class="flex items-center gap-2 shrink-0">
-				<button
-					class="bg-secondary-bg hover:bg-border dark:bg-white/10 dark:hover:bg-white/15 text-text-primary dark:text-dark-text text-small font-medium px-3.5 py-2 rounded-input transition-colors duration-150"
+				<a
+					[routerLink]="['/system/projects', projectId(), 'edit']"
+					class="bg-secondary-bg hover:bg-border dark:bg-white/10 dark:hover:bg-white/15 text-text-primary dark:text-dark-text text-small font-medium px-3.5 py-2 rounded-input transition-colors duration-150 no-underline"
 				>
 					Editar
-				</button>
+				</a>
 				<button
 					class="bg-primary hover:bg-primary-hover text-white text-small font-semibold px-3.5 py-2 rounded-input shadow-card transition-colors duration-200 flex items-center gap-1.5"
 				>

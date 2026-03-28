@@ -8,10 +8,13 @@
         {{ stats().total }} proyectos en total · {{ stats().active }} activos
       </p>
     </div>
-    <button class="bg-primary hover:bg-primary-hover text-white text-small font-semibold px-4 py-2.5 rounded-input shadow-card transition-colors duration-200 flex items-center gap-2 shrink-0">
+    <a
+      routerLink="/system/projects/new"
+      class="bg-primary hover:bg-primary-hover text-white text-small font-semibold px-4 py-2.5 rounded-input shadow-card transition-colors duration-200 flex items-center gap-2 shrink-0 no-underline"
+    >
       <lib-ui-icon icon="building" [size]="16" />
       Nuevo proyecto
-    </button>
+    </a>
   </div>
 
   <!-- KPI strip -->
