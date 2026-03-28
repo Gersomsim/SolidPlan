@@ -26,6 +26,7 @@ import {
 	LucideHouse,
 	LucideKeyRound,
 	LucideLandmark,
+	LucideLink,
 	LucideLoader,
 	LucideLoaderCircle,
 	LucideLockKeyhole,
@@ -119,6 +120,7 @@ export class Icon {
 			'arrow-down': LucideArrowDown,
 			send: LucideSend,
 			mail: LucideMail,
+			link: LucideLink,
 		}
 
 		return dic[this.icon()]

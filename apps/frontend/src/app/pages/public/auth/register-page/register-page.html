@@ -1,1 +1,320 @@
-<p>register-page works!</p>
+<div
+  class="min-h-[calc(100vh-4rem)] bg-background dark:bg-dark-background flex items-center justify-center px-4 py-12 transition-colors duration-200"
+>
+  <!-- outer container — expands on step 3 -->
+  <div
+    [class]="'w-full flex flex-col gap-8 animate-slide-in-up transition-all duration-300 ' +
+             (activeStep() === 'plan' ? 'max-w-4xl' : 'max-w-lg')"
+  >
+
+    <!-- ── Brand header ──────────────────────────────────────── -->
+    <div class="flex flex-col items-center gap-3 text-center">
+      <div class="w-12 h-12 bg-primary rounded-card flex items-center justify-center shadow-card">
+        <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
+        </svg>
+      </div>
+      <div class="flex flex-col gap-1">
+        <h1 class="text-h3 font-semibold text-text-primary dark:text-dark-text">Crea tu cuenta</h1>
+        <p class="text-small text-text-secondary dark:text-dark-text/70">
+          Configura tu organización y empieza a gestionar tus proyectos
+        </p>
+      </div>
+    </div>
+
+    <!-- ── Step indicator ────────────────────────────────────── -->
+    <lib-stepper
+      [steps]="stepItems()"
+      [activeStep]="activeStep()"
+      [linear]="true"
+      orientation="horizontal"
+      (stepChange)="onStepChange($event)"
+    />
+
+    <!-- ════════════════════════════════════════════════════════
+         STEP 1 — Tu cuenta
+    ═════════════════════════════════════════════════════════════ -->
+    @if (activeStep() === 'user') {
+      <lib-card [bordered]="true" [elevated]="true" padding="lg">
+        <form [formGroup]="userForm" class="flex flex-col gap-5" (ngSubmit)="nextStep()">
+
+          <!-- Nombre + Apellido -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <lib-input
+              formControlName="firstName"
+              label="Nombre"
+              placeholder="Juan"
+              [errors]="{ minlength: 'Mínimo 2 caracteres' }"
+            />
+            <lib-input
+              formControlName="lastName"
+              label="Apellido"
+              placeholder="Pérez"
+              [errors]="{ minlength: 'Mínimo 2 caracteres' }"
+            />
+          </div>
+
+          <!-- Email + Teléfono -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <lib-input
+              formControlName="email"
+              label="Correo electrónico"
+              type="email"
+              placeholder="juan@constructora.com"
+            />
+            <lib-input
+              formControlName="phone"
+              label="Teléfono"
+              type="tel"
+              placeholder="+52 55 1234 5678"
+              hint="Opcional"
+            />
+          </div>
+
+          <!-- Cargo -->
+          <lib-select
+            formControlName="jobTitle"
+            label="Cargo en la empresa"
+            placeholder="Selecciona tu cargo"
+            [options]="jobTitleOptions"
+          />
+
+          <!-- Contraseña + Confirmar -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <lib-input
+              formControlName="password"
+              label="Contraseña"
+              type="password"
+              placeholder="••••••••"
+              hint="Mínimo 8 caracteres"
+              [errors]="{ minlength: 'Mínimo 8 caracteres' }"
+            />
+            <div class="flex flex-col gap-1">
+              <lib-input
+                formControlName="confirmPassword"
+                label="Confirmar contraseña"
+                type="password"
+                placeholder="••••••••"
+              />
+              @if (passwordMismatch) {
+                <p class="text-xs text-danger">Las contraseñas no coinciden</p>
+              }
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center justify-between pt-1">
+            <p class="text-small text-text-secondary dark:text-dark-text/70">
+              ¿Ya tienes cuenta?
+              <lib-link routerLink="/auth/login" variant="link">Inicia sesión</lib-link>
+            </p>
+            <lib-button variant="primary" type="submit">
+              Continuar
+              <lib-ui-icon icon="arrow-right" [size]="16" />
+            </lib-button>
+          </div>
+
+        </form>
+      </lib-card>
+    }
+
+    <!-- ════════════════════════════════════════════════════════
+         STEP 2 — Tu empresa
+    ═════════════════════════════════════════════════════════════ -->
+    @if (activeStep() === 'tenant') {
+      <lib-card [bordered]="true" [elevated]="true" padding="lg">
+        <form [formGroup]="tenantForm" class="flex flex-col gap-6" (ngSubmit)="nextStep()">
+
+          <!-- Heading -->
+          <div class="flex flex-col gap-1">
+            <h2 class="text-h4 font-semibold text-text-primary dark:text-dark-text">
+              Cuéntanos sobre tu empresa
+            </h2>
+            <p class="text-small text-text-secondary dark:text-dark-text/70">
+              Crearemos tu organización en Solid Plan. Podrás agregar tu equipo y proyectos después.
+            </p>
+          </div>
+
+          <!-- Company name -->
+          <div class="flex flex-col gap-2">
+            <lib-input
+              formControlName="name"
+              label="Nombre de la empresa"
+              placeholder="Constructora Pérez S.A."
+              [errors]="{ minlength: 'Mínimo 2 caracteres' }"
+            />
+            @if (tenantSlugPreview) {
+              <p class="text-xs text-text-secondary dark:text-dark-text/50 flex items-center gap-1.5">
+                <lib-ui-icon icon="link" [size]="12" />
+                solidplan.app/<span class="font-mono text-primary dark:text-primary-light">{{ tenantSlugPreview }}</span>
+              </p>
+            }
+          </div>
+
+          <!-- Info callout -->
+          <div class="flex items-start gap-3 rounded-default bg-primary/5 dark:bg-dark-primary/10 border border-primary/15 dark:border-dark-primary/20 px-4 py-3">
+            <lib-ui-icon icon="shield-check" [size]="18" class="text-primary dark:text-primary-light shrink-0 mt-0.5" />
+            <p class="text-small text-text-secondary dark:text-dark-text/70 leading-relaxed">
+              Tu organización tendrá aislamiento total de datos.
+              Serás el <strong class="text-text-primary dark:text-dark-text font-medium">administrador</strong> y podrás invitar a tu equipo cuando quieras.
+            </p>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center justify-between pt-1">
+            <lib-button variant="ghost" type="button" (click)="prevStep()">
+              <lib-ui-icon icon="arrow-left" [size]="16" />
+              Anterior
+            </lib-button>
+            <lib-button variant="primary" type="submit">
+              Continuar
+              <lib-ui-icon icon="arrow-right" [size]="16" />
+            </lib-button>
+          </div>
+
+        </form>
+      </lib-card>
+    }
+
+    <!-- ════════════════════════════════════════════════════════
+         STEP 3 — Elige tu plan
+    ═════════════════════════════════════════════════════════════ -->
+    @if (activeStep() === 'plan') {
+      <div class="flex flex-col gap-6">
+
+        <div class="text-center flex flex-col gap-1">
+          <h2 class="text-h4 font-semibold text-text-primary dark:text-dark-text">
+            Elige tu plan
+          </h2>
+          <p class="text-small text-text-secondary dark:text-dark-text/70">
+            Puedes cambiar de plan en cualquier momento. Sin compromisos.
+          </p>
+        </div>
+
+        <!-- Plan cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          @for (plan of plans; track plan.key) {
+
+            @if (!plan.highlighted) {
+              <!-- Standard plan card -->
+              <button
+                type="button"
+                (click)="selectedPlan.set(plan.key)"
+                [class]="'relative text-left w-full rounded-card border-2 p-6 flex flex-col gap-5 transition-all duration-200 focus-visible:outline-none ' +
+                  (selectedPlan() === plan.key
+                    ? 'border-primary dark:border-dark-primary bg-primary/5 dark:bg-dark-primary/10 shadow-hover'
+                    : 'border-border dark:border-dark-border bg-surface dark:bg-dark-surface hover:border-primary/40 dark:hover:border-dark-primary/40 shadow-card')"
+              >
+                <!-- Selection indicator -->
+                <span
+                  [class]="'absolute top-4 right-4 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ' +
+                    (selectedPlan() === plan.key
+                      ? 'border-primary dark:border-dark-primary bg-primary dark:bg-dark-primary'
+                      : 'border-border dark:border-dark-border')"
+                >
+                  @if (selectedPlan() === plan.key) {
+                    <lib-ui-icon icon="check" [size]="10" class="text-white" />
+                  }
+                </span>
+
+                <div class="flex flex-col gap-2 pr-6">
+                  <h3 class="text-h4 font-semibold text-text-primary dark:text-dark-text">{{ plan.name }}</h3>
+                  <div class="flex items-end gap-1.5">
+                    <span class="text-h2 font-bold text-text-primary dark:text-dark-text">{{ plan.price }}</span>
+                    <span class="text-small text-text-secondary dark:text-dark-text/70 pb-1.5">{{ plan.period }}</span>
+                  </div>
+                  <p class="text-small text-text-secondary dark:text-dark-text/70 leading-relaxed">{{ plan.description }}</p>
+                </div>
+
+                <ul class="flex flex-col gap-2">
+                  @for (feat of plan.features; track feat) {
+                    <li class="flex items-start gap-2 text-small text-text-primary dark:text-dark-text">
+                      <lib-ui-icon icon="check" [size]="14" class="shrink-0 mt-0.5 text-success" />
+                      {{ feat }}
+                    </li>
+                  }
+                </ul>
+              </button>
+            }
+
+            @if (plan.highlighted) {
+              <!-- Highlighted plan card (PRO) -->
+              <button
+                type="button"
+                (click)="selectedPlan.set(plan.key)"
+                [class]="'relative text-left w-full rounded-card p-6 flex flex-col gap-5 transition-all duration-200 focus-visible:outline-none border-2 ' +
+                  (selectedPlan() === plan.key
+                    ? 'border-white/40 bg-primary shadow-hover'
+                    : 'border-transparent bg-primary shadow-card hover:shadow-hover')"
+              >
+                <!-- Badge + Selection indicator -->
+                <div class="flex items-center justify-between">
+                  <span class="bg-accent text-white text-label font-semibold uppercase px-3 py-1 rounded-badge">
+                    {{ plan.badge }}
+                  </span>
+                  <span
+                    [class]="'w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ' +
+                      (selectedPlan() === plan.key
+                        ? 'border-white bg-white'
+                        : 'border-white/50')"
+                  >
+                    @if (selectedPlan() === plan.key) {
+                      <lib-ui-icon icon="check" [size]="10" class="text-primary" />
+                    }
+                  </span>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                  <h3 class="text-h4 font-semibold text-white">{{ plan.name }}</h3>
+                  <div class="flex items-end gap-1.5">
+                    <span class="text-h2 font-bold text-white">{{ plan.price }}</span>
+                    <span class="text-small text-white/70 pb-1.5">{{ plan.period }}</span>
+                  </div>
+                  <p class="text-small text-white/80 leading-relaxed">{{ plan.description }}</p>
+                </div>
+
+                <ul class="flex flex-col gap-2">
+                  @for (feat of plan.features; track feat) {
+                    <li class="flex items-start gap-2 text-small text-white/90">
+                      <lib-ui-icon icon="check" [size]="14" class="shrink-0 mt-0.5 text-white" />
+                      {{ feat }}
+                    </li>
+                  }
+                </ul>
+              </button>
+            }
+
+          }
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center justify-between">
+          <lib-button variant="ghost" type="button" (click)="prevStep()">
+            <lib-ui-icon icon="arrow-left" [size]="16" />
+            Anterior
+          </lib-button>
+          <div class="flex items-center gap-3">
+            <p class="text-small text-text-secondary dark:text-dark-text/70 hidden sm:block">
+              Plan seleccionado:
+              <strong class="text-text-primary dark:text-dark-text">{{ selectedPlanName }}</strong>
+            </p>
+            <lib-button variant="primary" type="button" (click)="submit()">
+              Completar registro
+              <lib-ui-icon icon="check" [size]="16" />
+            </lib-button>
+          </div>
+        </div>
+
+      </div>
+    }
+
+    <!-- ── Legal footer ───────────────────────────────────────── -->
+    <p class="text-center text-label text-text-secondary dark:text-dark-text/50">
+      Al registrarte aceptas nuestros
+      <lib-link href="#" variant="link" underline="always">Términos de uso</lib-link>
+      y
+      <lib-link href="#" variant="link" underline="always">Política de privacidad</lib-link>
+    </p>
+
+  </div>
+</div>
