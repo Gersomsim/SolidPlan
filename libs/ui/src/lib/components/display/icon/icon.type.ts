@@ -58,3 +58,5 @@ export type IconType =
 	| 'plus'
 	| 'zap'
 	| 'info'
+	| 'cloud'
+	| 'cloud-rain'

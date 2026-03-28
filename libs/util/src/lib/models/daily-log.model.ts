@@ -19,6 +19,7 @@ export interface DailyLog {
   id: string;
   tenantId: string;  // Tenant ID — aislamiento de datos
   projectId: string;
+  activityIds?: string[]; // Actividades relacionadas (opcionales — un log puede ser general)
   authorId: string;  // Usuario que crea el registro (cualquier miembro del proyecto)
 
   reportDate: Date;  // Fecha a la que corresponde el registro (no necesariamente hoy)

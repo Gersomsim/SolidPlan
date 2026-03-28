@@ -56,6 +56,8 @@ import {
 	LucideUsers,
 	LucideX,
 	LucideCircleCheck,
+	LucideCloud,
+	LucideCloudRain,
 	LucideEllipsisVertical,
 	LucideExternalLink,
 	LucideInfo,
@@ -135,6 +137,8 @@ export class Icon {
 			plus: LucidePlus,
 			zap: LucideZap,
 			info: LucideInfo,
+			cloud: LucideCloud,
+			'cloud-rain': LucideCloudRain,
 		}
 
 		return dic[this.icon()]

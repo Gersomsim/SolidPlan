@@ -1,0 +1,222 @@
+<div [formGroup]="form" class="flex flex-col gap-0 divide-y divide-border dark:divide-dark-border">
+
+  <!-- ── Locked warning (edit mode only) ──────────────────── -->
+  @if (isEdit() && log()?.isLocked) {
+    <div class="px-6 py-3 bg-accent/5 dark:bg-accent/10 border-b border-accent/20">
+      <div class="flex items-center gap-2.5 text-small text-accent">
+        <lib-ui-icon icon="triangle-alert" [size]="14" class="shrink-0" />
+        <span>
+          Esta bitácora está firmada. Los cambios quedarán pendientes de re-validación por el supervisor.
+        </span>
+      </div>
+    </div>
+  }
+
+  <!-- ── Section: Fecha y título ──────────────────────────── -->
+  <div class="px-6 py-5 flex flex-col gap-4">
+    <p class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase tracking-wider">Información general</p>
+
+    <div class="grid grid-cols-3 gap-4">
+      <div>
+        <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">
+          Fecha del reporte <span class="text-danger">*</span>
+        </label>
+        <input
+          type="date"
+          formControlName="reportDate"
+          class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+        />
+        @if (form.get('reportDate')?.invalid && form.get('reportDate')?.touched) {
+          <p class="mt-1 text-xs text-danger">La fecha es obligatoria</p>
+        }
+      </div>
+      <div class="col-span-2">
+        <lib-input
+          formControlName="title"
+          label="Título *"
+          placeholder="Ej. Colado de columnas nivel 8"
+          [errors]="{ required: 'El título es obligatorio' }"
+        />
+      </div>
+    </div>
+
+    <lib-textarea
+      formControlName="description"
+      label="Actividades realizadas *"
+      placeholder="Describe en detalle las actividades, avances y trabajos ejecutados durante el día..."
+      [rows]="3"
+      [errors]="{ required: 'La descripción es obligatoria' }"
+    />
+  </div>
+
+  <!-- ── Section: Incidencias y observaciones ─────────────── -->
+  <div class="px-6 py-5 flex flex-col gap-4">
+    <p class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase tracking-wider">Incidencias y notas</p>
+
+    <div class="rounded-card border border-danger/25 dark:border-danger/20 bg-danger/3 dark:bg-danger/5 p-4">
+      <div class="flex items-start gap-2 mb-2">
+        <lib-ui-icon icon="triangle-alert" [size]="13" class="text-danger shrink-0 mt-0.5" />
+        <label class="text-label font-semibold text-danger">Incidencias</label>
+      </div>
+      <lib-textarea
+        formControlName="incidents"
+        placeholder="Describe accidentes, retrasos de proveedores, problemas técnicos u otros eventos relevantes..."
+        [rows]="2"
+      />
+    </div>
+
+    <div class="rounded-card border border-primary/20 dark:border-primary-light/20 bg-primary/3 dark:bg-primary-light/5 p-4">
+      <div class="flex items-start gap-2 mb-2">
+        <lib-ui-icon icon="info" [size]="13" class="text-primary dark:text-primary-light shrink-0 mt-0.5" />
+        <label class="text-label font-semibold text-primary dark:text-primary-light">Observaciones</label>
+      </div>
+      <lib-textarea
+        formControlName="observations"
+        placeholder="Notas para el siguiente turno, pendientes, recordatorios..."
+        [rows]="2"
+      />
+    </div>
+  </div>
+
+  <!-- ── Section: Métricas ─────────────────────────────────── -->
+  <div class="px-6 py-5 flex flex-col gap-4">
+    <p class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase tracking-wider">Métricas del día</p>
+
+    <div class="grid grid-cols-2 gap-4">
+      <lib-input
+        formControlName="headcount"
+        type="number"
+        label="Personal en obra *"
+        placeholder="18"
+        hint="Número total de personas"
+        [errors]="{ required: 'Requerido', min: 'Mínimo 0' }"
+      />
+      <lib-input
+        formControlName="workingHours"
+        type="number"
+        label="Horas-hombre totales *"
+        placeholder="144"
+        hint="Suma de horas de todos los trabajadores"
+        [errors]="{ required: 'Requerido', min: 'Mínimo 0' }"
+      />
+    </div>
+
+    <!-- Machinery list -->
+    <div>
+      <p class="text-label font-medium text-text-secondary dark:text-dark-text/70 mb-2">Maquinaria utilizada</p>
+      <div class="flex flex-col gap-2">
+        @for (machine of machines(); track machine.uid) {
+          <div class="flex items-center gap-2">
+            <lib-ui-icon icon="settings" [size]="14" class="text-text-secondary dark:text-dark-text/50 shrink-0" />
+            <input
+              type="text"
+              [value]="machine.value"
+              (input)="updateMachine(machine.uid, $any($event.target).value)"
+              placeholder="Ej. Bomba de concreto BPL 1600"
+              class="flex-1 px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-secondary/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+            />
+            <button
+              type="button"
+              (click)="removeMachine(machine.uid)"
+              class="w-7 h-7 flex items-center justify-center rounded text-text-secondary hover:text-danger hover:bg-danger/10 transition-colors shrink-0"
+            >
+              <lib-ui-icon icon="x" [size]="14" />
+            </button>
+          </div>
+        }
+        <button
+          type="button"
+          (click)="addMachine()"
+          class="flex items-center gap-2 text-small text-text-secondary dark:text-dark-text/50 hover:text-primary dark:hover:text-primary-light transition-colors self-start"
+        >
+          <lib-ui-icon icon="plus" [size]="14" />
+          Agregar maquinaria
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section: Clima ────────────────────────────────────── -->
+  <div class="px-6 py-5 flex flex-col gap-4">
+    <p class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase tracking-wider">Condiciones climáticas</p>
+
+    <div class="grid grid-cols-2 gap-4">
+      <lib-select
+        formControlName="weather"
+        label="Clima *"
+        [options]="weatherOptions"
+        [errors]="{ required: 'Requerido' }"
+      />
+      <lib-input
+        formControlName="temperature"
+        type="number"
+        label="Temperatura (°C)"
+        placeholder="22"
+        hint="Opcional"
+      />
+    </div>
+  </div>
+
+  <!-- ── Section: Actividades vinculadas ───────────────────── -->
+  <div class="px-6 py-5 flex flex-col gap-3">
+    <div>
+      <p class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase tracking-wider">Actividades trabajadas</p>
+      <p class="text-label text-text-secondary dark:text-dark-text/50 mt-0.5">Opcional — vincula este log a las actividades en las que se trabajó hoy.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-44 overflow-y-auto pr-1">
+      @for (act of allActivities; track act.id) {
+        <label
+          class="flex items-center gap-2.5 px-3 py-2 rounded-input cursor-pointer transition-colors"
+          [class.bg-primary/8]="isActivityChecked(act.id)"
+          [class.dark:bg-primary-light/10]="isActivityChecked(act.id)"
+          [class.hover:bg-secondary-bg]="!isActivityChecked(act.id)"
+          [class.dark:hover:bg-white/5]="!isActivityChecked(act.id)"
+        >
+          <input
+            type="checkbox"
+            [checked]="isActivityChecked(act.id)"
+            (change)="toggleActivity(act.id)"
+            class="w-4 h-4 rounded accent-primary shrink-0"
+          />
+          <span class="font-mono text-xs text-text-secondary shrink-0">{{ act.code }}</span>
+          <span class="text-small text-text-primary dark:text-dark-text truncate">{{ act.name }}</span>
+        </label>
+      }
+    </div>
+  </div>
+
+  <!-- ── Footer: actions ───────────────────────────────────── -->
+  <div class="px-6 py-4 flex items-center justify-between gap-3 bg-secondary-bg/40 dark:bg-white/3">
+    <span class="text-label text-text-secondary dark:text-dark-text/50">
+      {{ checkedActivities().size > 0 ? checkedActivities().size + ' actividad(es) vinculada(s)' : 'Sin actividades vinculadas' }}
+    </span>
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        (click)="canceled.emit()"
+        class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        (click)="onSubmit()"
+        [disabled]="saving() || savedOk()"
+        class="flex items-center gap-2 px-4 py-2 rounded-input bg-primary hover:bg-primary-hover disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+      >
+        @if (saving()) {
+          <lib-ui-icon icon="loader-circle" [size]="15" />
+          Guardando...
+        } @else if (savedOk()) {
+          <lib-ui-icon icon="check" [size]="15" />
+          Guardado
+        } @else {
+          <lib-ui-icon icon="check" [size]="15" />
+          {{ isEdit() ? 'Guardar cambios' : 'Crear bitácora' }}
+        }
+      </button>
+    </div>
+  </div>
+
+</div>

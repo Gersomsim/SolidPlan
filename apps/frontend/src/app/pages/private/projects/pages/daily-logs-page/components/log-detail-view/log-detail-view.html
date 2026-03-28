@@ -1,0 +1,356 @@
+<!-- ── Layout ──────────────────────────────────────────────── -->
+<div class="flex gap-6 p-6">
+	<!-- ══ MAIN COLUMN ═════════════════════════════════════════ -->
+	<div class="flex-1 min-w-0 flex flex-col gap-6">
+		<!-- Header meta -->
+		<div class="flex flex-wrap items-center gap-3">
+			<span
+				class="text-label font-mono font-semibold px-2.5 py-1 rounded-badge bg-secondary-bg dark:bg-white/10 text-text-secondary dark:text-dark-text/60"
+			>
+				{{ log().reportDate | date: "EEEE d 'de' MMMM, yyyy" : '' : 'es-MX' }}
+			</span>
+			@if (log().isLocked) {
+				<span
+					class="flex items-center gap-1 px-2.5 py-1 rounded-badge bg-success/10 text-success text-xs font-medium uppercase tracking-wide"
+				>
+					<lib-ui-icon
+						icon="lock-keyhole"
+						[size]="11"
+					/>
+					Firmado
+				</span>
+			} @else {
+				<span
+					class="flex items-center gap-1 px-2.5 py-1 rounded-badge bg-accent/10 text-accent text-xs font-medium uppercase tracking-wide"
+				>
+					<lib-ui-icon
+						icon="loader"
+						[size]="11"
+					/>
+					Borrador
+				</span>
+			}
+			<span class="ml-auto flex items-center gap-1.5 text-small text-text-secondary dark:text-dark-text/60">
+				<lib-ui-icon
+					[icon]="weatherIcon(log().environment.weather)"
+					[size]="14"
+					[class]="weatherClass(log().environment.weather)"
+				/>
+				{{ weatherLabel(log().environment.weather) }}
+				@if (log().environment.temperature != null) {
+					· {{ log().environment.temperature }}°C
+				}
+			</span>
+		</div>
+
+		<!-- Title -->
+		<h2 class="text-h3 font-bold text-text-primary dark:text-dark-text leading-snug -mt-2">
+			{{ log().content.title }}
+		</h2>
+
+		<!-- Description -->
+		<div>
+			<h3
+				class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase tracking-wider mb-2"
+			>
+				Actividades realizadas
+			</h3>
+			<p class="text-body text-text-primary dark:text-dark-text leading-relaxed">
+				{{ log().content.description }}
+			</p>
+		</div>
+
+		<!-- Incidents -->
+		@if (log().content.incidents) {
+			<div class="rounded-card border border-danger/30 dark:border-danger/20 bg-danger/5 dark:bg-danger/10 p-4">
+				<div class="flex items-start gap-2.5">
+					<lib-ui-icon
+						icon="triangle-alert"
+						[size]="15"
+						class="text-danger shrink-0 mt-0.5"
+					/>
+					<div>
+						<h3 class="text-label font-semibold text-danger mb-1.5 uppercase tracking-wider">
+							Incidencias
+						</h3>
+						<p class="text-body text-text-primary dark:text-dark-text leading-relaxed">
+							{{ log().content.incidents }}
+						</p>
+					</div>
+				</div>
+			</div>
+		}
+
+		<!-- Observations -->
+		@if (log().content.observations) {
+			<div
+				class="rounded-card border border-primary/20 dark:border-primary-light/20 bg-primary/5 dark:bg-primary-light/5 p-4"
+			>
+				<div class="flex items-start gap-2.5">
+					<lib-ui-icon
+						icon="info"
+						[size]="15"
+						class="text-primary dark:text-primary-light shrink-0 mt-0.5"
+					/>
+					<div>
+						<h3
+							class="text-label font-semibold text-primary dark:text-primary-light mb-1.5 uppercase tracking-wider"
+						>
+							Observaciones
+						</h3>
+						<p class="text-body text-text-primary dark:text-dark-text leading-relaxed">
+							{{ log().content.observations }}
+						</p>
+					</div>
+				</div>
+			</div>
+		}
+
+		<!-- Linked activities -->
+		<div>
+			<h3
+				class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase tracking-wider mb-3"
+			>
+				Actividades relacionadas
+				@if (linkedActivities().length > 0) {
+					<span
+						class="ml-1.5 text-xs font-medium px-1.5 py-0.5 rounded-badge bg-secondary-bg dark:bg-white/10 text-text-secondary dark:text-dark-text/60"
+					>
+						{{ linkedActivities().length }}
+					</span>
+				}
+			</h3>
+
+			@if (linkedActivities().length > 0) {
+				<div
+					class="flex flex-col divide-y divide-border dark:divide-dark-border rounded-default border border-border dark:border-dark-border overflow-hidden"
+				>
+					@for (act of linkedActivities(); track act.id) {
+						<a
+							[routerLink]="projectId() ? ['/system/projects', projectId(), 'activities', act.id] : null"
+							class="flex items-center gap-3 px-4 py-3 bg-surface dark:bg-dark-surface hover:bg-hover-row dark:hover:bg-dark-hover-row transition-colors group/act"
+							[class.cursor-pointer]="projectId()"
+						>
+							<!-- Category dot -->
+							<span
+								class="w-2 h-2 rounded-full shrink-0"
+								[style.background-color]="act.categoryColor"
+							></span>
+
+							<!-- Code + name -->
+							<span class="font-mono text-xs text-text-secondary shrink-0">{{ act.code }}</span>
+							<span
+								class="flex-1 text-small text-text-primary dark:text-dark-text group-hover/act:text-primary dark:group-hover/act:text-primary-light transition-colors truncate"
+							>
+								{{ act.name }}
+							</span>
+
+							<!-- Status -->
+							<lib-badge
+								[variant]="activityStatusBadge(act.status)"
+								[label]="activityStatusLabel(act.status)"
+								size="sm"
+							/>
+
+							@if (projectId()) {
+								<lib-ui-icon
+									icon="external-link"
+									[size]="12"
+									class="text-text-secondary/0 group-hover/act:text-text-secondary dark:group-hover/act:text-dark-text/40 transition-colors shrink-0"
+								/>
+							}
+						</a>
+					}
+				</div>
+			} @else {
+				<div
+					class="flex items-center gap-3 px-4 py-3 rounded-default border border-dashed border-border dark:border-dark-border text-text-secondary dark:text-dark-text/50 text-small"
+				>
+					<lib-ui-icon
+						icon="link"
+						[size]="15"
+					/>
+					Log general del proyecto — sin actividades específicas vinculadas
+				</div>
+			}
+		</div>
+
+		<!-- Evidence -->
+		@if (log().evidence.mediaIds.length > 0 || (log().evidence.documentIds?.length ?? 0) > 0) {
+			<div>
+				<h3
+					class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase tracking-wider mb-3"
+				>
+					Evidencias
+				</h3>
+				<div class="flex flex-wrap gap-3">
+					@for (mediaId of log().evidence.mediaIds; track mediaId) {
+						<div
+							class="w-20 h-20 rounded-card border border-border dark:border-dark-border bg-secondary-bg dark:bg-white/10 flex flex-col items-center justify-center gap-1.5 text-text-secondary dark:text-dark-text/50"
+						>
+							<lib-ui-icon
+								icon="eye"
+								[size]="18"
+							/>
+							<span class="text-xs">Foto</span>
+						</div>
+					}
+					@for (docId of log().evidence.documentIds ?? []; track docId) {
+						<div
+							class="w-20 h-20 rounded-card border border-border dark:border-dark-border bg-secondary-bg dark:bg-white/10 flex flex-col items-center justify-center gap-1.5 text-text-secondary dark:text-dark-text/50"
+						>
+							<lib-ui-icon
+								icon="file"
+								[size]="18"
+							/>
+							<span class="text-xs">Doc</span>
+						</div>
+					}
+				</div>
+			</div>
+		}
+
+		<!-- Machinery -->
+		@if (log().metrics.machineryInUse.length > 0) {
+			<div>
+				<h3
+					class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase tracking-wider mb-3"
+				>
+					Maquinaria utilizada
+				</h3>
+				<div class="flex flex-wrap gap-2">
+					@for (machine of log().metrics.machineryInUse; track machine) {
+						<span
+							class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-badge border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text"
+						>
+							<lib-ui-icon
+								icon="settings"
+								[size]="12"
+								class="text-text-secondary dark:text-dark-text/50 shrink-0"
+							/>
+							{{ machine }}
+						</span>
+					}
+				</div>
+			</div>
+		}
+	</div>
+
+	<!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+	<div class="w-56 shrink-0">
+		<div
+			class="flex flex-col gap-0 rounded-card border border-border dark:border-dark-border bg-background dark:bg-dark-background overflow-hidden"
+		>
+			<!-- Header -->
+			<div class="px-4 py-3 border-b border-border dark:border-dark-border bg-secondary-bg/60 dark:bg-white/5">
+				<span
+					class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase tracking-wider"
+				>
+					Resumen
+				</span>
+			</div>
+
+			<div class="divide-y divide-border dark:divide-dark-border">
+				<!-- Author -->
+				<div class="px-4 py-3">
+					<span class="text-label text-text-secondary dark:text-dark-text/60 block mb-1">Autor</span>
+					<span class="text-small font-medium text-text-primary dark:text-dark-text block">
+						{{ log().authorName }}
+					</span>
+					<lib-badge
+						[variant]="roleBadgeVariant(log().authorRole)"
+						[label]="roleLabel(log().authorRole)"
+						size="sm"
+						class="mt-1"
+					/>
+				</div>
+
+				<!-- Headcount -->
+				<div class="px-4 py-3 flex items-center justify-between">
+					<span class="text-small text-text-secondary dark:text-dark-text/60">Personal</span>
+					<span
+						class="text-small font-semibold text-text-primary dark:text-dark-text flex items-center gap-1"
+					>
+						<lib-ui-icon
+							icon="users"
+							[size]="13"
+							class="text-text-secondary dark:text-dark-text/50"
+						/>
+						{{ log().metrics.headcount }}
+					</span>
+				</div>
+
+				<!-- Working hours -->
+				<div class="px-4 py-3 flex items-center justify-between">
+					<span class="text-small text-text-secondary dark:text-dark-text/60">Horas-hombre</span>
+					<span class="text-small font-semibold text-text-primary dark:text-dark-text">
+						{{ log().metrics.workingHours }}h
+					</span>
+				</div>
+
+				<!-- Weather -->
+				<div class="px-4 py-3 flex items-center justify-between gap-2">
+					<span class="text-small text-text-secondary dark:text-dark-text/60 shrink-0">Clima</span>
+					<span
+						class="flex items-center gap-1.5 text-small font-medium text-text-primary dark:text-dark-text"
+					>
+						<lib-ui-icon
+							[icon]="weatherIcon(log().environment.weather)"
+							[size]="13"
+							[class]="weatherClass(log().environment.weather)"
+						/>
+						{{ weatherLabel(log().environment.weather) }}
+					</span>
+				</div>
+
+				<!-- Temperature -->
+				@if (log().environment.temperature != null) {
+					<div class="px-4 py-3 flex items-center justify-between">
+						<span class="text-small text-text-secondary dark:text-dark-text/60">Temperatura</span>
+						<span class="text-small font-semibold text-text-primary dark:text-dark-text">
+							{{ log().environment.temperature }}°C
+						</span>
+					</div>
+				}
+
+				<!-- Media count -->
+				<div class="px-4 py-3 flex items-center justify-between">
+					<span class="text-small text-text-secondary dark:text-dark-text/60">Fotos</span>
+					<span class="text-small font-semibold text-text-primary dark:text-dark-text">
+						{{ log().evidence.mediaIds.length }}
+					</span>
+				</div>
+
+				<!-- Status -->
+				<div class="px-4 py-3 flex items-center justify-between">
+					<span class="text-small text-text-secondary dark:text-dark-text/60">Estado</span>
+					@if (log().isLocked) {
+						<span class="text-small font-medium text-success flex items-center gap-1">
+							<lib-ui-icon
+								icon="lock-keyhole"
+								[size]="12"
+							/>
+							Firmado
+						</span>
+					} @else {
+						<span class="text-small font-medium text-accent flex items-center gap-1">
+							<lib-ui-icon
+								icon="loader"
+								[size]="12"
+							/>
+							Borrador
+						</span>
+					}
+				</div>
+
+				<!-- Created -->
+				<div class="px-4 py-3">
+					<span class="text-label text-text-secondary dark:text-dark-text/60 block mb-1">Registrado</span>
+					<span class="text-small text-text-primary dark:text-dark-text">
+						{{ log().createdAt | date: 'dd MMM yyyy, HH:mm' }}
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

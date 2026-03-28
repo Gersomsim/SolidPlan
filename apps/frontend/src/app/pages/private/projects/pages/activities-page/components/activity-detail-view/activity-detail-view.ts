@@ -6,6 +6,7 @@ import { Badge, BadgeVariant, Icon, ProgressBar } from '@org/ui'
 import { ActivityStatus } from '@org/util'
 
 import { getChildActivities, MockActivity } from '../../mock-activities'
+import { getLogsByActivityId } from '../../../daily-logs-page/mock-daily-logs'
 
 export type DetailLayout = 'modal' | 'page'
 
@@ -22,6 +23,7 @@ export class ActivityDetailView {
 
 	readonly children    = computed(() => getChildActivities(this.activity().id))
 	readonly isPage      = computed(() => this.layout() === 'page')
+	readonly relatedLogs = computed(() => getLogsByActivityId(this.activity().id))
 
 	// ── Add sub-activity ─────────────────────────────────────
 	readonly addingChild  = signal(false)
