@@ -1,7 +1,7 @@
-<div class="min-h-screen flex flex-col bg-background">
+<div class="min-h-screen flex flex-col bg-background dark:bg-dark-background transition-colors duration-200">
 
   <!-- Navbar -->
-  <header class="bg-surface border-b border-border sticky top-0 z-50 shadow-card">
+  <header class="bg-surface dark:bg-dark-surface border-b border-border dark:border-white/10 sticky top-0 z-50 shadow-card transition-colors duration-200">
     <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
 
       <!-- Brand -->
@@ -11,25 +11,41 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
           </svg>
         </div>
-        <span class="text-h4 font-semibold text-primary">Solid Plan</span>
+        <span class="text-h4 font-semibold text-primary dark:text-primary-light">Solid Plan</span>
       </a>
 
       <!-- Nav links — center -->
       <nav class="hidden md:flex items-center gap-1 flex-1">
-        <a routerLink="/" class="px-4 py-2 text-small font-medium text-text-secondary hover:text-text-primary hover:bg-secondary-bg rounded-default transition-colors duration-150 no-underline">
+        <a routerLink="/" class="px-4 py-2 text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text hover:bg-secondary-bg dark:hover:bg-white/10 rounded-default transition-colors duration-150 no-underline">
           Inicio
         </a>
-        <a href="#features" class="px-4 py-2 text-small font-medium text-text-secondary hover:text-text-primary hover:bg-secondary-bg rounded-default transition-colors duration-150 no-underline">
+        <a href="#features" class="px-4 py-2 text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text hover:bg-secondary-bg dark:hover:bg-white/10 rounded-default transition-colors duration-150 no-underline">
           Características
         </a>
-        <a href="#pricing" class="px-4 py-2 text-small font-medium text-text-secondary hover:text-text-primary hover:bg-secondary-bg rounded-default transition-colors duration-150 no-underline">
+        <a href="#pricing" class="px-4 py-2 text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text hover:bg-secondary-bg dark:hover:bg-white/10 rounded-default transition-colors duration-150 no-underline">
           Precios
         </a>
       </nav>
 
-      <!-- Auth actions -->
-      <div class="flex items-center gap-2 shrink-0">
-        <a routerLink="/auth/login" class="px-4 py-2 text-small font-medium text-text-primary hover:text-primary hover:bg-secondary-bg rounded-default transition-colors duration-150 no-underline hidden sm:block">
+      <!-- Right side: theme toggle + auth actions -->
+      <div class="flex items-center gap-1 shrink-0">
+
+        <!-- Theme toggle -->
+        <button
+          (click)="themeService.toggle()"
+          [attr.aria-label]="themeService.theme() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+          class="p-2 rounded-default text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors duration-150">
+          @if (themeService.theme() === 'dark') {
+            <lib-ui-icon icon="sun" [size]="18" />
+          } @else {
+            <lib-ui-icon icon="moon" [size]="18" />
+          }
+        </button>
+
+        <div class="w-px h-4 bg-border dark:bg-white/10 mx-1"></div>
+
+        <!-- Auth actions -->
+        <a routerLink="/auth/login" class="px-4 py-2 text-small font-medium text-text-primary dark:text-dark-text hover:text-primary dark:hover:text-primary-light hover:bg-secondary-bg dark:hover:bg-white/10 rounded-default transition-colors duration-150 no-underline hidden sm:block">
           Iniciar sesión
         </a>
         <a routerLink="/auth/register" class="px-5 py-2 text-small font-semibold text-white bg-primary hover:bg-primary-hover rounded-input shadow-card transition-colors duration-200 no-underline">
@@ -46,7 +62,7 @@
   </main>
 
   <!-- Footer -->
-  <footer class="bg-surface border-t border-border">
+  <footer class="bg-surface dark:bg-dark-surface border-t border-border dark:border-white/10 transition-colors duration-200">
     <div class="max-w-7xl mx-auto px-6 py-12">
 
       <!-- Top row: brand + link columns -->
@@ -60,47 +76,47 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
               </svg>
             </div>
-            <span class="text-body font-semibold text-text-primary">Solid Plan</span>
+            <span class="text-body font-semibold text-text-primary dark:text-dark-text">Solid Plan</span>
           </div>
-          <p class="text-small text-text-secondary leading-relaxed">
+          <p class="text-small text-text-secondary dark:text-dark-text/70 leading-relaxed">
             Gestión de proyectos de construcción. Control, trazabilidad y progreso en un solo lugar.
           </p>
         </div>
 
         <!-- Producto -->
         <div class="flex flex-col gap-3">
-          <h4 class="text-label font-semibold text-text-primary uppercase tracking-wide">Producto</h4>
-          <a href="#features" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Características</a>
-          <a href="#pricing" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Precios</a>
-          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Changelog</a>
-          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Roadmap</a>
+          <h4 class="text-label font-semibold text-text-primary dark:text-dark-text uppercase tracking-wide">Producto</h4>
+          <a href="#features" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Características</a>
+          <a href="#pricing" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Precios</a>
+          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Changelog</a>
+          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Roadmap</a>
         </div>
 
         <!-- Recursos -->
         <div class="flex flex-col gap-3">
-          <h4 class="text-label font-semibold text-text-primary uppercase tracking-wide">Recursos</h4>
-          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Documentación</a>
-          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Guías</a>
-          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Soporte</a>
-          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Estado del sistema</a>
+          <h4 class="text-label font-semibold text-text-primary dark:text-dark-text uppercase tracking-wide">Recursos</h4>
+          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Documentación</a>
+          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Guías</a>
+          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Soporte</a>
+          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Estado del sistema</a>
         </div>
 
         <!-- Legal -->
         <div class="flex flex-col gap-3">
-          <h4 class="text-label font-semibold text-text-primary uppercase tracking-wide">Legal</h4>
-          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Privacidad</a>
-          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Términos de uso</a>
-          <a href="#" class="text-small text-text-secondary hover:text-text-primary transition-colors duration-150 no-underline">Cookies</a>
+          <h4 class="text-label font-semibold text-text-primary dark:text-dark-text uppercase tracking-wide">Legal</h4>
+          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Privacidad</a>
+          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Términos de uso</a>
+          <a href="#" class="text-small text-text-secondary dark:text-dark-text/70 hover:text-text-primary dark:hover:text-dark-text transition-colors duration-150 no-underline">Cookies</a>
         </div>
 
       </div>
 
       <!-- Bottom row: copyright -->
-      <div class="border-t border-border pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p class="text-label text-text-secondary">
+      <div class="border-t border-border dark:border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-label text-text-secondary dark:text-dark-text/70">
           &copy; {{ currentYear }} Solid Plan. Todos los derechos reservados.
         </p>
-        <p class="text-label text-text-secondary">
+        <p class="text-label text-text-secondary dark:text-dark-text/70">
           Hecho para la industria de la construcción.
         </p>
       </div>
