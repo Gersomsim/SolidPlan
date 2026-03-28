@@ -52,3 +52,8 @@ export type IconType =
 	| 'mail'
 	| 'link'
 	| 'calendar'
+	| 'circle-check'
+	| 'ellipsis-vertical'
+	| 'external-link'
+	| 'plus'
+	| 'zap'

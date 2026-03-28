@@ -1,4 +1,5 @@
 export * from './badge/badge'
+export * from './modal/modal'
 export * from './card/card'
 export * from './dropdown/dropdown'
 export * from './empty-state/empty-state'

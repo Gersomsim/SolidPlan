@@ -55,6 +55,11 @@ import {
 	LucideUserPlus,
 	LucideUsers,
 	LucideX,
+	LucideCircleCheck,
+	LucideEllipsisVertical,
+	LucideExternalLink,
+	LucidePlus,
+	LucideZap,
 } from '@lucide/angular'
 
 import { IconType } from './icon.type'
@@ -123,6 +128,11 @@ export class Icon {
 			mail: LucideMail,
 			link: LucideLink,
 			calendar: LucideCalendar,
+			'circle-check': LucideCircleCheck,
+			'ellipsis-vertical': LucideEllipsisVertical,
+			'external-link': LucideExternalLink,
+			plus: LucidePlus,
+			zap: LucideZap,
 		}
 
 		return dic[this.icon()]

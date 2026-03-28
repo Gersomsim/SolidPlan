@@ -1,4 +1,5 @@
 export * from './card-actions.directive';
+export * from './modal-footer.directive';
 export * from './card-footer.directive';
 export * from './card-header.directive';
 export * from './card-prefix.directive';
