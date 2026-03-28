@@ -1,1 +1,568 @@
-<p>members-page works!</p>
+<!-- ── Stats ─────────────────────────────────────────────────── -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+  <lib-stat-card icon="users"        label="Total usuarios"          [value]="stats().total"    color="primary" />
+  <lib-stat-card icon="circle-check" label="Activos"                 [value]="stats().active"   color="success" />
+  <lib-stat-card icon="send"         label="Invitaciones pendientes" [value]="stats().pending"  [color]="stats().pending > 0 ? 'accent' : 'primary'" />
+  <lib-stat-card icon="ban"          label="Inactivos"               [value]="stats().inactive" [color]="stats().inactive > 0 ? 'danger' : 'primary'" />
+</div>
+
+<!-- ── Role info strip ────────────────────────────────────────── -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+  <div class="flex items-start gap-3 px-4 py-3 rounded-card border border-border dark:border-dark-border bg-surface dark:bg-dark-surface">
+    <div class="w-8 h-8 rounded-input bg-danger/10 flex items-center justify-center shrink-0">
+      <lib-ui-icon icon="shield-check" [size]="15" class="text-danger" />
+    </div>
+    <div>
+      <p class="text-small font-semibold text-text-primary dark:text-dark-text">Administrador del tenant</p>
+      <p class="text-label text-text-secondary dark:text-dark-text/60 mt-0.5">
+        Acceso total: gestiona usuarios, proyectos, plantillas y configuración del sistema.
+        <strong class="text-text-primary dark:text-dark-text">{{ stats().admins }}</strong> usuario{{ stats().admins !== 1 ? 's' : '' }}.
+      </p>
+    </div>
+  </div>
+  <div class="flex items-start gap-3 px-4 py-3 rounded-card border border-border dark:border-dark-border bg-surface dark:bg-dark-surface">
+    <div class="w-8 h-8 rounded-input bg-secondary-bg dark:bg-white/10 flex items-center justify-center shrink-0">
+      <lib-ui-icon icon="user" [size]="15" class="text-text-secondary dark:text-dark-text/60" />
+    </div>
+    <div>
+      <p class="text-small font-semibold text-text-primary dark:text-dark-text">Miembro</p>
+      <p class="text-label text-text-secondary dark:text-dark-text/60 mt-0.5">
+        Acceso estándar. Opera en proyectos según el rol asignado en cada uno (Admin, Supervisor, Residente o Espectador).
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toolbar ────────────────────────────────────────────────── -->
+<div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between mb-4">
+  <!-- Search -->
+  <div class="relative flex-1 max-w-sm">
+    <lib-ui-icon icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" [size]="16" />
+    <input
+      type="text"
+      placeholder="Buscar por nombre, correo o cargo..."
+      (input)="onSearch($event)"
+      class="w-full pl-9 pr-4 py-2 rounded-input border border-border bg-surface text-small text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:bg-dark-surface dark:border-dark-border dark:text-dark-text dark:placeholder:text-dark-text/40"
+    />
+  </div>
+
+  <div class="flex items-center gap-3 flex-wrap">
+    <!-- Status filter pills -->
+    <div class="flex flex-wrap gap-1.5">
+      <button [class]="filterPillClass(statusFilter(), 'ALL')"            (click)="statusFilter.set('ALL')">Todos</button>
+      <button [class]="filterPillClass(statusFilter(), 'ACTIVE')"         (click)="statusFilter.set('ACTIVE')">Activos</button>
+      <button [class]="filterPillClass(statusFilter(), 'PENDING_INVITE')" (click)="statusFilter.set('PENDING_INVITE')">Pendientes</button>
+      <button [class]="filterPillClass(statusFilter(), 'INACTIVE')"       (click)="statusFilter.set('INACTIVE')">Inactivos</button>
+    </div>
+
+    <!-- Invite button -->
+    <button
+      (click)="openInvite()"
+      class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-white text-small font-medium rounded-input transition-colors whitespace-nowrap shrink-0"
+    >
+      <lib-ui-icon icon="user-plus" [size]="16" />
+      Invitar usuario
+    </button>
+  </div>
+</div>
+
+<!-- ── Users table ────────────────────────────────────────────── -->
+@if (filteredUsers().length === 0) {
+  <lib-card [elevated]="true" [bordered]="true" padding="none">
+    <div class="py-16">
+      <lib-empty-state icon="users" title="Sin usuarios" description="No se encontraron usuarios con los filtros aplicados." />
+    </div>
+  </lib-card>
+} @else {
+  <lib-card [elevated]="true" [bordered]="true" padding="none">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[720px]">
+        <thead>
+          <tr class="border-b border-border/60 dark:border-dark-border/60">
+            <th class="px-5 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">Usuario</th>
+            <th class="px-5 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">Cargo</th>
+            <th class="px-5 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">Rol</th>
+            <th class="px-5 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">Proyectos</th>
+            <th class="px-5 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">Estado</th>
+            <th class="px-5 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">Alta</th>
+            <th class="px-4 py-3 w-28"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of filteredUsers(); track user.id) {
+            <tr
+              class="border-b border-border/40 dark:border-dark-border/40 hover:bg-hover-row dark:hover:bg-dark-hover-row transition-colors group"
+              [class.opacity-50]="user.status === 'INACTIVE'"
+            >
+
+              <!-- Avatar + name + email -->
+              <td class="px-5 py-3.5">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-9 h-9 rounded-full flex items-center justify-center text-white text-small font-bold shrink-0"
+                    [style.background-color]="user.profile.avatarBg"
+                  >
+                    {{ initials(user) }}
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-small font-medium text-text-primary dark:text-dark-text truncate">{{ fullName(user) }}</p>
+                    <p class="text-label text-text-secondary dark:text-dark-text/50 truncate">{{ user.auth.email }}</p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Job title -->
+              <td class="px-5 py-3.5">
+                <span class="text-small text-text-secondary dark:text-dark-text/60">{{ user.profile.jobTitle || '—' }}</span>
+              </td>
+
+              <!-- Tenant role -->
+              <td class="px-5 py-3.5">
+                <lib-badge [variant]="tenantRoleBadgeVariant(user.tenantRole)" [label]="tenantRoleLabel(user.tenantRole)" size="sm" />
+              </td>
+
+              <!-- Projects count -->
+              <td class="px-5 py-3.5">
+                @if (user.projectCount > 0) {
+                  <div class="flex items-center gap-1.5">
+                    <lib-ui-icon icon="building" [size]="12" class="text-text-secondary dark:text-dark-text/50 shrink-0" />
+                    <span class="text-small text-text-secondary dark:text-dark-text/60">{{ user.projectCount }}</span>
+                  </div>
+                } @else {
+                  <span class="text-label text-text-secondary/40 dark:text-dark-text/30">—</span>
+                }
+              </td>
+
+              <!-- Status -->
+              <td class="px-5 py-3.5">
+                <lib-badge [variant]="statusBadgeVariant(user.status)" [label]="statusLabel(user.status)" size="sm" />
+                @if (user.status === 'PENDING_INVITE' && user.invitedAt) {
+                  <p class="text-label text-text-secondary/50 dark:text-dark-text/30 mt-0.5">{{ user.invitedAt | date:'dd MMM yyyy' }}</p>
+                }
+              </td>
+
+              <!-- Created at -->
+              <td class="px-5 py-3.5">
+                <span class="text-small text-text-secondary dark:text-dark-text/60">{{ user.createdAt | date:'dd MMM yyyy' }}</span>
+              </td>
+
+              <!-- Actions -->
+              <td class="px-4 py-3.5">
+                <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+
+                  <!-- Edit -->
+                  @if (user.status !== 'INACTIVE') {
+                    <button
+                      (click)="openEdit(user, $event)"
+                      class="flex items-center justify-center w-7 h-7 rounded-default text-text-secondary hover:text-primary hover:bg-primary/10 dark:text-dark-text/50 dark:hover:text-primary-light transition-colors"
+                      title="Editar"
+                    >
+                      <lib-ui-icon icon="user-pen" [size]="14" />
+                    </button>
+                  }
+
+                  <!-- Block / Unblock -->
+                  <button
+                    (click)="openBlock(user, $event)"
+                    class="flex items-center justify-center w-7 h-7 rounded-default text-text-secondary dark:text-dark-text/50 transition-colors"
+                    [class.hover:text-accent]="user.status !== 'INACTIVE'"
+                    [class.hover:bg-accent\/10]="user.status !== 'INACTIVE'"
+                    [class.hover:text-success]="user.status === 'INACTIVE'"
+                    [class.hover:bg-success\/10]="user.status === 'INACTIVE'"
+                    [title]="user.status === 'INACTIVE' ? 'Reactivar' : 'Bloquear'"
+                  >
+                    <lib-ui-icon [icon]="user.status === 'INACTIVE' ? 'circle-check' : 'ban'" [size]="14" />
+                  </button>
+
+                  <!-- Deactivate (dar de baja) -->
+                  <button
+                    (click)="openDeactivate(user, $event)"
+                    class="flex items-center justify-center w-7 h-7 rounded-default text-text-secondary hover:text-danger hover:bg-danger/10 dark:text-dark-text/50 transition-colors"
+                    title="Dar de baja"
+                  >
+                    <lib-ui-icon icon="user-minus" [size]="14" />
+                  </button>
+                </div>
+              </td>
+
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Table footer -->
+    <div class="px-5 py-3 border-t border-border/40 dark:border-dark-border/40 flex items-center justify-between">
+      <span class="text-label text-text-secondary dark:text-dark-text/50">
+        {{ filteredUsers().length }} {{ filteredUsers().length === 1 ? 'usuario' : 'usuarios' }}
+      </span>
+      <span class="text-label text-text-secondary dark:text-dark-text/50">
+        {{ stats().admins }} {{ stats().admins === 1 ? 'administrador' : 'administradores' }} · {{ stats().active }} activos
+      </span>
+    </div>
+  </lib-card>
+}
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- ── Invite modal ───────────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<lib-modal [open]="inviteOpen()" size="sm" (closed)="closeInvite()">
+  <div modal-header class="flex items-center gap-3">
+    <lib-ui-icon icon="send" [size]="16" class="text-primary dark:text-primary-light shrink-0" />
+    <span class="text-body font-semibold text-text-primary dark:text-dark-text">Invitar usuario</span>
+  </div>
+
+  <div [formGroup]="inviteForm" class="flex flex-col gap-5 p-6">
+
+    <!-- Email -->
+    <div>
+      <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Correo electrónico *</label>
+      <input
+        type="email"
+        formControlName="email"
+        placeholder="nombre@empresa.com"
+        class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-secondary dark:placeholder:text-dark-text/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+        [class.border-danger]="inviteForm.get('email')?.invalid && inviteForm.get('email')?.touched"
+      />
+      @if (inviteForm.get('email')?.invalid && inviteForm.get('email')?.touched) {
+        <p class="text-label text-danger mt-1">Ingresa un correo válido</p>
+      }
+    </div>
+
+    <!-- Job title -->
+    <div>
+      <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Cargo en la empresa</label>
+      <input
+        type="text"
+        formControlName="jobTitle"
+        placeholder="Ej: Residente de Obra, Arquitecto..."
+        class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-secondary dark:placeholder:text-dark-text/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+      />
+    </div>
+
+    <!-- Role selector (radio cards) -->
+    <div>
+      <p class="text-label font-medium text-text-secondary dark:text-dark-text/70 mb-2">Rol en la organización *</p>
+      <div class="flex flex-col gap-2">
+        @for (opt of roleOptions; track opt.value) {
+          @let isSelected = inviteForm.get('role')?.value === opt.value;
+          <button
+            type="button"
+            (click)="inviteForm.get('role')?.setValue($any(opt.value))"
+            class="flex items-center gap-3 px-4 py-3 rounded-card border text-left transition-all cursor-pointer"
+            [class.border-primary]="isSelected"
+            [class.bg-primary\/5]="isSelected"
+            [class.dark:bg-primary-light\/5]="isSelected"
+            [class.dark:border-primary-light]="isSelected"
+            [class.border-border]="!isSelected"
+            [class.dark:border-dark-border]="!isSelected"
+            [class.hover:border-primary\/40]="!isSelected"
+          >
+            <div
+              class="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
+              [class.border-primary]="isSelected"
+              [class.dark:border-primary-light]="isSelected"
+              [class.border-border]="!isSelected"
+              [class.dark:border-dark-border]="!isSelected"
+            >
+              @if (isSelected) {
+                <div class="w-2 h-2 rounded-full bg-primary dark:bg-primary-light"></div>
+              }
+            </div>
+            <lib-ui-icon [icon]="tenantRoleIcon(opt.value)" [size]="14" class="text-text-secondary dark:text-dark-text/50 shrink-0" />
+            <div class="flex-1 min-w-0">
+              <p class="text-small font-semibold text-text-primary dark:text-dark-text">{{ opt.label }}</p>
+              <p class="text-label text-text-secondary dark:text-dark-text/50">{{ tenantRoleDescription(opt.value) }}</p>
+            </div>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-end gap-2 pt-1">
+      <button
+        type="button"
+        (click)="closeInvite()"
+        class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        (click)="onInviteSubmit()"
+        [disabled]="inviteSaving() || inviteSavedOk()"
+        class="flex items-center gap-2 px-4 py-2 rounded-input bg-primary hover:bg-primary-hover disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+      >
+        @if (inviteSaving()) {
+          <lib-ui-icon icon="loader-circle" [size]="15" />
+          Enviando...
+        } @else if (inviteSavedOk()) {
+          <lib-ui-icon icon="check" [size]="15" />
+          Invitación enviada
+        } @else {
+          <lib-ui-icon icon="send" [size]="15" />
+          Enviar invitación
+        }
+      </button>
+    </div>
+  </div>
+</lib-modal>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- ── Edit user modal ────────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<lib-modal [open]="editOpen()" size="sm" (closed)="closeEdit()">
+  <div modal-header class="flex items-center gap-3">
+    @if (editUser()) {
+      <div
+        class="w-7 h-7 rounded-full flex items-center justify-center text-white text-label font-bold shrink-0"
+        [style.background-color]="editUser()!.profile.avatarBg"
+      >
+        {{ initials(editUser()!) }}
+      </div>
+      <div class="min-w-0">
+        <p class="text-body font-semibold text-text-primary dark:text-dark-text truncate">{{ fullName(editUser()!) }}</p>
+        <p class="text-label text-text-secondary dark:text-dark-text/50">Editar usuario</p>
+      </div>
+    }
+  </div>
+
+  @if (editUser()) {
+    <div [formGroup]="editForm" class="flex flex-col gap-5 p-6">
+
+      <!-- Job title -->
+      <div>
+        <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Cargo en la empresa *</label>
+        <input
+          type="text"
+          formControlName="jobTitle"
+          class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+        />
+      </div>
+
+      <!-- Role selector (radio cards) -->
+      <div>
+        <p class="text-label font-medium text-text-secondary dark:text-dark-text/70 mb-2">Rol en la organización *</p>
+        <div class="flex flex-col gap-2">
+          @for (opt of roleOptions; track opt.value) {
+            @let isSelected = editForm.get('role')?.value === opt.value;
+            <button
+              type="button"
+              (click)="editForm.get('role')?.setValue($any(opt.value))"
+              class="flex items-center gap-3 px-4 py-3 rounded-card border text-left transition-all cursor-pointer"
+              [class.border-primary]="isSelected"
+              [class.bg-primary\/5]="isSelected"
+              [class.dark:bg-primary-light\/5]="isSelected"
+              [class.dark:border-primary-light]="isSelected"
+              [class.border-border]="!isSelected"
+              [class.dark:border-dark-border]="!isSelected"
+              [class.hover:border-primary\/40]="!isSelected"
+            >
+              <div
+                class="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
+                [class.border-primary]="isSelected"
+                [class.dark:border-primary-light]="isSelected"
+                [class.border-border]="!isSelected"
+                [class.dark:border-dark-border]="!isSelected"
+              >
+                @if (isSelected) {
+                  <div class="w-2 h-2 rounded-full bg-primary dark:bg-primary-light"></div>
+                }
+              </div>
+              <lib-ui-icon [icon]="tenantRoleIcon(opt.value)" [size]="14" class="text-text-secondary dark:text-dark-text/50 shrink-0" />
+              <div class="flex-1 min-w-0">
+                <p class="text-small font-semibold text-text-primary dark:text-dark-text">{{ opt.label }}</p>
+                <p class="text-label text-text-secondary dark:text-dark-text/50">{{ tenantRoleDescription(opt.value) }}</p>
+              </div>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-1">
+        <button
+          type="button"
+          (click)="closeEdit()"
+          class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          (click)="onEditSubmit()"
+          [disabled]="editSaving()"
+          class="flex items-center gap-2 px-4 py-2 rounded-input bg-primary hover:bg-primary-hover disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+        >
+          @if (editSaving()) {
+            <lib-ui-icon icon="loader-circle" [size]="15" />
+            Guardando...
+          } @else {
+            <lib-ui-icon icon="check" [size]="15" />
+            Guardar cambios
+          }
+        </button>
+      </div>
+    </div>
+  }
+</lib-modal>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- ── Block / Unblock modal ──────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<lib-modal [open]="blockOpen()" size="sm" (closed)="closeBlock()">
+  <div modal-header class="flex items-center gap-3">
+    <lib-ui-icon
+      [icon]="blockCandidate()?.status === 'INACTIVE' ? 'circle-check' : 'ban'"
+      [size]="16"
+      class="shrink-0"
+      [class.text-accent]="blockCandidate()?.status !== 'INACTIVE'"
+      [class.text-success]="blockCandidate()?.status === 'INACTIVE'"
+    />
+    <span class="text-body font-semibold text-text-primary dark:text-dark-text">
+      {{ blockCandidate()?.status === 'INACTIVE' ? 'Reactivar usuario' : 'Bloquear usuario' }}
+    </span>
+  </div>
+
+  @if (blockCandidate()) {
+    <div class="flex flex-col gap-5 p-6">
+
+      <!-- User preview -->
+      <div class="flex items-center gap-3 px-4 py-3.5 rounded-card border border-border dark:border-dark-border bg-secondary-bg/50 dark:bg-white/5">
+        <div
+          class="w-10 h-10 rounded-full flex items-center justify-center text-white text-small font-bold shrink-0"
+          [style.background-color]="blockCandidate()!.profile.avatarBg"
+        >
+          {{ initials(blockCandidate()!) }}
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="text-small font-semibold text-text-primary dark:text-dark-text">{{ fullName(blockCandidate()!) }}</p>
+          <p class="text-label text-text-secondary dark:text-dark-text/50">{{ blockCandidate()!.auth.email }}</p>
+        </div>
+        <lib-badge [variant]="statusBadgeVariant(blockCandidate()!.status)" [label]="statusLabel(blockCandidate()!.status)" size="sm" />
+      </div>
+
+      <!-- Info / warning -->
+      @if (blockCandidate()!.status !== 'INACTIVE') {
+        <div class="flex items-start gap-2.5 px-4 py-3 rounded-card bg-accent/5 border border-accent/20">
+          <lib-ui-icon icon="triangle-alert" [size]="14" class="text-accent shrink-0 mt-0.5" />
+          <div>
+            <p class="text-small font-medium text-accent">El usuario perderá acceso inmediatamente.</p>
+            <p class="text-label text-text-secondary dark:text-dark-text/60 mt-1">
+              No podrá iniciar sesión ni interactuar con ningún proyecto mientras esté bloqueado. Puedes reactivarlo en cualquier momento.
+            </p>
+          </div>
+        </div>
+      } @else {
+        <div class="flex items-start gap-2.5 px-4 py-3 rounded-card bg-success/5 border border-success/20">
+          <lib-ui-icon icon="circle-check" [size]="14" class="text-success shrink-0 mt-0.5" />
+          <p class="text-small text-text-secondary dark:text-dark-text/60">
+            El usuario recuperará acceso al sistema y a los proyectos en los que está asignado.
+          </p>
+        </div>
+      }
+
+      <div class="flex items-center justify-end gap-2">
+        <button
+          type="button"
+          (click)="closeBlock()"
+          class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          (click)="confirmBlock()"
+          [disabled]="blocking()"
+          class="flex items-center gap-2 px-4 py-2 rounded-input disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+          [class.bg-accent]="blockCandidate()!.status !== 'INACTIVE'"
+          [class.hover:bg-accent\/90]="blockCandidate()!.status !== 'INACTIVE'"
+          [class.bg-success]="blockCandidate()!.status === 'INACTIVE'"
+          [class.hover:bg-success\/90]="blockCandidate()!.status === 'INACTIVE'"
+        >
+          @if (blocking()) {
+            <lib-ui-icon icon="loader-circle" [size]="15" />
+            Procesando...
+          } @else if (blockCandidate()!.status === 'INACTIVE') {
+            <lib-ui-icon icon="circle-check" [size]="15" />
+            Reactivar usuario
+          } @else {
+            <lib-ui-icon icon="ban" [size]="15" />
+            Bloquear usuario
+          }
+        </button>
+      </div>
+    </div>
+  }
+</lib-modal>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- ── Deactivate (dar de baja) modal ─────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<lib-modal [open]="deactivateOpen()" size="sm" (closed)="closeDeactivate()">
+  <div modal-header class="flex items-center gap-3">
+    <lib-ui-icon icon="user-minus" [size]="16" class="text-danger shrink-0" />
+    <span class="text-body font-semibold text-text-primary dark:text-dark-text">Dar de baja al usuario</span>
+  </div>
+
+  @if (deactivateCandidate()) {
+    <div class="flex flex-col gap-5 p-6">
+
+      <!-- User preview -->
+      <div class="flex items-center gap-3 px-4 py-3.5 rounded-card border border-border dark:border-dark-border bg-secondary-bg/50 dark:bg-white/5">
+        <div
+          class="w-10 h-10 rounded-full flex items-center justify-center text-white text-small font-bold shrink-0"
+          [style.background-color]="deactivateCandidate()!.profile.avatarBg"
+        >
+          {{ initials(deactivateCandidate()!) }}
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="text-small font-semibold text-text-primary dark:text-dark-text">{{ fullName(deactivateCandidate()!) }}</p>
+          <p class="text-label text-text-secondary dark:text-dark-text/50">{{ deactivateCandidate()!.auth.email }}</p>
+          <p class="text-label text-text-secondary dark:text-dark-text/40 mt-0.5">{{ deactivateCandidate()!.profile.jobTitle }}</p>
+        </div>
+      </div>
+
+      <!-- Warning strong -->
+      <div class="flex items-start gap-2.5 px-4 py-3 rounded-card bg-danger/5 border border-danger/20">
+        <lib-ui-icon icon="triangle-alert" [size]="14" class="text-danger shrink-0 mt-0.5" />
+        <div>
+          <p class="text-small font-medium text-danger">Esta acción no se puede deshacer fácilmente.</p>
+          <p class="text-label text-text-secondary dark:text-dark-text/60 mt-1">
+            El usuario será removido del sistema y perderá acceso a todos los proyectos.
+            Sus actividades y bitácoras registradas se conservarán en el historial.
+          </p>
+        </div>
+      </div>
+
+      <p class="text-label text-text-secondary dark:text-dark-text/50">
+        Para suspender temporalmente sin eliminar, usa la opción
+        <strong class="text-text-primary dark:text-dark-text">Bloquear</strong>.
+      </p>
+
+      <div class="flex items-center justify-end gap-2">
+        <button
+          type="button"
+          (click)="closeDeactivate()"
+          class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          (click)="confirmDeactivate()"
+          [disabled]="deactivating()"
+          class="flex items-center gap-2 px-4 py-2 rounded-input bg-danger hover:bg-danger/90 disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+        >
+          @if (deactivating()) {
+            <lib-ui-icon icon="loader-circle" [size]="15" />
+            Procesando...
+          } @else {
+            <lib-ui-icon icon="user-minus" [size]="15" />
+            Sí, dar de baja
+          }
+        </button>
+      </div>
+    </div>
+  }
+</lib-modal>
