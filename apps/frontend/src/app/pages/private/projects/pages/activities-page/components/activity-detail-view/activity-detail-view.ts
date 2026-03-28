@@ -1,12 +1,12 @@
-import { Component, computed, ElementRef, input, signal, viewChild } from '@angular/core'
 import { DatePipe } from '@angular/common'
+import { Component, ElementRef, computed, input, signal, viewChild } from '@angular/core'
 import { RouterLink } from '@angular/router'
 
 import { Badge, BadgeVariant, Icon, ProgressBar } from '@org/ui'
 import { ActivityStatus } from '@org/util'
 
-import { getChildActivities, MockActivity } from '../../mock-activities'
 import { getLogsByActivityId } from '../../../daily-logs-page/mock-daily-logs'
+import { MockActivity, getChildActivities } from '../../mock-activities'
 
 export type DetailLayout = 'modal' | 'page'
 
@@ -18,15 +18,15 @@ export type DetailLayout = 'modal' | 'page'
 })
 export class ActivityDetailView {
 	readonly activity = input.required<MockActivity>()
-	readonly layout   = input<DetailLayout>('modal')
+	readonly layout = input<DetailLayout>('modal')
 	readonly projectId = input<string>('')
 
-	readonly children    = computed(() => getChildActivities(this.activity().id))
-	readonly isPage      = computed(() => this.layout() === 'page')
+	readonly children = computed(() => getChildActivities(this.activity().id))
+	readonly isPage = computed(() => this.layout() === 'page')
 	readonly relatedLogs = computed(() => getLogsByActivityId(this.activity().id))
 
 	// ── Add sub-activity ─────────────────────────────────────
-	readonly addingChild  = signal(false)
+	readonly addingChild = signal(false)
 	readonly newChildTitle = signal('')
 	private readonly titleInput = viewChild<ElementRef<HTMLInputElement>>('titleInput')
 
@@ -57,20 +57,24 @@ export class ActivityDetailView {
 
 	readonly statusBadgeVariant = computed<BadgeVariant>(() => {
 		const map: Record<ActivityStatus, BadgeVariant> = {
-			COMPLETED:   'completed',
+			COMPLETED: 'completed',
 			IN_PROGRESS: 'in-progress',
-			PENDING:     'planning',
-			BLOCKED:     'delayed',
+			PENDING: 'planning',
+			BLOCKED: 'delayed',
+			CANCELLED: 'custom',
+			DELAYED: 'delayed',
 		}
 		return map[this.activity().status]
 	})
 
 	readonly statusLabel = computed(() => {
 		const map: Record<ActivityStatus, string> = {
-			COMPLETED:   'Completado',
+			COMPLETED: 'Completado',
 			IN_PROGRESS: 'En progreso',
-			PENDING:     'Pendiente',
-			BLOCKED:     'Bloqueado',
+			PENDING: 'Pendiente',
+			BLOCKED: 'Bloqueado',
+			CANCELLED: 'Cancelado',
+			DELAYED: 'Retrasado',
 		}
 		return map[this.activity().status]
 	})
@@ -82,20 +86,24 @@ export class ActivityDetailView {
 
 	childStatusVariant(status: ActivityStatus): BadgeVariant {
 		const map: Record<ActivityStatus, BadgeVariant> = {
-			COMPLETED:   'completed',
+			COMPLETED: 'completed',
 			IN_PROGRESS: 'in-progress',
-			PENDING:     'planning',
-			BLOCKED:     'delayed',
+			PENDING: 'planning',
+			BLOCKED: 'delayed',
+			CANCELLED: 'custom',
+			DELAYED: 'delayed',
 		}
 		return map[status]
 	}
 
 	childStatusLabel(status: ActivityStatus): string {
 		const map: Record<ActivityStatus, string> = {
-			COMPLETED:   'Completado',
+			COMPLETED: 'Completado',
 			IN_PROGRESS: 'En progreso',
-			PENDING:     'Pendiente',
-			BLOCKED:     'Bloqueado',
+			PENDING: 'Pendiente',
+			BLOCKED: 'Bloqueado',
+			CANCELLED: 'Cancelado',
+			DELAYED: 'Retrasado',
 		}
 		return map[status]
 	}

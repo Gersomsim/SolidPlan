@@ -17,28 +17,32 @@ export class ActivityDetailPage {
 	private readonly route = inject(ActivatedRoute)
 
 	readonly activityId = computed(() => this.route.snapshot.params['activityId'])
-	readonly projectId  = computed(() => this.route.snapshot.parent?.parent?.params?.['id'] ?? '')
+	readonly projectId = computed(() => this.route.snapshot.parent?.parent?.params?.['id'] ?? '')
 
-	readonly activity   = computed(() => getActivityById(this.activityId()))
+	readonly activity = computed(() => getActivityById(this.activityId()))
 
 	readonly statusBadgeVariant = computed<BadgeVariant>(() => {
 		const status = this.activity()?.status
 		if (!status) return 'planning'
 		const map: Record<ActivityStatus, BadgeVariant> = {
-			COMPLETED:   'completed',
+			COMPLETED: 'completed',
 			IN_PROGRESS: 'in-progress',
-			PENDING:     'planning',
-			BLOCKED:     'delayed',
+			PENDING: 'planning',
+			BLOCKED: 'delayed',
+			CANCELLED: 'custom',
+			DELAYED: 'delayed',
 		}
 		return map[status]
 	})
 
 	readonly statusLabel = computed(() => {
 		const map: Record<ActivityStatus, string> = {
-			COMPLETED:   'Completado',
+			COMPLETED: 'Completado',
 			IN_PROGRESS: 'En progreso',
-			PENDING:     'Pendiente',
-			BLOCKED:     'Bloqueado',
+			PENDING: 'Pendiente',
+			BLOCKED: 'Bloqueado',
+			CANCELLED: 'Cancelado',
+			DELAYED: 'Retrasado',
 		}
 		return map[this.activity()?.status ?? 'PENDING']
 	})

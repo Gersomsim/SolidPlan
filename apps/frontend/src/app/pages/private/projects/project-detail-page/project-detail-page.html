@@ -26,6 +26,7 @@
 					Editar
 				</a>
 				<button
+					(click)="ganttOpen.set(true)"
 					class="bg-primary hover:bg-primary-hover text-white text-small font-semibold px-3.5 py-2 rounded-input shadow-card transition-colors duration-200 flex items-center gap-1.5"
 				>
 					<lib-ui-icon
@@ -49,7 +50,7 @@
 						</code>
 						<lib-badge
 							[variant]="statusBadgeVariant"
-							[label]="statusLabel"
+							[label]="StatusLabel"
 							[color]="statusBadgeColor"
 						/>
 					</div>
@@ -164,3 +165,201 @@
 		<router-outlet />
 	</div>
 </div>
+
+<!-- ── Gantt modal ────────────────────────────────────────────── -->
+<lib-modal
+	[open]="ganttOpen()"
+	size="full"
+	(closed)="ganttOpen.set(false)"
+>
+	<!-- Header -->
+	<div modal-header class="flex items-center gap-3 flex-1 min-w-0">
+		<lib-ui-icon icon="calendar-days" [size]="16" class="text-primary dark:text-primary-light shrink-0" />
+		<div class="min-w-0">
+			<span class="text-body font-semibold text-text-primary dark:text-dark-text block leading-tight">Cronograma Gantt</span>
+			<span class="text-label text-text-secondary dark:text-dark-text/60">{{ project.name }} · {{ project.code }}</span>
+		</div>
+
+		<!-- Legend -->
+		<div class="flex items-center gap-4 ml-6 pl-6 border-l border-border dark:border-dark-border flex-wrap">
+			<div class="flex items-center gap-1.5">
+				<div class="w-3 h-3 rounded-badge" style="background: var(--color-success)"></div>
+				<span class="text-label text-text-secondary dark:text-dark-text/60">Completada</span>
+			</div>
+			<div class="flex items-center gap-1.5">
+				<div class="w-3 h-3 rounded-badge" style="background: var(--color-primary)"></div>
+				<span class="text-label text-text-secondary dark:text-dark-text/60">En progreso</span>
+			</div>
+			<div class="flex items-center gap-1.5">
+				<div class="w-3 h-3 rounded-badge" style="background: var(--color-danger)"></div>
+				<span class="text-label text-text-secondary dark:text-dark-text/60">Crítica / Bloqueada</span>
+			</div>
+			<div class="flex items-center gap-1.5">
+				<div class="w-3 h-3 rounded-badge" style="background: var(--color-accent)"></div>
+				<span class="text-label text-text-secondary dark:text-dark-text/60">Bloqueada</span>
+			</div>
+			<div class="flex items-center gap-1.5">
+				<div class="w-3 h-3 rounded-badge border border-border dark:border-dark-border" style="background: var(--color-border)"></div>
+				<span class="text-label text-text-secondary dark:text-dark-text/60">Pendiente</span>
+			</div>
+		</div>
+	</div>
+
+	<!-- Gantt body -->
+	@if (ganttOpen()) {
+		<div class="overflow-auto" style="max-height: calc(90vh - 72px)">
+			<table class="border-collapse" [style.min-width.px]="ganttData().totalWidth + 288">
+
+				<!-- ── Month headers (sticky top) ── -->
+				<thead class="sticky top-0 z-20">
+					<tr>
+						<!-- Activity column header -->
+						<th
+							class="sticky left-0 z-30 bg-secondary-bg dark:bg-dark-surface border-b border-r border-border dark:border-dark-border px-4 py-2.5 text-left"
+							style="width: 288px; min-width: 288px"
+						>
+							<span class="text-label font-semibold text-text-secondary dark:text-dark-text/60 uppercase tracking-wider">Actividad</span>
+						</th>
+						<!-- Month cells -->
+						<th
+							class="bg-secondary-bg dark:bg-dark-surface border-b border-border dark:border-dark-border p-0"
+							[style.min-width.px]="ganttData().totalWidth"
+						>
+							<div class="flex">
+								@for (month of ganttData().months; track $index) {
+									<div
+										class="shrink-0 border-r border-border dark:border-dark-border px-2 py-2.5 text-label font-medium text-text-secondary dark:text-dark-text/60 whitespace-nowrap"
+										[style.width.px]="month.widthPx"
+									>
+										{{ month.label }}
+									</div>
+								}
+							</div>
+						</th>
+					</tr>
+				</thead>
+
+				<!-- ── Activity rows ── -->
+				<tbody>
+					@for (row of ganttData().rows; track row.id) {
+						<tr
+							class="border-b border-border/40 dark:border-dark-border/40 transition-colors"
+							[class.bg-secondary-bg]="row.isGroup"
+							[class.dark:bg-white\/3]="row.isGroup"
+							[class.hover:bg-hover-row]="!row.isGroup"
+							[class.dark:hover:bg-dark-hover-row]="!row.isGroup"
+							[style.height.px]="row.isGroup ? 40 : 44"
+						>
+
+							<!-- Activity name (sticky left) -->
+							<td
+								class="sticky left-0 z-10 border-r border-border dark:border-dark-border px-3"
+								[class.bg-secondary-bg]="row.isGroup"
+								[class.dark:bg-dark-surface]="!row.isGroup"
+								[class.bg-surface]="!row.isGroup"
+								[class.dark:bg-white\/3]="row.isGroup"
+								[style.padding-left.px]="12 + row.depth * 14"
+							>
+								<div class="flex items-center gap-2 min-w-0">
+									@if (row.isCriticalPath && !row.isGroup) {
+										<div class="w-1.5 h-1.5 rounded-full bg-danger shrink-0" title="Ruta crítica"></div>
+									}
+									<span
+										class="font-mono shrink-0"
+										[class.text-xs]="!row.isGroup"
+										[class.text-label]="row.isGroup"
+										[class.font-bold]="row.isGroup"
+										[class.text-text-secondary]="!row.isGroup"
+										[class.dark:text-dark-text\/50]="!row.isGroup"
+										[class.text-text-primary]="row.isGroup"
+										[class.dark:text-dark-text]="row.isGroup"
+									>{{ row.code }}</span>
+									<span
+										class="truncate"
+										[class.text-small]="!row.isGroup"
+										[class.text-body]="row.isGroup"
+										[class.font-semibold]="row.isGroup"
+										[class.text-text-primary]="true"
+										[class.dark:text-dark-text]="true"
+									>{{ row.name }}</span>
+								</div>
+							</td>
+
+							<!-- Timeline canvas -->
+							<td class="relative p-0" [style.min-width.px]="ganttData().totalWidth" [style.height.px]="row.isGroup ? 40 : 44">
+
+								<!-- Month grid lines (subtle) -->
+								@for (month of ganttData().months; track $index) {
+									<div
+										class="absolute top-0 bottom-0 border-r border-border/30 dark:border-dark-border/30 pointer-events-none"
+										[style.left.px]="month.leftPx"
+										[style.width.px]="month.widthPx"
+									></div>
+								}
+
+								<!-- Today line -->
+								@if (ganttData().todayPx >= 0) {
+									<div
+										class="absolute top-0 bottom-0 w-px bg-danger/50 dark:bg-danger/40 z-10 pointer-events-none"
+										[style.left.px]="ganttData().todayPx"
+									>
+										<div class="w-2 h-2 rounded-full bg-danger absolute -top-1 -left-0.5"></div>
+									</div>
+								}
+
+								<!-- Bar -->
+								@if (!row.isGroup) {
+									<div
+										class="absolute rounded-badge overflow-hidden"
+										[style.left.px]="row.leftPx"
+										[style.width.px]="row.widthPx"
+										[style.top.px]="8"
+										[style.bottom.px]="8"
+									>
+										<!-- Base (translucent background) -->
+										<div
+											class="absolute inset-0"
+											[style.background-color]="barColor(row.status, row.isCriticalPath)"
+											style="opacity: 0.2"
+										></div>
+										<!-- Progress fill -->
+										@if (row.progress > 0) {
+											<div
+												class="absolute inset-y-0 left-0"
+												[style.background-color]="barColor(row.status, row.isCriticalPath)"
+												[style.width.%]="row.progress"
+											></div>
+										}
+										<!-- Border -->
+										<div
+											class="absolute inset-0 rounded-badge border"
+											[style.border-color]="barColor(row.status, row.isCriticalPath)"
+										></div>
+										<!-- Label -->
+										<span
+											class="absolute inset-0 flex items-center px-1.5 text-xs font-semibold truncate"
+											style="color: var(--color-text-primary)"
+										>
+											{{ row.progress > 0 ? row.progress + '%' : '' }}
+										</span>
+									</div>
+								} @else {
+									<!-- Group bar: full-span thin marker -->
+									<div
+										class="absolute rounded-badge"
+										[style.left.px]="row.leftPx"
+										[style.width.px]="row.widthPx"
+										[style.top.px]="14"
+										[style.height.px]="12"
+										[style.background-color]="barColor(row.status, row.isCriticalPath)"
+										style="opacity: 0.5"
+									></div>
+								}
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	}
+</lib-modal>

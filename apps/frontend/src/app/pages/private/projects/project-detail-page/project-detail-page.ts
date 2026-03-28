@@ -1,10 +1,11 @@
-import { Component, computed } from '@angular/core'
-import { inject } from '@angular/core'
 import { DecimalPipe } from '@angular/common'
-import { RouterLink, RouterLinkActive, RouterOutlet, ActivatedRoute } from '@angular/router'
+import { Component, computed, inject, signal } from '@angular/core'
+import { ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router'
 
-import { Badge, BadgeVariant, Icon, Stepper, StepItem } from '@org/ui'
-import { ProjectStageStatus, ProjectStatus } from '@org/util'
+import { Badge, BadgeVariant, Icon, Modal, StepItem, Stepper } from '@org/ui'
+import { ActivityStatus, ProjectStageStatus, ProjectStatus } from '@org/util'
+
+import { MOCK_ACTIVITIES, MockActivity } from '../pages/activities-page/mock-activities'
 
 interface ProjectDetail {
 	id: string
@@ -37,6 +38,35 @@ interface NavTab {
 	route: string
 	icon: string
 }
+
+interface GanttRow {
+	id: string
+	code: string
+	name: string
+	depth: number
+	isGroup: boolean
+	status: ActivityStatus
+	isCriticalPath: boolean
+	progress: number
+	leftPx: number
+	widthPx: number
+}
+
+interface GanttMonth {
+	label: string
+	widthPx: number
+	leftPx: number
+}
+
+interface GanttData {
+	totalWidth: number
+	months: GanttMonth[]
+	rows: GanttRow[]
+	todayPx: number
+}
+
+const PX_PER_DAY = 6
+const MIN_BAR_PX = 16
 
 const MOCK_PROJECT: ProjectDetail = {
 	id: '1',
@@ -109,7 +139,7 @@ const MOCK_STAGES: MockStage[] = [
 
 @Component({
 	selector: 'app-project-detail-page',
-	imports: [RouterLink, RouterLinkActive, RouterOutlet, Badge, Icon, Stepper, DecimalPipe],
+	imports: [RouterLink, RouterLinkActive, RouterOutlet, Badge, Icon, Modal, Stepper, DecimalPipe],
 	templateUrl: './project-detail-page.html',
 })
 export class ProjectDetailPage {
@@ -118,6 +148,112 @@ export class ProjectDetailPage {
 	readonly projectId = computed(() => this.route.snapshot.params['id'] ?? '')
 	readonly project = MOCK_PROJECT
 
+	// ── Gantt ─────────────────────────────────────────────────────
+	readonly ganttOpen = signal(false)
+
+	readonly ganttData = computed<GanttData>(() => {
+		const activities = MOCK_ACTIVITIES
+
+		// Date range
+		const minTime = Math.min(...activities.map(a => a.startDate.getTime()))
+		const maxTime = Math.max(...activities.map(a => a.endDate.getTime()))
+
+		const firstDate = new Date(minTime)
+		const ganttStart = new Date(firstDate.getFullYear(), firstDate.getMonth(), 1)
+
+		const lastDate = new Date(maxTime)
+		const ganttEnd = new Date(lastDate.getFullYear(), lastDate.getMonth() + 1, 0)
+
+		const totalDays = Math.ceil((ganttEnd.getTime() - ganttStart.getTime()) / 86400000) + 1
+		const totalWidth = totalDays * PX_PER_DAY
+
+		// Generate months
+		const months: GanttMonth[] = []
+		const cur = new Date(ganttStart)
+		let accLeft = 0
+		while (cur <= ganttEnd) {
+			const monthStart = new Date(cur.getFullYear(), cur.getMonth(), 1)
+			const monthEnd = new Date(cur.getFullYear(), cur.getMonth() + 1, 0)
+			const effectiveEnd = monthEnd < ganttEnd ? monthEnd : ganttEnd
+			const days = Math.ceil((effectiveEnd.getTime() - monthStart.getTime()) / 86400000) + 1
+			const widthPx = days * PX_PER_DAY
+			months.push({
+				label: new Intl.DateTimeFormat('es-MX', { month: 'short', year: '2-digit' }).format(monthStart),
+				widthPx,
+				leftPx: accLeft,
+			})
+			accLeft += widthPx
+			cur.setMonth(cur.getMonth() + 1)
+			cur.setDate(1)
+		}
+
+		// Build tree order
+		const childMap = new Map<string, MockActivity[]>()
+		const roots: MockActivity[] = []
+		for (const a of activities) {
+			if (!a.parentId) {
+				roots.push(a)
+			} else {
+				const arr = childMap.get(a.parentId) ?? []
+				arr.push(a)
+				childMap.set(a.parentId, arr)
+			}
+		}
+
+		const rows: GanttRow[] = []
+		const addRow = (activity: MockActivity, depth: number) => {
+			const children = childMap.get(activity.id) ?? []
+			const dayOffset = Math.floor((activity.startDate.getTime() - ganttStart.getTime()) / 86400000)
+			rows.push({
+				id: activity.id,
+				code: activity.code,
+				name: activity.name,
+				depth,
+				isGroup: children.length > 0,
+				status: activity.status,
+				isCriticalPath: activity.isCriticalPath,
+				progress: activity.progress,
+				leftPx: Math.max(0, dayOffset * PX_PER_DAY),
+				widthPx: Math.max(MIN_BAR_PX, activity.durationDays * PX_PER_DAY),
+			})
+			for (const child of children) addRow(child, depth + 1)
+		}
+
+		for (const root of roots) addRow(root, 0)
+
+		// Today line
+		const todayOffset = Math.floor((Date.now() - ganttStart.getTime()) / 86400000)
+		const todayPx = todayOffset >= 0 && todayOffset <= totalDays ? todayOffset * PX_PER_DAY : -1
+
+		return { totalWidth, months, rows, todayPx }
+	})
+
+	barColor(status: ActivityStatus, isCriticalPath: boolean): string {
+		if (isCriticalPath && status === 'IN_PROGRESS') return 'var(--color-danger)'
+		const map: Partial<Record<ActivityStatus, string>> = {
+			COMPLETED: 'var(--color-success)',
+			IN_PROGRESS: 'var(--color-primary)',
+			DELAYED: 'var(--color-danger)',
+			BLOCKED: 'var(--color-accent)',
+			CANCELLED: 'var(--color-text-secondary)',
+			PENDING: 'var(--color-border)',
+		}
+		return map[status] ?? 'var(--color-primary)'
+	}
+
+	statusLabel(status: ActivityStatus): string {
+		const map: Partial<Record<ActivityStatus, string>> = {
+			COMPLETED: 'Completada',
+			IN_PROGRESS: 'En progreso',
+			DELAYED: 'Retrasada',
+			PENDING: 'Pendiente',
+			BLOCKED: 'Bloqueada',
+			CANCELLED: 'Cancelada',
+		}
+		return map[status] ?? status
+	}
+
+	// ── Stage stepper ─────────────────────────────────────────────
 	readonly stageSteps = computed<StepItem[]>(() =>
 		MOCK_STAGES.map(s => ({
 			key: s.id,
@@ -166,16 +302,9 @@ export class ProjectDetailPage {
 		}
 		return map[this.project.status]
 	}
-
-	get statusBadgeColor(): string {
-		if (this.project.status === 'HALTED') return '#D97706'
-		if (this.project.status === 'ARCHIVED') return '#718096'
-		return ''
-	}
-
-	get statusLabel(): string {
+	get StatusLabel(): string {
 		const map: Record<ProjectStatus, string> = {
-			PLANNING: 'Planificación',
+			PLANNING: 'Planeación',
 			IN_PROGRESS: 'En progreso',
 			DELAYED: 'Retrasado',
 			HALTED: 'Detenido',
@@ -183,6 +312,12 @@ export class ProjectDetailPage {
 			ARCHIVED: 'Archivado',
 		}
 		return map[this.project.status]
+	}
+
+	get statusBadgeColor(): string {
+		if (this.project.status === 'HALTED') return '#D97706'
+		if (this.project.status === 'ARCHIVED') return '#718096'
+		return ''
 	}
 
 	tabClass(isActive: boolean): string {
@@ -199,10 +334,6 @@ export class ProjectDetailPage {
 	}
 
 	formatDate(date: Date): string {
-		return new Intl.DateTimeFormat('es-MX', {
-			day: 'numeric',
-			month: 'short',
-			year: 'numeric',
-		}).format(date)
+		return new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }).format(date)
 	}
 }

@@ -1,12 +1,7 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core'
-import {
-	FormControl,
-	FormGroup,
-	ReactiveFormsModule,
-	Validators,
-} from '@angular/forms'
 import { DecimalPipe } from '@angular/common'
-import { Router, RouterLink, ActivatedRoute } from '@angular/router'
+import { Component, OnInit, computed, inject, signal } from '@angular/core'
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
+import { ActivatedRoute, Router, RouterLink } from '@angular/router'
 
 import {
 	Badge,
@@ -23,7 +18,7 @@ import {
 } from '@org/ui'
 import { ActivityStatus } from '@org/util'
 
-import { getActivityById, MOCK_ACTIVITIES } from '../activities-page/mock-activities'
+import { MOCK_ACTIVITIES, getActivityById } from '../activities-page/mock-activities'
 
 interface DependencyRow {
 	uid: string
@@ -47,58 +42,66 @@ function uid(): string {
 		ReactiveFormsModule,
 		RouterLink,
 		DecimalPipe,
-		Badge, Card, Checkbox, Icon, Input, Radio, RadioGroup, Select, Textarea,
+		Badge,
+		Card,
+		Checkbox,
+		Icon,
+		Input,
+		Radio,
+		RadioGroup,
+		Select,
+		Textarea,
 	],
 	templateUrl: './activity-edit-page.html',
 })
 export class ActivityEditPage implements OnInit {
-	private readonly route  = inject(ActivatedRoute)
+	private readonly route = inject(ActivatedRoute)
 	private readonly router = inject(Router)
 
 	readonly activityId = computed(() => this.route.snapshot.params['activityId'] as string)
-	readonly projectId  = computed(() => this.route.snapshot.parent?.parent?.params?.['id'] as string ?? '')
-	readonly activity   = computed(() => getActivityById(this.activityId()))
+	readonly projectId = computed(() => (this.route.snapshot.parent?.parent?.params?.['id'] as string) ?? '')
+	readonly activity = computed(() => getActivityById(this.activityId()))
 
 	readonly saving = signal(false)
-	readonly saved  = signal(false)
+	readonly saved = signal(false)
 
 	readonly dependencies = signal<DependencyRow[]>([])
 
 	// ── Options ───────────────────────────────────────────────
 	readonly roleOptions: SelectOption[] = [
-		{ value: 'ADMIN',      label: 'Administrador' },
+		{ value: 'ADMIN', label: 'Administrador' },
 		{ value: 'SUPERVISOR', label: 'Supervisor' },
-		{ value: 'RESIDENT',   label: 'Residente de obra' },
-		{ value: 'VIEWER',     label: 'Solo lectura' },
+		{ value: 'RESIDENT', label: 'Residente de obra' },
+		{ value: 'VIEWER', label: 'Solo lectura' },
 	]
 
 	readonly statusOptions: SelectOption[] = [
-		{ value: 'PENDING',     label: 'Pendiente' },
+		{ value: 'PENDING', label: 'Pendiente' },
 		{ value: 'IN_PROGRESS', label: 'En progreso' },
-		{ value: 'BLOCKED',     label: 'Bloqueado' },
-		{ value: 'COMPLETED',   label: 'Completado' },
+		{ value: 'BLOCKED', label: 'Bloqueado' },
+		{ value: 'COMPLETED', label: 'Completado' },
 	]
 
 	readonly categoryOptions: SelectOption[] = [
-		{ value: 'Diseño',         label: 'Diseño' },
-		{ value: 'Topografía',     label: 'Topografía' },
-		{ value: 'Obra civil',     label: 'Obra civil' },
-		{ value: 'Estructural',    label: 'Estructural' },
-		{ value: 'Eléctrico',      label: 'Eléctrico' },
-		{ value: 'Hidráulico',     label: 'Hidráulico' },
-		{ value: 'Instalaciones',  label: 'Instalaciones' },
-		{ value: 'Documentación',  label: 'Documentación' },
+		{ value: 'Diseño', label: 'Diseño' },
+		{ value: 'Topografía', label: 'Topografía' },
+		{ value: 'Obra civil', label: 'Obra civil' },
+		{ value: 'Estructural', label: 'Estructural' },
+		{ value: 'Eléctrico', label: 'Eléctrico' },
+		{ value: 'Hidráulico', label: 'Hidráulico' },
+		{ value: 'Instalaciones', label: 'Instalaciones' },
+		{ value: 'Documentación', label: 'Documentación' },
 	]
 
 	readonly unitOptions: SelectOption[] = [
-		{ value: 'm2',  label: 'm² — Metro cuadrado' },
-		{ value: 'm3',  label: 'm³ — Metro cúbico' },
-		{ value: 'ml',  label: 'ml — Metro lineal' },
+		{ value: 'm2', label: 'm² — Metro cuadrado' },
+		{ value: 'm3', label: 'm³ — Metro cúbico' },
+		{ value: 'ml', label: 'ml — Metro lineal' },
 		{ value: 'ton', label: 'ton — Tonelada' },
 		{ value: 'pza', label: 'pza — Pieza' },
-		{ value: 'kg',  label: 'kg — Kilogramo' },
-		{ value: 'gl',  label: 'gl — Global' },
-		{ value: 'hr',  label: 'hr — Hora' },
+		{ value: 'kg', label: 'kg — Kilogramo' },
+		{ value: 'gl', label: 'gl — Global' },
+		{ value: 'hr', label: 'hr — Hora' },
 	]
 
 	readonly dependencyTypeOptions: SelectOption[] = [
@@ -109,49 +112,51 @@ export class ActivityEditPage implements OnInit {
 	]
 
 	readonly activityOptions = computed<SelectOption[]>(() =>
-		MOCK_ACTIVITIES
-			.filter(a => a.id !== this.activityId())
-			.map(a => ({ value: a.id, label: `${a.code} — ${a.name}` })),
+		MOCK_ACTIVITIES.filter(a => a.id !== this.activityId()).map(a => ({
+			value: a.id,
+			label: `${a.code} — ${a.name}`,
+		})),
 	)
 
 	readonly parentOptions = computed<SelectOption[]>(() => [
 		{ value: '', label: 'Sin actividad padre (nivel raíz)' },
-		...MOCK_ACTIVITIES
-			.filter(a => a.id !== this.activityId())
-			.map(a => ({ value: a.id, label: `${a.code} — ${a.name}` })),
+		...MOCK_ACTIVITIES.filter(a => a.id !== this.activityId()).map(a => ({
+			value: a.id,
+			label: `${a.code} — ${a.name}`,
+		})),
 	])
 
 	// ── Form ──────────────────────────────────────────────────
 	readonly form = new FormGroup({
 		// Información general
-		code:        new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-		name:        new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+		code: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+		name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
 		description: new FormControl('', { nonNullable: true }),
-		category:    new FormControl('', { nonNullable: true }),
+		category: new FormControl('', { nonNullable: true }),
 
 		// Asignación
 		assignedRole: new FormControl('', { nonNullable: true }),
-		parentId:     new FormControl('', { nonNullable: true }),
+		parentId: new FormControl('', { nonNullable: true }),
 
 		// Cronograma
-		startDate:      new FormControl('', { nonNullable: true }),
-		endDate:        new FormControl('', { nonNullable: true }),
-		durationDays:   new FormControl(0, { nonNullable: true }),
+		startDate: new FormControl('', { nonNullable: true }),
+		endDate: new FormControl('', { nonNullable: true }),
+		durationDays: new FormControl(0, { nonNullable: true }),
 		actualStartDate: new FormControl('', { nonNullable: true }),
-		actualEndDate:   new FormControl('', { nonNullable: true }),
-		isCriticalPath:  new FormControl(false, { nonNullable: true }),
+		actualEndDate: new FormControl('', { nonNullable: true }),
+		isCriticalPath: new FormControl(false, { nonNullable: true }),
 
 		// Estado y progreso
-		status:          new FormControl('PENDING',     { nonNullable: true }),
-		progressType:    new FormControl('PERCENTAGE',  { nonNullable: true }),
-		progress:        new FormControl(0,  { nonNullable: true, validators: [Validators.min(0), Validators.max(100)] }),
+		status: new FormControl('PENDING', { nonNullable: true }),
+		progressType: new FormControl('PERCENTAGE', { nonNullable: true }),
+		progress: new FormControl(0, { nonNullable: true, validators: [Validators.min(0), Validators.max(100)] }),
 		progressStateId: new FormControl('', { nonNullable: true }),
 
 		// Medición
-		unit:             new FormControl('m2', { nonNullable: true }),
-		plannedQuantity:  new FormControl(0,    { nonNullable: true, validators: [Validators.min(0)] }),
-		actualQuantity:   new FormControl(0,    { nonNullable: true, validators: [Validators.min(0)] }),
-		unitPrice:        new FormControl(0,    { nonNullable: true, validators: [Validators.min(0)] }),
+		unit: new FormControl('m2', { nonNullable: true }),
+		plannedQuantity: new FormControl(0, { nonNullable: true, validators: [Validators.min(0)] }),
+		actualQuantity: new FormControl(0, { nonNullable: true, validators: [Validators.min(0)] }),
+		unitPrice: new FormControl(0, { nonNullable: true, validators: [Validators.min(0)] }),
 	})
 
 	ngOnInit(): void {
@@ -159,28 +164,25 @@ export class ActivityEditPage implements OnInit {
 		if (!act) return
 
 		this.form.patchValue({
-			code:         act.code,
-			name:         act.name,
-			description:  act.description ?? '',
-			category:     act.category,
+			code: act.code,
+			name: act.name,
+			description: act.description ?? '',
+			category: act.category,
 			assignedRole: act.assignedRole,
-			parentId:     act.parentId ?? '',
-			startDate:    toDateInput(act.startDate),
-			endDate:      toDateInput(act.endDate),
+			parentId: act.parentId ?? '',
+			startDate: toDateInput(act.startDate),
+			endDate: toDateInput(act.endDate),
 			durationDays: act.durationDays,
-			status:       act.status,
+			status: act.status,
 			progressType: act.progressType,
-			progress:     act.progress,
+			progress: act.progress,
 			isCriticalPath: act.isCriticalPath,
 		})
 	}
 
 	// ── Dependencies ──────────────────────────────────────────
 	addDependency(): void {
-		this.dependencies.update(rows => [
-			...rows,
-			{ uid: uid(), targetActivityId: '', type: 'FS', lagDays: 0 },
-		])
+		this.dependencies.update(rows => [...rows, { uid: uid(), targetActivityId: '', type: 'FS', lagDays: 0 }])
 	}
 
 	removeDependency(uid: string): void {
@@ -188,9 +190,7 @@ export class ActivityEditPage implements OnInit {
 	}
 
 	updateDependency(uid: string, field: keyof Omit<DependencyRow, 'uid'>, value: string | number): void {
-		this.dependencies.update(rows =>
-			rows.map(r => r.uid === uid ? { ...r, [field]: value } : r),
-		)
+		this.dependencies.update(rows => rows.map(r => (r.uid === uid ? { ...r, [field]: value } : r)))
 	}
 
 	// ── Submit ────────────────────────────────────────────────
@@ -204,19 +204,13 @@ export class ActivityEditPage implements OnInit {
 			this.saving.set(false)
 			this.saved.set(true)
 			setTimeout(() => {
-				this.router.navigate([
-					'/system/projects', this.projectId(),
-					'activities', this.activityId(),
-				])
+				this.router.navigate(['/system/projects', this.projectId(), 'activities', this.activityId()])
 			}, 800)
 		}, 1200)
 	}
 
 	onCancel(): void {
-		this.router.navigate([
-			'/system/projects', this.projectId(),
-			'activities', this.activityId(),
-		])
+		this.router.navigate(['/system/projects', this.projectId(), 'activities', this.activityId()])
 	}
 
 	// ── Helpers ───────────────────────────────────────────────
@@ -226,10 +220,12 @@ export class ActivityEditPage implements OnInit {
 
 	statusBadgeVariant(status: string): BadgeVariant {
 		const map: Record<ActivityStatus, BadgeVariant> = {
-			COMPLETED:   'completed',
+			COMPLETED: 'completed',
 			IN_PROGRESS: 'in-progress',
-			PENDING:     'planning',
-			BLOCKED:     'delayed',
+			PENDING: 'planning',
+			BLOCKED: 'delayed',
+			CANCELLED: 'custom',
+			DELAYED: 'delayed',
 		}
 		return map[status as ActivityStatus] ?? 'planning'
 	}
