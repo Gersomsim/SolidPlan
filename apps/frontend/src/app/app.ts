@@ -1,10 +1,8 @@
 import { Component } from '@angular/core'
 import { RouterModule } from '@angular/router'
 
-import { Card } from '@org/ui'
-
 @Component({
-	imports: [RouterModule, Card],
+	imports: [RouterModule],
 	selector: 'app-root',
 	templateUrl: './app.html',
 	styleUrl: './app.css',
