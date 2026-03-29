@@ -1,0 +1,20 @@
+services:
+    db:
+        image: postgres:15-alpine
+        ports:
+            - '5432:5432'
+        environment:
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_DB: ${DB_DATABASE}
+        volumes:
+            - solidplan-db:/var/lib/postgresql/data
+        networks:
+            - solidplan
+
+volumes:
+    solidplan-db:
+
+networks:
+    solidplan:
+        driver: bridge
