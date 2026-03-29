@@ -2,7 +2,7 @@ import 'dotenv/config'
 import * as joi from 'joi'
 
 interface EnvSchema {
-	URL_DATABASE: string
+	DB_CONEXION: string
 	API_PORT: number
 	API_VERSION: string
 	API_PREFIX: string
@@ -10,7 +10,7 @@ interface EnvSchema {
 
 const envsSchema = joi
 	.object({
-		URL_DATABASE: joi.string().required(),
+		DB_CONEXION: joi.string().required(),
 		API_PORT: joi.number().required(),
 		API_VERSION: joi.string().required(),
 		API_PREFIX: joi.string().required(),
@@ -33,6 +33,6 @@ export const envs = {
 		prefix: value.API_PREFIX,
 	},
 	db: {
-		url: value.URL_DATABASE,
+		url: value.DB_CONEXION,
 	},
 }
