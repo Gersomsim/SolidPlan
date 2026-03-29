@@ -17,6 +17,11 @@ export const privateRoutes: Routes = [
 			import('./members-page/members-page').then(m => m.MembersPage),
 	},
 	{
+		path: 'members/:id',
+		loadComponent: () =>
+			import('./member-detail-page/member-detail-page').then(m => m.MemberDetailPage),
+	},
+	{
 		path: 'stage-templates',
 		loadComponent: () =>
 			import('./stage-templates-page/stage-templates-page').then(

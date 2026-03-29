@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common'
 import { Component, computed, signal } from '@angular/core'
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
+import { RouterLink } from '@angular/router'
 
 import { Badge, BadgeVariant, Card, EmptyState, Icon, IconType, Modal, StatCard } from '@org/ui'
 import { UserTenantRole } from '@org/util'
@@ -18,7 +19,7 @@ const ROLE_OPTIONS: { label: string; value: UserTenantRole }[] = [
 @Component({
 	selector: 'app-members-page',
 	standalone: true,
-	imports: [DatePipe, ReactiveFormsModule, Badge, Card, EmptyState, Icon, Modal, StatCard],
+	imports: [DatePipe, ReactiveFormsModule, RouterLink, Badge, Card, EmptyState, Icon, Modal, StatCard],
 	templateUrl: './members-page.html',
 })
 export class MembersPage {
