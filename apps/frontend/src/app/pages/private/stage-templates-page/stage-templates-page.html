@@ -1,1 +1,423 @@
-<p>stage-templates-page works!</p>
+<!-- ── Stats ─────────────────────────────────────────────────── -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+  <lib-stat-card icon="landmark"     label="Total plantillas"    [value]="stats().total"    color="primary" />
+  <lib-stat-card icon="circle-check" label="Activas"             [value]="stats().active"   color="success" />
+  <lib-stat-card icon="building"     label="En uso en proyectos" [value]="stats().inUse"    color="primary" />
+  <lib-stat-card icon="ban"          label="Archivadas"          [value]="stats().archived" [color]="stats().archived > 0 ? 'accent' : 'primary'" />
+</div>
+
+<!-- ── Context note ───────────────────────────────────────────── -->
+<div class="flex items-start gap-3 px-4 py-3 rounded-card border border-border dark:border-dark-border bg-surface dark:bg-dark-surface mb-5">
+  <lib-ui-icon icon="info" [size]="14" class="text-primary dark:text-primary-light shrink-0 mt-0.5" />
+  <p class="text-small text-text-secondary dark:text-dark-text/70 leading-relaxed">
+    Las plantillas de etapas son el catálogo de fases reutilizables de tu organización.
+    Al configurar un proyecto, el equipo puede seleccionarlas para estructurar el cronograma.
+    Las plantillas <strong class="text-text-primary dark:text-dark-text">archivadas</strong> ya no aparecen al crear nuevos proyectos,
+    pero los proyectos existentes que las usan no se ven afectados.
+  </p>
+</div>
+
+<!-- ── Toolbar ────────────────────────────────────────────────── -->
+<div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between mb-5">
+  <!-- Search -->
+  <div class="relative flex-1 max-w-sm">
+    <lib-ui-icon icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" [size]="16" />
+    <input
+      type="text"
+      placeholder="Buscar plantilla..."
+      (input)="onSearch($event)"
+      class="w-full pl-9 pr-4 py-2 rounded-input border border-border bg-surface text-small text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:bg-dark-surface dark:border-dark-border dark:text-dark-text dark:placeholder:text-dark-text/40"
+    />
+  </div>
+
+  <div class="flex items-center gap-3">
+    <!-- View filter pills -->
+    <div class="flex gap-1.5">
+      <button [class]="filterPillClass('ACTIVE')"   (click)="viewFilter.set('ACTIVE')">Activas</button>
+      <button [class]="filterPillClass('ARCHIVED')" (click)="viewFilter.set('ARCHIVED')">Archivadas</button>
+      <button [class]="filterPillClass('ALL')"      (click)="viewFilter.set('ALL')">Todas</button>
+    </div>
+
+    <!-- New template button -->
+    <button
+      (click)="openCreate()"
+      class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-white text-small font-medium rounded-input transition-colors whitespace-nowrap"
+    >
+      <lib-ui-icon icon="plus" [size]="16" />
+      Nueva plantilla
+    </button>
+  </div>
+</div>
+
+<!-- ── Template grid ──────────────────────────────────────────── -->
+@if (filteredTemplates().length === 0) {
+  <lib-card [elevated]="true" [bordered]="true" padding="none">
+    <div class="py-16">
+      <lib-empty-state
+        icon="landmark"
+        title="Sin plantillas"
+        description="No hay plantillas con los filtros aplicados. Crea una nueva para comenzar."
+      />
+    </div>
+  </lib-card>
+} @else {
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    @for (t of filteredTemplates(); track t.id) {
+      <div
+        class="group relative flex flex-col rounded-card border bg-surface dark:bg-dark-surface transition-shadow hover:shadow-hover cursor-default"
+        [class.border-border]="!t.isArchived"
+        [class.dark:border-dark-border]="!t.isArchived"
+        [class.border-border\/50]="t.isArchived"
+        [class.opacity-60]="t.isArchived"
+      >
+        <!-- Color bar + header -->
+        <div class="flex items-stretch rounded-t-card overflow-hidden border-b border-border dark:border-dark-border">
+          <!-- Color swatch -->
+          <div class="w-2 shrink-0" [style.background-color]="t.color"></div>
+
+          <!-- Header content -->
+          <div class="flex-1 flex items-start justify-between gap-3 px-4 py-4">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-3 h-3 rounded-full shrink-0" [style.background-color]="t.color"></div>
+              <div class="min-w-0">
+                <p class="text-small font-semibold text-text-primary dark:text-dark-text truncate">{{ t.name }}</p>
+                @if (t.isArchived) {
+                  <span class="text-label text-text-secondary/60 dark:text-dark-text/40">Archivada</span>
+                }
+              </div>
+            </div>
+
+            <!-- Actions (visible on hover) -->
+            <div class="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+              @if (!t.isArchived) {
+                <button
+                  (click)="openEdit(t, $event)"
+                  class="flex items-center justify-center w-7 h-7 rounded-default text-text-secondary hover:text-primary hover:bg-primary/10 dark:text-dark-text/50 dark:hover:text-primary-light transition-colors"
+                  title="Editar"
+                >
+                  <lib-ui-icon icon="user-pen" [size]="13" />
+                </button>
+              }
+              <button
+                (click)="openArchive(t, $event)"
+                class="flex items-center justify-center w-7 h-7 rounded-default text-text-secondary hover:bg-accent/10 transition-colors"
+                [class.hover:text-accent]="!t.isArchived"
+                [class.hover:text-success]="t.isArchived"
+                [title]="t.isArchived ? 'Restaurar' : 'Archivar'"
+              >
+                <lib-ui-icon [icon]="t.isArchived ? 'circle-check' : 'ban'" [size]="13" />
+              </button>
+              <button
+                (click)="openDelete(t, $event)"
+                class="flex items-center justify-center w-7 h-7 rounded-default text-text-secondary hover:text-danger hover:bg-danger/10 dark:text-dark-text/50 transition-colors"
+                title="Eliminar"
+              >
+                <lib-ui-icon icon="trash-2" [size]="13" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="flex-1 px-4 py-3.5">
+          @if (t.description) {
+            <p class="text-small text-text-secondary dark:text-dark-text/60 leading-relaxed line-clamp-2">
+              {{ t.description }}
+            </p>
+          } @else {
+            <p class="text-small text-text-secondary/40 dark:text-dark-text/30 italic">Sin descripción</p>
+          }
+        </div>
+
+        <!-- Footer -->
+        <div class="px-4 py-3 border-t border-border/50 dark:border-dark-border/50 flex items-center justify-between">
+          <div class="flex items-center gap-1.5 text-label text-text-secondary dark:text-dark-text/50">
+            <lib-ui-icon icon="building" [size]="11" />
+            @if (t.usageCount > 0) {
+              <span>{{ t.usageCount }} proyecto{{ t.usageCount !== 1 ? 's' : '' }}</span>
+            } @else {
+              <span>Sin uso</span>
+            }
+          </div>
+          <span class="text-label text-text-secondary/50 dark:text-dark-text/30">{{ t.updatedAt | date:'dd MMM yyyy' }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- New template card (shortcut) -->
+    @if (viewFilter() === 'ACTIVE' || viewFilter() === 'ALL') {
+      <button
+        (click)="openCreate()"
+        class="flex flex-col items-center justify-center gap-3 rounded-card border-2 border-dashed border-border dark:border-dark-border hover:border-primary/50 dark:hover:border-primary-light/50 hover:bg-primary/3 dark:hover:bg-primary-light/3 min-h-[140px] transition-colors group/add"
+      >
+        <div class="w-10 h-10 rounded-full bg-secondary-bg dark:bg-white/10 flex items-center justify-center group-hover/add:bg-primary/10 transition-colors">
+          <lib-ui-icon icon="plus" [size]="18" class="text-text-secondary dark:text-dark-text/50 group-hover/add:text-primary dark:group-hover/add:text-primary-light" />
+        </div>
+        <span class="text-small font-medium text-text-secondary dark:text-dark-text/60 group-hover/add:text-primary dark:group-hover/add:text-primary-light transition-colors">
+          Nueva plantilla
+        </span>
+      </button>
+    }
+  </div>
+}
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- ── Create / Edit modal ────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<lib-modal [open]="formOpen()" size="sm" (closed)="closeForm()">
+  <div modal-header class="flex items-center gap-3">
+    @if (formMode() === 'edit' && formTemplate()) {
+      <div class="w-4 h-4 rounded-full shrink-0" [style.background-color]="formTemplate()!.color"></div>
+      <span class="text-body font-semibold text-text-primary dark:text-dark-text">Editar plantilla</span>
+    } @else {
+      <lib-ui-icon icon="plus" [size]="16" class="text-primary dark:text-primary-light shrink-0" />
+      <span class="text-body font-semibold text-text-primary dark:text-dark-text">Nueva plantilla de etapa</span>
+    }
+  </div>
+
+  <div [formGroup]="form" class="flex flex-col gap-5 p-6">
+
+    <!-- Name -->
+    <div>
+      <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Nombre *</label>
+      <input
+        type="text"
+        formControlName="name"
+        placeholder="Ej: Cimentación, Acabados, Instalaciones..."
+        class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-secondary dark:placeholder:text-dark-text/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+        [class.border-danger]="form.get('name')?.invalid && form.get('name')?.touched"
+      />
+      @if (form.get('name')?.invalid && form.get('name')?.touched) {
+        <p class="text-label text-danger mt-1">El nombre es obligatorio</p>
+      }
+    </div>
+
+    <!-- Description -->
+    <div>
+      <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Descripción</label>
+      <textarea
+        formControlName="description"
+        rows="2"
+        placeholder="Describe brevemente qué incluye esta etapa..."
+        class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-secondary dark:placeholder:text-dark-text/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors resize-none"
+      ></textarea>
+    </div>
+
+    <!-- Color picker -->
+    <div>
+      <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-2">Color de identificación</label>
+      <div class="flex flex-wrap gap-2 mb-3">
+        @for (preset of presetColors; track preset.hex) {
+          @let isSelected = form.get('color')?.value === preset.hex;
+          <button
+            type="button"
+            (click)="form.get('color')?.setValue(preset.hex)"
+            class="w-8 h-8 rounded-full transition-transform hover:scale-110 relative"
+            [style.background-color]="preset.hex"
+            [title]="preset.label"
+          >
+            @if (isSelected) {
+              <div class="absolute inset-0 rounded-full ring-2 ring-offset-2 ring-offset-surface dark:ring-offset-dark-surface"
+                   [style.ring-color]="preset.hex"></div>
+              <lib-ui-icon icon="check" [size]="14" class="text-white absolute inset-0 m-auto" />
+            }
+          </button>
+        }
+      </div>
+
+      <!-- Preview -->
+      @if (form.get('name')?.value) {
+        <div class="flex items-center gap-3 px-3 py-2.5 rounded-card border border-border dark:border-dark-border bg-secondary-bg/50 dark:bg-white/5">
+          <span class="text-label text-text-secondary dark:text-dark-text/60">Vista previa:</span>
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full" [style.background-color]="form.get('color')?.value"></div>
+            <span class="text-small font-medium text-text-primary dark:text-dark-text">{{ form.get('name')?.value }}</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-end gap-2 pt-1">
+      <button
+        type="button"
+        (click)="closeForm()"
+        class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        (click)="onFormSubmit()"
+        [disabled]="formSaving() || formSavedOk()"
+        class="flex items-center gap-2 px-4 py-2 rounded-input bg-primary hover:bg-primary-hover disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+      >
+        @if (formSaving()) {
+          <lib-ui-icon icon="loader-circle" [size]="15" />
+          Guardando...
+        } @else if (formSavedOk()) {
+          <lib-ui-icon icon="check" [size]="15" />
+          Guardado
+        } @else {
+          <lib-ui-icon icon="check" [size]="15" />
+          {{ formMode() === 'edit' ? 'Guardar cambios' : 'Crear plantilla' }}
+        }
+      </button>
+    </div>
+  </div>
+</lib-modal>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- ── Archive / Restore modal ────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<lib-modal [open]="archiveOpen()" size="sm" (closed)="closeArchive()">
+  <div modal-header class="flex items-center gap-3">
+    <lib-ui-icon
+      [icon]="archiveCandidate()?.isArchived ? 'circle-check' : 'ban'"
+      [size]="16"
+      class="shrink-0"
+      [class.text-accent]="!archiveCandidate()?.isArchived"
+      [class.text-success]="archiveCandidate()?.isArchived"
+    />
+    <span class="text-body font-semibold text-text-primary dark:text-dark-text">
+      {{ archiveCandidate()?.isArchived ? 'Restaurar plantilla' : 'Archivar plantilla' }}
+    </span>
+  </div>
+
+  @if (archiveCandidate()) {
+    <div class="flex flex-col gap-5 p-6">
+
+      <!-- Template preview -->
+      <div class="flex items-center gap-3 px-4 py-3.5 rounded-card border border-border dark:border-dark-border bg-secondary-bg/50 dark:bg-white/5">
+        <div class="w-4 h-4 rounded-full shrink-0" [style.background-color]="archiveCandidate()!.color"></div>
+        <div class="flex-1 min-w-0">
+          <p class="text-small font-semibold text-text-primary dark:text-dark-text">{{ archiveCandidate()!.name }}</p>
+          @if (archiveCandidate()!.usageCount > 0) {
+            <p class="text-label text-text-secondary dark:text-dark-text/50">
+              En uso en {{ archiveCandidate()!.usageCount }} proyecto{{ archiveCandidate()!.usageCount !== 1 ? 's' : '' }}
+            </p>
+          }
+        </div>
+      </div>
+
+      <!-- Info -->
+      @if (!archiveCandidate()!.isArchived) {
+        <div class="flex items-start gap-2.5 px-4 py-3 rounded-card bg-accent/5 border border-accent/20">
+          <lib-ui-icon icon="info" [size]="14" class="text-accent shrink-0 mt-0.5" />
+          <div>
+            <p class="text-small font-medium text-accent">La plantilla dejará de aparecer al configurar nuevos proyectos.</p>
+            <p class="text-label text-text-secondary dark:text-dark-text/60 mt-1">
+              Los proyectos que ya la usan no se verán afectados. Puedes restaurarla en cualquier momento.
+            </p>
+          </div>
+        </div>
+      } @else {
+        <div class="flex items-start gap-2.5 px-4 py-3 rounded-card bg-success/5 border border-success/20">
+          <lib-ui-icon icon="circle-check" [size]="14" class="text-success shrink-0 mt-0.5" />
+          <p class="text-small text-text-secondary dark:text-dark-text/60">
+            La plantilla volverá a estar disponible al configurar nuevos proyectos.
+          </p>
+        </div>
+      }
+
+      <div class="flex items-center justify-end gap-2">
+        <button
+          type="button"
+          (click)="closeArchive()"
+          class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          (click)="confirmArchive()"
+          [disabled]="archiving()"
+          class="flex items-center gap-2 px-4 py-2 rounded-input disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+          [class.bg-accent]="!archiveCandidate()!.isArchived"
+          [class.hover:bg-accent\/90]="!archiveCandidate()!.isArchived"
+          [class.bg-success]="archiveCandidate()!.isArchived"
+          [class.hover:bg-success\/90]="archiveCandidate()!.isArchived"
+        >
+          @if (archiving()) {
+            <lib-ui-icon icon="loader-circle" [size]="15" />
+            Procesando...
+          } @else if (archiveCandidate()!.isArchived) {
+            <lib-ui-icon icon="circle-check" [size]="15" />
+            Restaurar
+          } @else {
+            <lib-ui-icon icon="ban" [size]="15" />
+            Archivar
+          }
+        </button>
+      </div>
+    </div>
+  }
+</lib-modal>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- ── Delete modal ───────────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<lib-modal [open]="deleteOpen()" size="sm" (closed)="closeDelete()">
+  <div modal-header class="flex items-center gap-3">
+    <lib-ui-icon icon="trash-2" [size]="16" class="text-danger shrink-0" />
+    <span class="text-body font-semibold text-text-primary dark:text-dark-text">Eliminar plantilla</span>
+  </div>
+
+  @if (deleteCandidate()) {
+    <div class="flex flex-col gap-5 p-6">
+
+      <!-- Template preview -->
+      <div class="flex items-center gap-3 px-4 py-3.5 rounded-card border border-border dark:border-dark-border bg-secondary-bg/50 dark:bg-white/5">
+        <div class="w-4 h-4 rounded-full shrink-0" [style.background-color]="deleteCandidate()!.color"></div>
+        <p class="text-small font-semibold text-text-primary dark:text-dark-text">{{ deleteCandidate()!.name }}</p>
+      </div>
+
+      <!-- Warning -->
+      @if (deleteCandidate()!.usageCount > 0) {
+        <div class="flex items-start gap-2.5 px-4 py-3 rounded-card bg-danger/5 border border-danger/20">
+          <lib-ui-icon icon="triangle-alert" [size]="14" class="text-danger shrink-0 mt-0.5" />
+          <div>
+            <p class="text-small font-medium text-danger">
+              Esta plantilla está en uso en {{ deleteCandidate()!.usageCount }} proyecto{{ deleteCandidate()!.usageCount !== 1 ? 's' : '' }}.
+            </p>
+            <p class="text-label text-text-secondary dark:text-dark-text/60 mt-1">
+              Si la eliminas, esos proyectos perderán la referencia a esta plantilla. Las etapas del proyecto existentes no se borrarán,
+              pero ya no estarán vinculadas al catálogo.
+            </p>
+          </div>
+        </div>
+      } @else {
+        <div class="flex items-start gap-2.5 px-4 py-3 rounded-card bg-danger/5 border border-danger/20">
+          <lib-ui-icon icon="triangle-alert" [size]="14" class="text-danger shrink-0 mt-0.5" />
+          <p class="text-small text-text-secondary dark:text-dark-text/60">
+            Esta acción es permanente y no se puede deshacer.
+          </p>
+        </div>
+      }
+
+      <div class="flex items-center justify-end gap-2">
+        <button
+          type="button"
+          (click)="closeDelete()"
+          class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          (click)="confirmDelete()"
+          [disabled]="deleting()"
+          class="flex items-center gap-2 px-4 py-2 rounded-input bg-danger hover:bg-danger/90 disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+        >
+          @if (deleting()) {
+            <lib-ui-icon icon="loader-circle" [size]="15" />
+            Eliminando...
+          } @else {
+            <lib-ui-icon icon="trash-2" [size]="15" />
+            Eliminar plantilla
+          }
+        </button>
+      </div>
+    </div>
+  }
+</lib-modal>
