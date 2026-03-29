@@ -7,6 +7,7 @@ import { ActivityStatus } from '@org/util'
 
 import { getLogsByActivityId } from '../../../daily-logs-page/mock-daily-logs'
 import { MockActivity, getChildActivities } from '../../mock-activities'
+import { MockComment, getCommentsByActivityId } from '../../mock-comments'
 
 export type DetailLayout = 'modal' | 'page'
 
@@ -25,6 +26,40 @@ export class ActivityDetailView {
 	readonly isPage = computed(() => this.layout() === 'page')
 	readonly relatedLogs = computed(() => getLogsByActivityId(this.activity().id))
 
+	// ── Comments ──────────────────────────────────────────────
+	private readonly baseComments = computed(() => getCommentsByActivityId(this.activity().id))
+	readonly newComments = signal<MockComment[]>([])
+	readonly comments = computed(() => [...this.baseComments(), ...this.newComments()])
+
+	readonly commentText = signal('')
+	readonly commentSending = signal(false)
+
+	onCommentKeydown(event: KeyboardEvent): void {
+		if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+			this.submitComment()
+		}
+	}
+
+	submitComment(): void {
+		const text = this.commentText().trim()
+		if (!text) return
+
+		this.commentSending.set(true)
+
+		setTimeout(() => {
+			const comment: MockComment = {
+				id: `c-new-${Date.now()}`,
+				activityId: this.activity().id,
+				author: { userId: 'u1', name: 'Carlos Mendoza', initials: 'CM', avatarBg: '#1E3A5F' },
+				content: text,
+				createdAt: new Date(),
+			}
+			this.newComments.update(list => [...list, comment])
+			this.commentText.set('')
+			this.commentSending.set(false)
+		}, 400)
+	}
+
 	// ── Add sub-activity ─────────────────────────────────────
 	readonly addingChild = signal(false)
 	readonly newChildTitle = signal('')
@@ -33,7 +68,6 @@ export class ActivityDetailView {
 	startAdding(): void {
 		this.addingChild.set(true)
 		this.newChildTitle.set('')
-		// Focus after render
 		setTimeout(() => this.titleInput()?.nativeElement.focus(), 0)
 	}
 
@@ -45,7 +79,6 @@ export class ActivityDetailView {
 	confirmAdding(): void {
 		const title = this.newChildTitle().trim()
 		if (!title) return
-		// TODO: dispatch to store/service — for now just reset
 		console.log('Nueva sub-actividad:', title, 'parent:', this.activity().id)
 		this.cancelAdding()
 	}
@@ -106,5 +139,19 @@ export class ActivityDetailView {
 			DELAYED: 'Retrasado',
 		}
 		return map[status]
+	}
+
+	timeAgo(date: Date): string {
+		const now = new Date()
+		const diff = now.getTime() - date.getTime()
+		const minutes = Math.floor(diff / 60000)
+		const hours = Math.floor(diff / 3600000)
+		const days = Math.floor(diff / 86400000)
+
+		if (minutes < 2) return 'ahora'
+		if (minutes < 60) return `hace ${minutes} min`
+		if (hours < 24) return `hace ${hours}h`
+		if (days < 7) return `hace ${days}d`
+		return date.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })
 	}
 }

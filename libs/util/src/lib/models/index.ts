@@ -1,4 +1,5 @@
 export * from './activity-state.model';
+export * from './comment.model';
 export * from './activity.model';
 export * from './category.model';
 export * from './classification-resource.model';
