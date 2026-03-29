@@ -2,18 +2,18 @@ import { DatePipe } from '@angular/common'
 import { Component, computed, signal } from '@angular/core'
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
 
-import { Badge, Card, EmptyState, Icon, Modal, StatCard } from '@org/ui'
+import { Card, EmptyState, Icon, Modal, StatCard } from '@org/ui'
 
+import { ActivityStateForm } from '../../../features/activity-state/presentation'
 import { MOCK_ACTIVITY_STATES, MockActivityState, STATE_PRESET_COLORS } from './mock-activity-states'
 
 @Component({
 	selector: 'app-activity-states-page',
 	standalone: true,
-	imports: [DatePipe, ReactiveFormsModule, Badge, Card, EmptyState, Icon, Modal, StatCard],
+	imports: [DatePipe, ReactiveFormsModule, Card, EmptyState, Icon, Modal, StatCard, ActivityStateForm],
 	templateUrl: './activity-states-page.html',
 })
 export class ActivityStatesPage {
-
 	// ── Live data ─────────────────────────────────────────────────
 	readonly states = signal([...MOCK_ACTIVITY_STATES])
 
@@ -23,14 +23,14 @@ export class ActivityStatesPage {
 	// ── Form modal (create / edit) ────────────────────────────────
 	readonly formState = signal<MockActivityState | null>(null)
 	readonly formOpen = signal(false)
-	readonly formMode = computed<'create' | 'edit'>(() => this.formState() ? 'edit' : 'create')
+	readonly formMode = computed<'create' | 'edit'>(() => (this.formState() ? 'edit' : 'create'))
 	readonly formSaving = signal(false)
 	readonly formSavedOk = signal(false)
 
 	readonly form = new FormGroup({
-		name:      new FormControl('', Validators.required),
-		color:     new FormControl('#64748B', Validators.required),
-		isFinal:   new FormControl(false),
+		name: new FormControl('', Validators.required),
+		color: new FormControl('#64748B', Validators.required),
+		isFinal: new FormControl(false),
 		isDefault: new FormControl(false),
 	})
 
@@ -47,9 +47,9 @@ export class ActivityStatesPage {
 		const all = this.states()
 		const def = all.find(s => s.isDefault)
 		return {
-			total:       all.length,
-			finals:      all.filter(s => s.isFinal).length,
-			inUse:       all.filter(s => s.usageCount > 0).length,
+			total: all.length,
+			finals: all.filter(s => s.isFinal).length,
+			inUse: all.filter(s => s.usageCount > 0).length,
 			defaultName: def?.name ?? '—',
 			defaultColor: def?.color ?? '#9CA3AF',
 		}
@@ -58,9 +58,7 @@ export class ActivityStatesPage {
 	// ── Filtered + sorted list ────────────────────────────────────
 	readonly filteredStates = computed(() => {
 		const q = this.searchQuery().toLowerCase().trim()
-		return [...this.states()]
-			.filter(s => !q || s.name.toLowerCase().includes(q))
-			.sort((a, b) => a.order - b.order)
+		return [...this.states()].filter(s => !q || s.name.toLowerCase().includes(q)).sort((a, b) => a.order - b.order)
 	})
 
 	// ── Create / Edit ─────────────────────────────────────────────
@@ -99,7 +97,14 @@ export class ActivityStatesPage {
 				if (target) {
 					updated = list.map(s =>
 						s.id === target.id
-							? { ...s, name: name!, color: color!, isFinal: !!isFinal, isDefault: !!isDefault, updatedAt: new Date() }
+							? {
+									...s,
+									name: name!,
+									color: color!,
+									isFinal: !!isFinal,
+									isDefault: !!isDefault,
+									updatedAt: new Date(),
+								}
 							: s,
 					)
 				} else {
@@ -164,10 +169,11 @@ export class ActivityStatesPage {
 		const idx = sorted.findIndex(x => x.id === s.id)
 		if (idx <= 0) return
 		const prev = sorted[idx - 1]
-		this.states.update(list => list.map(x =>
-			x.id === s.id    ? { ...x, order: prev.order } :
-			x.id === prev.id ? { ...x, order: s.order }   : x,
-		))
+		this.states.update(list =>
+			list.map(x =>
+				x.id === s.id ? { ...x, order: prev.order } : x.id === prev.id ? { ...x, order: s.order } : x,
+			),
+		)
 	}
 
 	moveDown(s: MockActivityState, event: Event): void {
@@ -176,10 +182,11 @@ export class ActivityStatesPage {
 		const idx = sorted.findIndex(x => x.id === s.id)
 		if (idx >= sorted.length - 1) return
 		const next = sorted[idx + 1]
-		this.states.update(list => list.map(x =>
-			x.id === s.id    ? { ...x, order: next.order } :
-			x.id === next.id ? { ...x, order: s.order }   : x,
-		))
+		this.states.update(list =>
+			list.map(x =>
+				x.id === s.id ? { ...x, order: next.order } : x.id === next.id ? { ...x, order: s.order } : x,
+			),
+		)
 	}
 
 	// ── Search helper ─────────────────────────────────────────────
