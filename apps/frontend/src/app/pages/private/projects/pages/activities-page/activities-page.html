@@ -50,7 +50,10 @@
     </div>
 
     <!-- Add button -->
-    <button class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-white text-small font-medium rounded-input transition-colors whitespace-nowrap shrink-0">
+    <button
+      (click)="openCreateActivity()"
+      class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-white text-small font-medium rounded-input transition-colors whitespace-nowrap shrink-0"
+    >
       <lib-ui-icon icon="plus" [size]="16" />
       Nueva actividad
     </button>
@@ -254,6 +257,243 @@
     </div>
   }
 </lib-card>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- ── Create activity modal ──────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<lib-modal [open]="createOpen()" size="lg" (closed)="closeCreateActivity()">
+  <div modal-header class="flex items-center gap-3">
+    <lib-ui-icon icon="plus" [size]="16" class="text-primary dark:text-primary-light shrink-0" />
+    <span class="text-body font-semibold text-text-primary dark:text-dark-text">Nueva actividad</span>
+  </div>
+
+  <div [formGroup]="createForm" class="flex flex-col gap-5 p-6">
+
+    <!-- Name -->
+    <div>
+      <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Nombre *</label>
+      <input
+        type="text"
+        formControlName="name"
+        placeholder="Ej: Excavación de cimientos, Planos estructurales..."
+        class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-secondary dark:placeholder:text-dark-text/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+        [class.border-danger]="createForm.get('name')?.invalid && createForm.get('name')?.touched"
+      />
+      @if (createForm.get('name')?.invalid && createForm.get('name')?.touched) {
+        <p class="text-label text-danger mt-1">El nombre es obligatorio</p>
+      }
+    </div>
+
+    <!-- Parent + Category (2-col) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+      <!-- Parent activity -->
+      <div>
+        <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">
+          Actividad padre
+          <span class="font-normal text-text-secondary/50 ml-1">(opcional)</span>
+        </label>
+        <select
+          formControlName="parentId"
+          class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+        >
+          <option value="">Sin padre (nivel raíz)</option>
+          @for (opt of parentOptions(); track opt.id) {
+            <option [value]="opt.id">{{ opt.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Category -->
+      <div>
+        <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Categoría *</label>
+        <select
+          formControlName="category"
+          class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+        >
+          @for (cat of categoryOptions; track cat.label) {
+            <option [value]="cat.label">{{ cat.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Dates (2-col) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Fecha de inicio *</label>
+        <input
+          type="date"
+          formControlName="startDate"
+          class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+          [class.border-danger]="createForm.get('startDate')?.invalid && createForm.get('startDate')?.touched"
+        />
+        @if (createForm.get('startDate')?.invalid && createForm.get('startDate')?.touched) {
+          <p class="text-label text-danger mt-1">Requerido</p>
+        }
+      </div>
+      <div>
+        <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Fecha de fin *</label>
+        <input
+          type="date"
+          formControlName="endDate"
+          class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+          [class.border-danger]="createForm.get('endDate')?.invalid && createForm.get('endDate')?.touched"
+        />
+        @if (createForm.get('endDate')?.invalid && createForm.get('endDate')?.touched) {
+          <p class="text-label text-danger mt-1">Requerido</p>
+        }
+      </div>
+    </div>
+
+    <!-- Assigned role (radio cards) -->
+    <div>
+      <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-2">Rol asignado *</label>
+      <div class="grid grid-cols-2 gap-2">
+        @for (opt of roleOptions; track opt.value) {
+          @let isSelected = createForm.get('assignedRole')?.value === opt.value;
+          <button
+            type="button"
+            (click)="createForm.get('assignedRole')?.setValue(opt.value)"
+            class="flex items-start gap-3 px-3 py-2.5 rounded-card border text-left transition-all cursor-pointer"
+            [class.border-primary]="isSelected"
+            [class.bg-primary\/5]="isSelected"
+            [class.dark:bg-primary-light\/8]="isSelected"
+            [class.border-border]="!isSelected"
+            [class.dark:border-dark-border]="!isSelected"
+          >
+            <div
+              class="mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
+              [class.border-primary]="isSelected"
+              [class.dark:border-primary-light]="isSelected"
+              [class.border-border]="!isSelected"
+              [class.dark:border-dark-border]="!isSelected"
+            >
+              @if (isSelected) {
+                <div class="w-2 h-2 rounded-full bg-primary dark:bg-primary-light"></div>
+              }
+            </div>
+            <div>
+              <p class="text-small font-semibold text-text-primary dark:text-dark-text">{{ opt.label }}</p>
+              <p class="text-label text-text-secondary dark:text-dark-text/60">{{ opt.description }}</p>
+            </div>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Progress type + Critical path (2-col) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+      <!-- Progress type -->
+      <div>
+        <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-2">Tipo de progreso</label>
+        <div class="flex gap-2">
+          @let isPct = createForm.get('progressType')?.value === 'PERCENTAGE';
+          <button
+            type="button"
+            (click)="createForm.get('progressType')?.setValue('PERCENTAGE')"
+            class="flex-1 flex items-center gap-2 px-3 py-2 rounded-card border text-left transition-all cursor-pointer text-small font-medium"
+            [class.border-primary]="isPct"
+            [class.bg-primary\/5]="isPct"
+            [class.text-primary]="isPct"
+            [class.border-border]="!isPct"
+            [class.dark:border-dark-border]="!isPct"
+            [class.text-text-secondary]="!isPct"
+          >
+            <lib-ui-icon icon="chart-area" [size]="14" />
+            % Porcentaje
+          </button>
+          <button
+            type="button"
+            (click)="createForm.get('progressType')?.setValue('STATE')"
+            class="flex-1 flex items-center gap-2 px-3 py-2 rounded-card border text-left transition-all cursor-pointer text-small font-medium"
+            [class.border-primary]="!isPct"
+            [class.bg-primary\/5]="!isPct"
+            [class.text-primary]="!isPct"
+            [class.border-border]="isPct"
+            [class.dark:border-dark-border]="isPct"
+            [class.text-text-secondary]="isPct"
+          >
+            <lib-ui-icon icon="zap" [size]="14" />
+            Estado
+          </button>
+        </div>
+      </div>
+
+      <!-- Critical path -->
+      <div>
+        <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-2">Ruta crítica</label>
+        <button
+          type="button"
+          (click)="createForm.get('isCriticalPath')?.setValue(!createForm.get('isCriticalPath')?.value)"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-card border w-full text-left transition-all cursor-pointer"
+          [class.border-accent]="createForm.get('isCriticalPath')?.value"
+          [class.bg-accent\/5]="createForm.get('isCriticalPath')?.value"
+          [class.border-border]="!createForm.get('isCriticalPath')?.value"
+          [class.dark:border-dark-border]="!createForm.get('isCriticalPath')?.value"
+        >
+          <div
+            class="w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors"
+            [class.border-accent]="createForm.get('isCriticalPath')?.value"
+            [class.bg-accent]="createForm.get('isCriticalPath')?.value"
+            [class.border-border]="!createForm.get('isCriticalPath')?.value"
+          >
+            @if (createForm.get('isCriticalPath')?.value) {
+              <lib-ui-icon icon="check" [size]="10" class="text-white" />
+            }
+          </div>
+          <div class="flex items-center gap-1.5">
+            <lib-ui-icon icon="zap" [size]="14" class="text-accent" />
+            <span class="text-small font-medium text-text-primary dark:text-dark-text">Marcar como ruta crítica</span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div>
+      <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">
+        Descripción
+        <span class="font-normal text-text-secondary/50 ml-1">(opcional)</span>
+      </label>
+      <textarea
+        formControlName="description"
+        rows="2"
+        placeholder="Describe brevemente el alcance de esta actividad..."
+        class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-secondary dark:placeholder:text-dark-text/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors resize-none"
+      ></textarea>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-end gap-2 pt-1 border-t border-border/50 dark:border-dark-border/50">
+      <button
+        type="button"
+        (click)="closeCreateActivity()"
+        class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        (click)="onCreateSubmit()"
+        [disabled]="createSaving() || createSavedOk()"
+        class="flex items-center gap-2 px-4 py-2 rounded-input bg-primary hover:bg-primary-hover disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+      >
+        @if (createSaving()) {
+          <lib-ui-icon icon="loader-circle" [size]="15" />
+          Guardando...
+        } @else if (createSavedOk()) {
+          <lib-ui-icon icon="check" [size]="15" />
+          Actividad creada
+        } @else {
+          <lib-ui-icon icon="check" [size]="15" />
+          Crear actividad
+        }
+      </button>
+    </div>
+  </div>
+</lib-modal>
 
 <!-- ── Activity detail modal ─────────────────────────────────── -->
 <lib-modal

@@ -31,6 +31,11 @@ export const privateRoutes: Routes = [
 			),
 	},
 	{
+		path: 'categories',
+		loadComponent: () =>
+			import('./categories-page/categories-page').then(m => m.CategoriesPage),
+	},
+	{
 		path: 'settings',
 		loadComponent: () =>
 			import('./settings-page/settings-page').then(m => m.SettingsPage),

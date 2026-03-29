@@ -62,6 +62,7 @@ import {
 	LucideExternalLink,
 	LucideInfo,
 	LucidePlus,
+	LucideTag,
 	LucideZap,
 } from '@lucide/angular'
 
@@ -136,6 +137,7 @@ export class Icon {
 			'external-link': LucideExternalLink,
 			plus: LucidePlus,
 			zap: LucideZap,
+			tag: LucideTag,
 			info: LucideInfo,
 			cloud: LucideCloud,
 			'cloud-rain': LucideCloudRain,

@@ -60,3 +60,4 @@ export type IconType =
 	| 'info'
 	| 'cloud'
 	| 'cloud-rain'
+	| 'tag'
