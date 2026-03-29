@@ -1,0 +1,270 @@
+@if (resource()) {
+  @let r = resource()!;
+  @let s = stats()!;
+  @let sv = statValues()!;
+
+  <div class="p-6 max-w-5xl mx-auto">
+
+    <!-- ── Back + header ──────────────────────────────────────────── -->
+    <div class="mb-6">
+      <button
+        type="button"
+        (click)="goBack()"
+        class="flex items-center gap-1.5 text-small text-text-secondary dark:text-dark-text/50 hover:text-primary dark:hover:text-primary-light transition-colors mb-5"
+      >
+        <lib-ui-icon icon="arrow-left" [size]="15" />
+        Volver a recursos
+      </button>
+
+      <div class="flex items-start gap-4">
+        <!-- Type icon -->
+        <div
+          class="w-12 h-12 rounded-card flex items-center justify-center shrink-0"
+          [class.bg-primary\/10]="r.classification.type === 'MATERIAL'"
+          [class.dark:bg-primary-light\/10]="r.classification.type === 'MATERIAL'"
+          [class.bg-accent\/10]="r.classification.type === 'EQUIPMENT'"
+          [class.bg-violet-500\/10]="r.classification.type === 'LABOR'"
+        >
+          <lib-ui-icon
+            [icon]="typeIcon(r.classification.type)"
+            [size]="22"
+            [class.text-primary]="r.classification.type === 'MATERIAL'"
+            [class.dark:text-primary-light]="r.classification.type === 'MATERIAL'"
+            [class.text-accent]="r.classification.type === 'EQUIPMENT'"
+            [class.text-violet-500]="r.classification.type === 'LABOR'"
+          />
+        </div>
+
+        <div class="flex-1 min-w-0">
+          <div class="flex flex-wrap items-center gap-2 mb-1">
+            <lib-badge [variant]="typeBadgeVariant(r.classification.type)" [label]="typeLabel(r.classification.type)" size="sm" />
+            <lib-badge [variant]="statusBadgeVariant(r.status)" [label]="statusLabel(r.status)" size="sm" />
+            @if (s.isLow) {
+              <span class="flex items-center gap-1 text-xs font-medium text-danger">
+                <lib-ui-icon icon="triangle-alert" [size]="12" />
+                Stock bajo mínimo
+              </span>
+            }
+          </div>
+          <h1 class="text-h2 font-bold text-text-primary dark:text-dark-text leading-tight">
+            {{ r.identification.name }}
+          </h1>
+          <div class="flex items-center gap-3 mt-1">
+            <span class="font-mono text-small text-text-secondary dark:text-dark-text/50">{{ r.identification.sku }}</span>
+            <span class="text-border dark:text-dark-border">·</span>
+            <span class="text-small text-text-secondary dark:text-dark-text/50">{{ r.classification.name }}</span>
+            <span class="text-border dark:text-dark-border">·</span>
+            <span class="text-small text-text-secondary dark:text-dark-text/50">{{ r.classification.unitOfMeasure }}</span>
+          </div>
+          @if (r.identification.description) {
+            <p class="text-small text-text-secondary dark:text-dark-text/60 mt-2 leading-relaxed">
+              {{ r.identification.description }}
+            </p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Stats ──────────────────────────────────────────────────── -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+      <!-- Costo unitario — siempre -->
+      <lib-stat-card
+        [icon]="typeIcon(r.classification.type)"
+        [label]="r.classification.type === 'LABOR' ? 'Tarifa / jornal' : r.classification.type === 'EQUIPMENT' ? 'Tarifa / día' : 'Costo unitario'"
+        [value]="sv.unitCost"
+        color="primary"
+      />
+
+      <!-- Proyectos activos — siempre -->
+      <lib-stat-card
+        icon="building"
+        label="Proyectos en uso"
+        [value]="s.activeUsages"
+        color="primary"
+      />
+
+      <!-- Stock — solo MATERIAL -->
+      @if (r.classification.type === 'MATERIAL' && r.inventory != null) {
+        <lib-stat-card
+          icon="shopping-basket"
+          label="Stock actual"
+          [value]="r.inventory.currentStock + ' ' + r.classification.unitOfMeasure"
+          [color]="s.isLow ? 'danger' : 'primary'"
+        />
+        <lib-stat-card
+          icon="chart-area"
+          label="Valor en inventario"
+          [value]="sv.inventoryValue"
+          color="primary"
+        />
+      }
+
+      <!-- Qty totales — EQUIPMENT / LABOR -->
+      @if (r.classification.type !== 'MATERIAL') {
+        <lib-stat-card
+          icon="calendar"
+          [label]="r.classification.type === 'LABOR' ? 'Jornales planificados' : 'Días planificados'"
+          [value]="s.plannedTotal + ' ' + r.classification.unitOfMeasure"
+          color="primary"
+        />
+        <lib-stat-card
+          icon="chart-area"
+          label="Costo planificado total"
+          [value]="sv.plannedCostSum"
+          color="primary"
+        />
+      }
+    </div>
+
+    <!-- ── Usage list ──────────────────────────────────────────────── -->
+    <lib-card [elevated]="true" [bordered]="true" padding="none">
+
+      <!-- Section header -->
+      <div class="px-5 py-4 border-b border-border dark:border-dark-border flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <lib-ui-icon icon="building" [size]="15" class="text-primary dark:text-primary-light" />
+          <h2 class="text-small font-semibold text-text-primary dark:text-dark-text">Uso en proyectos</h2>
+          @if (usage().length > 0) {
+            <span class="px-1.5 py-0.5 rounded-badge bg-border/50 dark:bg-dark-border/50 text-tiny font-medium text-text-secondary dark:text-dark-text/60">
+              {{ usage().length }}
+            </span>
+          }
+        </div>
+        @if (s.usedCostSum > 0) {
+          <span class="text-small text-text-secondary dark:text-dark-text/60">
+            Ejecutado total:
+            <span class="font-semibold text-text-primary dark:text-dark-text ml-1">{{ sv.usedCostSum }}</span>
+          </span>
+        }
+      </div>
+
+      @if (usage().length === 0) {
+        <div class="py-14">
+          <lib-empty-state
+            [icon]="typeIcon(r.classification.type)"
+            title="Sin asignaciones"
+            description="Este recurso no ha sido asignado a ningún proyecto todavía."
+          />
+        </div>
+      } @else {
+        <div class="divide-y divide-border/50 dark:divide-dark-border/50">
+          @for (u of usage(); track u.id) {
+            @let pct = consumptionPct(u);
+            @let uc  = unitCost(u);
+            @let cur = currency(u);
+
+            <div class="px-5 py-4">
+              <!-- Row top: project + stage + status -->
+              <div class="flex items-start justify-between gap-4 mb-3">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2 mb-0.5">
+                    <span class="text-small font-semibold text-text-primary dark:text-dark-text">
+                      {{ projectName(u.projectId) }}
+                    </span>
+                    @if (hasOverride(u)) {
+                      <span class="px-1.5 py-0.5 rounded-badge bg-accent/10 text-accent text-tiny font-semibold uppercase tracking-wider">
+                        Precio especial
+                      </span>
+                    }
+                  </div>
+                  @if (u.stageName) {
+                    <span class="text-tiny text-text-muted dark:text-dark-text/40">Etapa: {{ u.stageName }}</span>
+                  }
+                  @if (u.activityName) {
+                    <span class="text-tiny text-text-muted dark:text-dark-text/40 block">Actividad: {{ u.activityName }}</span>
+                  }
+                </div>
+                <lib-badge [variant]="usageStatusVariant(u.status)" [label]="usageStatusLabel(u.status)" size="sm" />
+              </div>
+
+              <!-- Consumption row -->
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+                <div>
+                  <p class="text-tiny text-text-muted dark:text-dark-text/40 mb-0.5">Planificado</p>
+                  <p class="text-small font-semibold text-text-primary dark:text-dark-text">
+                    {{ u.allocation.plannedQuantity | number }} <span class="font-normal text-text-secondary dark:text-dark-text/50">{{ r.classification.unitOfMeasure }}</span>
+                  </p>
+                </div>
+                <div>
+                  <p class="text-tiny text-text-muted dark:text-dark-text/40 mb-0.5">Utilizado</p>
+                  <p class="text-small font-semibold"
+                    [class.text-danger]="pct >= 90"
+                    [class.text-warning]="pct >= 70 && pct < 90"
+                    [class.text-text-primary]="pct < 70"
+                    [class.dark:text-dark-text]="pct < 70"
+                  >
+                    {{ u.allocation.usedQuantity | number }} <span class="font-normal text-text-secondary dark:text-dark-text/50">{{ r.classification.unitOfMeasure }}</span>
+                  </p>
+                </div>
+                <div>
+                  <p class="text-tiny text-text-muted dark:text-dark-text/40 mb-0.5">Costo planificado</p>
+                  <p class="text-small font-medium text-text-secondary dark:text-dark-text/60">
+                    {{ uc * u.allocation.plannedQuantity | currency:cur:'symbol-narrow':'1.0-0' }}
+                  </p>
+                </div>
+                <div>
+                  <p class="text-tiny text-text-muted dark:text-dark-text/40 mb-0.5">Costo ejecutado</p>
+                  <p class="text-small font-semibold text-text-primary dark:text-dark-text">
+                    {{ uc * u.allocation.usedQuantity | currency:cur:'symbol-narrow':'1.0-0' }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Progress bar -->
+              <div class="flex items-center gap-3">
+                <lib-progress-bar
+                  [value]="pct"
+                  size="xs"
+                  [color]="consumptionColor(pct)"
+                  class="flex-1"
+                />
+                <span class="text-tiny font-semibold w-9 text-right shrink-0"
+                  [class.text-danger]="pct >= 90"
+                  [class.text-warning]="pct >= 70 && pct < 90"
+                  [class.text-text-secondary]="pct < 70"
+                  [class.dark:text-dark-text\/60]="pct < 70"
+                >{{ pct }}%</span>
+              </div>
+
+              <!-- Notes -->
+              @if (u.notes) {
+                <p class="text-tiny text-text-muted dark:text-dark-text/40 mt-2 italic">
+                  "{{ u.notes }}"
+                </p>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Footer summary -->
+        <div class="px-5 py-3 border-t border-border dark:border-dark-border flex items-center justify-between bg-border/10 dark:bg-dark-border/10">
+          <span class="text-small text-text-secondary dark:text-dark-text/60">
+            {{ usage().length }} asignación{{ usage().length !== 1 ? 'es' : '' }} en total
+          </span>
+          <span class="text-small text-text-secondary dark:text-dark-text/60">
+            Planificado total:
+            <span class="font-semibold text-text-primary dark:text-dark-text ml-1">{{ sv.plannedCostSum }}</span>
+          </span>
+        </div>
+      }
+    </lib-card>
+
+    <!-- ── Metadata footer ───────────────────────────────────────── -->
+    <div class="mt-4 flex items-center gap-4 text-tiny text-text-muted dark:text-dark-text/30">
+      <span>Creado {{ r.createdAt | date:'d MMM yyyy' }}</span>
+      <span>·</span>
+      <span>Actualizado {{ r.updatedAt | date:'d MMM yyyy' }}</span>
+    </div>
+
+  </div>
+
+} @else {
+  <div class="p-6">
+    <lib-empty-state
+      icon="shopping-basket"
+      title="Recurso no encontrado"
+      description="El recurso que buscas no existe o fue eliminado."
+    />
+  </div>
+}

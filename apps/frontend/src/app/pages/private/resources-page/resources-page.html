@@ -1,4 +1,5 @@
-<!-- ── Stats ─────────────────────────────────────────────────── -->
+<div class="p-6">
+  <!-- ── Stats ─────────────────────────────────────────────────── -->
 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
   <lib-stat-card icon="shopping-basket" label="Total"           [value]="stats().total"     color="primary" />
   <lib-stat-card icon="shopping-basket" label="Materiales"      [value]="stats().materials"  color="primary" />
@@ -252,6 +253,14 @@
               <!-- Actions -->
               <td class="px-5 py-3.5">
                 <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <a
+                    [routerLink]="['/system/resources', r.id]"
+                    (click)="$event.stopPropagation()"
+                    class="flex items-center justify-center w-7 h-7 rounded-default text-text-secondary dark:text-dark-text/50 hover:text-primary hover:bg-primary/10 transition-colors"
+                    title="Ver detalle"
+                  >
+                    <lib-ui-icon icon="eye" [size]="13" />
+                  </a>
                   <button
                     (click)="openEdit(r, $event)"
                     class="flex items-center justify-center w-7 h-7 rounded-default text-text-secondary dark:text-dark-text/50 hover:text-primary hover:bg-primary/10 transition-colors"
@@ -488,3 +497,5 @@
     </div>
   </div>
 </lib-modal>
+
+</div>

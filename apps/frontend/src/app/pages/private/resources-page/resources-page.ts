@@ -1,6 +1,7 @@
 import { CommonModule, CurrencyPipe } from '@angular/common'
 import { Component, computed, signal } from '@angular/core'
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
+import { RouterLink } from '@angular/router'
 
 import { Badge, BadgeVariant, Card, EmptyState, Icon, IconType, Modal, StatCard } from '@org/ui'
 import { ClassificationType, ResourceStatus } from '@org/util'
@@ -19,7 +20,7 @@ type StatusFilter = ResourceStatus | 'ALL'
 @Component({
 	selector: 'app-resources-page',
 	standalone: true,
-	imports: [CurrencyPipe, CommonModule, ReactiveFormsModule, Badge, Card, EmptyState, Icon, Modal, StatCard],
+	imports: [CurrencyPipe, CommonModule, ReactiveFormsModule, RouterLink, Badge, Card, EmptyState, Icon, Modal, StatCard],
 	templateUrl: './resources-page.html',
 })
 export class ResourcesPage {

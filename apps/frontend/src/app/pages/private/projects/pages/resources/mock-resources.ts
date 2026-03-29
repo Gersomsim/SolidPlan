@@ -433,3 +433,18 @@ export function resourceIsLowStock(res: MockResource): boolean {
 	if (minimumStock == null) return false
 	return currentStock < minimumStock
 }
+
+// ── Project name lookup (mock) ─────────────────────────────────
+export const MOCK_PROJECT_NAMES: Record<string, string> = {
+	'1': 'Torre Residencial Pedregal',
+	'2': 'Centro Comercial Lomas',
+	'3': 'Fraccionamiento Villas del Sol',
+}
+
+export function getUsageByResourceId(resourceId: string): MockProjectResource[] {
+	return MOCK_PROJECT_RESOURCES.filter(pr => pr.resourceId === resourceId)
+}
+
+export function getResourceById(resourceId: string): MockResource | undefined {
+	return MOCK_RESOURCES.find(r => r.id === resourceId)
+}
