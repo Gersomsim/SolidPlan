@@ -8,6 +8,7 @@ import { ActivityProgressType, ActivityStatus } from '@org/util'
 
 import { ActivityDetailView } from './components/activity-detail-view/activity-detail-view'
 import { MOCK_ACTIVITIES, MockActivity, buildActivityTree } from './mock-activities'
+import { MOCK_PROJECT_STAGES } from '../stages-page/mock-stages'
 
 export type ActivityStatusFilter = 'ALL' | ActivityStatus
 
@@ -65,6 +66,7 @@ export class ActivitiesPage {
 	readonly createForm = new FormGroup({
 		name:           new FormControl('', Validators.required),
 		parentId:       new FormControl<string>(''),
+		stageId:        new FormControl<string>(''),
 		category:       new FormControl('Diseño', Validators.required),
 		assignedRole:   new FormControl('SUPERVISOR', Validators.required),
 		startDate:      new FormControl('', Validators.required),
@@ -73,6 +75,8 @@ export class ActivitiesPage {
 		isCriticalPath: new FormControl(false),
 		description:    new FormControl(''),
 	})
+
+	readonly stageOptions = MOCK_PROJECT_STAGES.map(s => ({ id: s.id, label: s.info.name, color: s.info.color }))
 
 	// ── Route ─────────────────────────────────────────────────────
 	readonly projectId = computed(() => {
@@ -155,7 +159,7 @@ export class ActivitiesPage {
 	// ── Create activity ───────────────────────────────────────────
 	openCreateActivity(): void {
 		this.createForm.reset({
-			name: '', parentId: '', category: 'Diseño', assignedRole: 'SUPERVISOR',
+			name: '', parentId: '', stageId: '', category: 'Diseño', assignedRole: 'SUPERVISOR',
 			startDate: '', endDate: '', progressType: 'PERCENTAGE', isCriticalPath: false, description: '',
 		})
 		this.createOpen.set(true)
@@ -187,9 +191,14 @@ export class ActivitiesPage {
 				? `${baseCode}-${String(siblings.length + 1).padStart(2, '0')}`
 				: `NEW-${String(all.filter(a => !a.parentId).length + 1).padStart(2, '0')}`
 
+			const stageId   = v.stageId || undefined
+			const stageOpt  = stageId ? this.stageOptions.find(s => s.id === stageId) : undefined
+
 			const newActivity: MockActivity = {
 				id:                `act-${Date.now()}`,
 				parentId,
+				stageId,
+				stageName:         stageOpt?.label,
 				code,
 				name:              v.name!,
 				description:       v.description || undefined,

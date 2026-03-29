@@ -74,6 +74,7 @@ import {
 	LucideBell,
 	LucideFolder,
 	LucideClock,
+	LucideHourglass,
 } from '@lucide/angular'
 
 import { IconType } from './icon.type'
@@ -161,6 +162,7 @@ export class Icon {
 			bell: LucideBell,
 			folder: LucideFolder,
 			clock: LucideClock,
+			hourglass: LucideHourglass,
 		}
 
 		return dic[this.icon()]

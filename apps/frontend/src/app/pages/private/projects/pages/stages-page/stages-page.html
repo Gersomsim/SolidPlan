@@ -1,0 +1,378 @@
+<div class="p-6">
+
+  <!-- ── Header ───────────────────────────────────────────────────── -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-heading font-semibold text-text-primary dark:text-dark-text">Etapas del proyecto</h2>
+      <p class="text-small text-text-secondary dark:text-dark-text/60 mt-0.5">
+        {{ stats().total }} etapas · {{ stats().completed }} completadas · {{ stats().inProgress }} en curso
+      </p>
+    </div>
+    <button
+      type="button"
+      (click)="openCreate()"
+      class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-white text-small font-medium rounded-input transition-colors"
+    >
+      <lib-ui-icon icon="plus" [size]="16" />
+      Nueva etapa
+    </button>
+  </div>
+
+  <!-- ── Stages list ───────────────────────────────────────────────── -->
+  @if (sortedStages().length === 0) {
+    <div class="py-16">
+      <lib-empty-state
+        icon="landmark"
+        title="Sin etapas"
+        description="Este proyecto no tiene etapas definidas. Crea la primera para estructurar el avance."
+      />
+    </div>
+  } @else {
+    <div class="relative">
+      <!-- Vertical connector line -->
+      <div class="absolute left-[27px] top-10 bottom-10 w-px bg-border dark:bg-dark-border z-0"></div>
+
+      <div class="flex flex-col gap-3">
+        @for (stage of sortedStages(); track stage.id; let i = $index) {
+          @let pct = progressPct(stage);
+
+          <div
+            class="relative z-10 flex gap-4 group"
+            [class.opacity-60]="stage.status === 'SKIPPED'"
+          >
+            <!-- Order badge -->
+            <div
+              class="w-[54px] shrink-0 flex flex-col items-center gap-1 pt-4"
+            >
+              <div
+                class="w-9 h-9 rounded-full flex items-center justify-center text-white text-small font-bold shadow-card shrink-0"
+                [style.background-color]="stage.info.color"
+              >
+                {{ stage.order }}
+              </div>
+            </div>
+
+            <!-- Card -->
+            <div class="flex-1 min-w-0 rounded-card border border-border dark:border-dark-border bg-surface dark:bg-dark-surface shadow-card hover:shadow-hover transition-shadow">
+
+              <!-- Card header -->
+              <div class="px-5 py-4 flex items-start gap-3">
+                <!-- Color dot + name -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2.5 mb-1">
+                    <h3 class="text-small font-semibold text-text-primary dark:text-dark-text">{{ stage.info.name }}</h3>
+                    @if (stage.templateId) {
+                      <span class="px-1.5 py-0.5 rounded-badge bg-border/50 dark:bg-dark-border/50 text-tiny text-text-muted dark:text-dark-text/40 uppercase tracking-wider font-medium">Plantilla</span>
+                    }
+                  </div>
+                  @if (stage.info.description) {
+                    <p class="text-tiny text-text-muted dark:text-dark-text/40 leading-relaxed">{{ stage.info.description }}</p>
+                  }
+                </div>
+
+                <!-- Badge + actions -->
+                <div class="flex items-center gap-2 shrink-0">
+                  <lib-badge [variant]="statusBadgeVariant(stage.status)" [label]="statusLabel(stage.status)" size="sm" />
+
+                  <!-- Hover actions -->
+                  <div class="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      type="button"
+                      (click)="moveUp(stage)"
+                      [disabled]="isFirst(stage)"
+                      class="w-7 h-7 flex items-center justify-center rounded-default text-text-muted dark:text-dark-text/40 hover:text-primary hover:bg-primary/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      title="Subir"
+                    >
+                      <lib-ui-icon icon="arrow-up" [size]="13" />
+                    </button>
+                    <button
+                      type="button"
+                      (click)="moveDown(stage)"
+                      [disabled]="isLast(stage)"
+                      class="w-7 h-7 flex items-center justify-center rounded-default text-text-muted dark:text-dark-text/40 hover:text-primary hover:bg-primary/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      title="Bajar"
+                    >
+                      <lib-ui-icon icon="arrow-down" [size]="13" />
+                    </button>
+                    <div class="w-px h-4 bg-border dark:bg-dark-border mx-0.5"></div>
+                    <button
+                      type="button"
+                      (click)="openEdit(stage)"
+                      class="w-7 h-7 flex items-center justify-center rounded-default text-text-muted dark:text-dark-text/40 hover:text-primary hover:bg-primary/10 transition-colors"
+                      title="Editar"
+                    >
+                      <lib-ui-icon icon="user-pen" [size]="13" />
+                    </button>
+                    <button
+                      type="button"
+                      (click)="cycleStatus(stage)"
+                      class="w-7 h-7 flex items-center justify-center rounded-default text-text-muted dark:text-dark-text/40 hover:text-accent hover:bg-accent/10 transition-colors"
+                      [title]="'Cambiar estado'"
+                    >
+                      <lib-ui-icon icon="arrow-right" [size]="13" />
+                    </button>
+                    <div class="w-px h-4 bg-border dark:bg-dark-border mx-0.5"></div>
+                    <a
+                      [routerLink]="['/system/projects', projectId, 'stages', stage.id]"
+                      class="w-7 h-7 flex items-center justify-center rounded-default text-text-muted dark:text-dark-text/40 hover:text-primary hover:bg-primary/10 transition-colors"
+                      title="Ver detalle"
+                    >
+                      <lib-ui-icon icon="eye" [size]="13" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card body: dates + progress + activity count -->
+              <div class="px-5 pb-4 flex flex-col gap-3">
+
+                <!-- Dates row -->
+                <div class="flex flex-wrap items-center gap-x-6 gap-y-1">
+                  @if (stage.dates.plannedStartDate) {
+                    <div class="flex items-center gap-1.5 text-tiny text-text-muted dark:text-dark-text/40">
+                      <lib-ui-icon icon="calendar" [size]="12" />
+                      <span>Inicio plan: <span class="text-text-secondary dark:text-dark-text/60 font-medium">{{ stage.dates.plannedStartDate | date:'d MMM yyyy' }}</span></span>
+                    </div>
+                  }
+                  @if (stage.dates.plannedEndDate) {
+                    <div class="flex items-center gap-1.5 text-tiny text-text-muted dark:text-dark-text/40">
+                      <lib-ui-icon icon="calendar" [size]="12" />
+                      <span>Fin plan: <span class="text-text-secondary dark:text-dark-text/60 font-medium">{{ stage.dates.plannedEndDate | date:'d MMM yyyy' }}</span></span>
+                    </div>
+                  }
+                  @if (durationDays(stage)) {
+                    <span class="text-tiny text-text-muted dark:text-dark-text/40">{{ durationDays(stage) }} días</span>
+                  }
+                  @if (stage.dates.actualStartDate && stage.status !== 'PENDING') {
+                    <div class="flex items-center gap-1.5 text-tiny text-success">
+                      <lib-ui-icon icon="check" [size]="12" />
+                      <span>Inició: {{ stage.dates.actualStartDate | date:'d MMM yyyy' }}</span>
+                    </div>
+                  }
+                  @if (stage.dates.actualEndDate) {
+                    <div class="flex items-center gap-1.5 text-tiny text-success">
+                      <lib-ui-icon icon="check-circle" [size]="12" />
+                      <span>Cerró: {{ stage.dates.actualEndDate | date:'d MMM yyyy' }}</span>
+                    </div>
+                  }
+                </div>
+
+                <!-- Progress + activities -->
+                @let actCount = activityCountFor(stage.id);
+                @let completedCount = completedCountFor(stage.id);
+                @if (actCount > 0) {
+                  <div class="flex items-center gap-3">
+                    <lib-progress-bar
+                      [value]="pct"
+                      size="xs"
+                      [color]="stage.status === 'COMPLETED' ? 'success' : 'primary'"
+                      class="flex-1"
+                    />
+                    <span class="text-tiny font-semibold text-text-secondary dark:text-dark-text/60 w-8 text-right shrink-0">{{ pct }}%</span>
+                    <button
+                      type="button"
+                      (click)="toggleActivities(stage.id); $event.stopPropagation()"
+                      class="flex items-center gap-1 text-tiny text-text-secondary dark:text-dark-text/60 hover:text-primary dark:hover:text-primary-light transition-colors shrink-0"
+                    >
+                      <span>{{ completedCount }}/{{ actCount }} actividades</span>
+                      <lib-ui-icon
+                        icon="chevron-right"
+                        [size]="12"
+                        class="transition-transform duration-200"
+                        [class.rotate-90]="isExpanded(stage.id)"
+                      />
+                    </button>
+                  </div>
+
+                  <!-- Expandable activity list -->
+                  @if (isExpanded(stage.id)) {
+                    <div class="mt-1 border border-border dark:border-dark-border rounded-card overflow-hidden">
+                      @for (act of stageActivities(stage.id); track act.id) {
+                        <a
+                          [routerLink]="['/system/projects', projectId, 'activities', act.id]"
+                          class="flex items-center gap-3 px-4 py-2.5 border-b last:border-b-0 border-border dark:border-dark-border hover:bg-hover-row dark:hover:bg-dark-hover-row transition-colors no-underline"
+                        >
+                          <span
+                            class="w-1.5 h-1.5 rounded-full shrink-0"
+                            [class.bg-success]="act.status === 'COMPLETED'"
+                            [class.bg-primary]="act.status === 'IN_PROGRESS'"
+                            [class.bg-danger]="act.status === 'BLOCKED' || act.status === 'DELAYED'"
+                            [class.bg-border]="act.status === 'PENDING' || act.status === 'CANCELLED'"
+                          ></span>
+                          <span class="font-mono text-xs text-text-muted dark:text-dark-text/40 shrink-0 w-20">{{ act.code }}</span>
+                          <span class="text-small text-text-primary dark:text-dark-text flex-1 truncate">{{ act.name }}</span>
+                          <span class="text-tiny shrink-0" [class]="activityStatusClass(act.status)">{{ activityStatusLabel(act.status) }}</span>
+                          @if (act.progressType === 'PERCENTAGE') {
+                            <span class="text-tiny font-medium text-text-secondary dark:text-dark-text/60 shrink-0 w-8 text-right">{{ act.progress }}%</span>
+                          } @else {
+                            <span class="text-tiny text-text-muted dark:text-dark-text/40 shrink-0">{{ act.progressState }}</span>
+                          }
+                        </a>
+                      }
+                    </div>
+                  }
+                } @else {
+                  <p class="text-tiny text-text-muted dark:text-dark-text/40 italic">Sin actividades vinculadas</p>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- ── Create / Edit modal ──────────────────────────────────────── -->
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <lib-modal [open]="formOpen()" (closed)="closeForm()">
+    <div modal-header class="flex items-center gap-2">
+      <div class="w-4 h-4 rounded-full shrink-0" [style.background-color]="formColor()"></div>
+      <span class="text-body font-semibold text-text-primary dark:text-dark-text">
+        {{ formMode() === 'edit' ? 'Editar etapa' : 'Nueva etapa' }}
+      </span>
+    </div>
+
+    <div [formGroup]="form" class="flex flex-col gap-5 p-6">
+
+      <!-- Source selector (only on create) -->
+      @if (formMode() === 'create') {
+        <div class="grid grid-cols-2 gap-2">
+          @for (src of [['template','Desde plantilla','landmark'],['custom','Desde cero','plus']] ; track src[0]) {
+            @let active = formSource() === src[0];
+            <button
+              type="button"
+              (click)="onSourceChange($any(src[0]))"
+              class="flex items-center gap-2 px-3 py-2.5 rounded-card border transition-all text-small font-medium"
+              [class.border-primary]="active"
+              [class.bg-primary\/5]="active"
+              [class.text-primary]="active"
+              [class.dark:text-primary-light]="active"
+              [class.dark:border-primary-light]="active"
+              [class.border-border]="!active"
+              [class.text-text-secondary]="!active"
+              [class.dark:border-dark-border]="!active"
+            >
+              <lib-ui-icon [icon]="$any(src[2])" [size]="15" />
+              {{ src[1] }}
+            </button>
+          }
+        </div>
+
+        <!-- Template picker -->
+        @if (formSource() === 'template') {
+          <div>
+            <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Plantilla</label>
+            <select
+              formControlName="templateId"
+              (change)="onTemplateChange($any($event.target).value)"
+              class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+            >
+              @for (t of templates; track t.id) {
+                <option [value]="t.id">{{ t.name }}</option>
+              }
+            </select>
+          </div>
+        }
+      }
+
+      <!-- Name -->
+      <div>
+        <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Nombre <span class="text-danger">*</span></label>
+        <input
+          type="text"
+          formControlName="name"
+          placeholder="Ej: Cimentación, Estructura..."
+          class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-secondary dark:placeholder:text-dark-text/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+          [class.border-danger]="form.get('name')?.invalid && form.get('name')?.touched"
+        />
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
+          <p class="text-label text-danger mt-1">El nombre es obligatorio</p>
+        }
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Descripción</label>
+        <textarea
+          formControlName="description"
+          rows="2"
+          placeholder="Alcance de esta etapa..."
+          class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-secondary dark:placeholder:text-dark-text/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors resize-none"
+        ></textarea>
+      </div>
+
+      <!-- Color -->
+      <div>
+        <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-2">Color</label>
+        <div class="flex items-center gap-2 flex-wrap">
+          @for (c of presetColors; track c.hex) {
+            <button
+              type="button"
+              (click)="formColor.set(c.hex)"
+              class="w-7 h-7 rounded-full transition-transform hover:scale-110 focus:outline-none"
+              [style.background-color]="c.hex"
+              [class.ring-2]="formColor() === c.hex"
+              [class.ring-offset-2]="formColor() === c.hex"
+              [class.ring-text-primary]="formColor() === c.hex"
+              [title]="c.label"
+            ></button>
+          }
+          <!-- Current color preview -->
+          <div class="ml-2 flex items-center gap-2">
+            <div class="w-7 h-7 rounded-full border-2 border-border dark:border-dark-border" [style.background-color]="formColor()"></div>
+            <span class="font-mono text-tiny text-text-secondary dark:text-dark-text/60">{{ formColor() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dates -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Inicio planeado</label>
+          <input
+            type="date"
+            formControlName="plannedStartDate"
+            class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+          />
+        </div>
+        <div>
+          <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Fin planeado</label>
+          <input
+            type="date"
+            formControlName="plannedEndDate"
+            class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+          />
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex items-center justify-end gap-2 pt-1 border-t border-border/50 dark:border-dark-border/50">
+        <button
+          type="button"
+          (click)="closeForm()"
+          class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          (click)="onFormSubmit()"
+          [disabled]="formSaving() || formSavedOk()"
+          class="flex items-center gap-2 px-4 py-2 rounded-input bg-primary hover:bg-primary-hover disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+        >
+          @if (formSaving()) {
+            <lib-ui-icon icon="loader-circle" [size]="15" />
+            Guardando...
+          } @else if (formSavedOk()) {
+            <lib-ui-icon icon="check" [size]="15" />
+            Guardado
+          } @else {
+            {{ formMode() === 'edit' ? 'Guardar cambios' : 'Crear etapa' }}
+          }
+        </button>
+      </div>
+    </div>
+  </lib-modal>
+
+</div>

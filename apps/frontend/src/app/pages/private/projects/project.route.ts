@@ -47,6 +47,16 @@ export const projectRoutes: Routes = [
 					import('./pages/resources/resources').then(m => m.Resources),
 			},
 			{
+				path: 'stages',
+				loadComponent: () =>
+					import('./pages/stages-page/stages-page').then(m => m.StagesPage),
+			},
+			{
+				path: 'stages/:stageId',
+				loadComponent: () =>
+					import('./pages/stage-detail-page/stage-detail-page').then(m => m.StageDetailPage),
+			},
+			{
 				path: 'members',
 				loadComponent: () =>
 					import('./pages/project-members/project-members').then(m => m.ProjectMembers),

@@ -3,6 +3,8 @@ import { ActivityProgressType, ActivityStatus } from '@org/util'
 export interface MockActivity {
 	id: string
 	parentId?: string
+	stageId?: string   // FK a ProjectStage — opcional
+	stageName?: string // Denormalizado para display
 	code: string
 	name: string
 	description?: string
@@ -81,7 +83,7 @@ export const MOCK_ACTIVITIES: MockActivity[] = [
 
 	// ── EST: Estructura ──────────────────────────────────────────
 	{
-		id: 'est', code: 'EST', name: 'Estructura',
+		id: 'est', code: 'EST', name: 'Estructura', stageId: 's2', stageName: 'Estructura',
 		description: 'Actividades relacionadas al análisis, diseño y construcción del sistema estructural del edificio.',
 		category: 'Obra civil', categoryColor: '#F59E0B',
 		assignedRole: 'ADMIN',
@@ -89,7 +91,7 @@ export const MOCK_ACTIVITIES: MockActivity[] = [
 		progressType: 'PERCENTAGE', progress: 45, status: 'IN_PROGRESS', isCriticalPath: true,
 	},
 	{
-		id: 'est-01', parentId: 'est', code: 'EST-01', name: 'Estudio de suelos',
+		id: 'est-01', parentId: 'est', stageId: 's2', stageName: 'Estructura', code: 'EST-01', name: 'Estudio de suelos',
 		description: 'Análisis geotécnico del terreno para determinar la capacidad portante y tipo de cimentación.',
 		category: 'Topografía', categoryColor: '#8B5CF6',
 		assignedRole: 'SUPERVISOR',
@@ -97,7 +99,7 @@ export const MOCK_ACTIVITIES: MockActivity[] = [
 		progressType: 'PERCENTAGE', progress: 100, status: 'COMPLETED', isCriticalPath: true,
 	},
 	{
-		id: 'est-02', parentId: 'est', code: 'EST-02', name: 'Cimentación',
+		id: 'est-02', parentId: 'est', stageId: 's2', stageName: 'Estructura', code: 'EST-02', name: 'Cimentación',
 		description: 'Construcción del sistema de cimentación según el tipo definido en el estudio de suelos.',
 		category: 'Obra civil', categoryColor: '#F59E0B',
 		assignedRole: 'RESIDENT',
@@ -105,7 +107,7 @@ export const MOCK_ACTIVITIES: MockActivity[] = [
 		progressType: 'PERCENTAGE', progress: 62, status: 'IN_PROGRESS', isCriticalPath: true,
 	},
 	{
-		id: 'est-02a', parentId: 'est-02', code: 'EST-02A', name: 'Excavación y trazo',
+		id: 'est-02a', parentId: 'est-02', stageId: 's2', stageName: 'Estructura', code: 'EST-02A', name: 'Excavación y trazo',
 		description: 'Preparación del terreno mediante excavación hasta la profundidad de desplante.',
 		category: 'Obra civil', categoryColor: '#F59E0B',
 		assignedRole: 'RESIDENT',
@@ -113,7 +115,7 @@ export const MOCK_ACTIVITIES: MockActivity[] = [
 		progressType: 'PERCENTAGE', progress: 100, status: 'COMPLETED', isCriticalPath: true,
 	},
 	{
-		id: 'est-02b', parentId: 'est-02', code: 'EST-02B', name: 'Armado de acero',
+		id: 'est-02b', parentId: 'est-02', stageId: 's2', stageName: 'Estructura', code: 'EST-02B', name: 'Armado de acero',
 		description: 'Habilitación y colocación de armadura de acero para la cimentación.',
 		category: 'Estructural', categoryColor: '#EF4444',
 		assignedRole: 'RESIDENT',
@@ -121,7 +123,7 @@ export const MOCK_ACTIVITIES: MockActivity[] = [
 		progressType: 'PERCENTAGE', progress: 80, status: 'IN_PROGRESS', isCriticalPath: true,
 	},
 	{
-		id: 'est-02c', parentId: 'est-02', code: 'EST-02C', name: 'Vaciado de concreto',
+		id: 'est-02c', parentId: 'est-02', stageId: 's2', stageName: 'Estructura', code: 'EST-02C', name: 'Vaciado de concreto',
 		description: 'Vaciado y curado del concreto en cimientos. Bloqueado por falta de aprobación de armadura.',
 		category: 'Estructural', categoryColor: '#EF4444',
 		assignedRole: 'RESIDENT',
@@ -129,7 +131,7 @@ export const MOCK_ACTIVITIES: MockActivity[] = [
 		progressType: 'PERCENTAGE', progress: 0, status: 'BLOCKED', isCriticalPath: true,
 	},
 	{
-		id: 'est-03', parentId: 'est', code: 'EST-03', name: 'Estructura metálica',
+		id: 'est-03', parentId: 'est', stageId: 's2', stageName: 'Estructura', code: 'EST-03', name: 'Estructura metálica',
 		description: 'Fabricación, transporte e instalación de la estructura metálica principal del edificio.',
 		category: 'Estructural', categoryColor: '#EF4444',
 		assignedRole: 'SUPERVISOR',
@@ -139,7 +141,7 @@ export const MOCK_ACTIVITIES: MockActivity[] = [
 
 	// ── INS: Instalaciones ───────────────────────────────────────
 	{
-		id: 'ins', code: 'INS', name: 'Instalaciones',
+		id: 'ins', stageId: 's3', stageName: 'Instalaciones', code: 'INS', name: 'Instalaciones',
 		description: 'Instalaciones técnicas del edificio: sistemas eléctricos, hidráulicos y sanitarios.',
 		category: 'Instalaciones', categoryColor: '#10B981',
 		assignedRole: 'ADMIN',
@@ -147,7 +149,7 @@ export const MOCK_ACTIVITIES: MockActivity[] = [
 		progressType: 'PERCENTAGE', progress: 0, status: 'PENDING', isCriticalPath: false,
 	},
 	{
-		id: 'ins-01', parentId: 'ins', code: 'INS-01', name: 'Instalación eléctrica',
+		id: 'ins-01', parentId: 'ins', stageId: 's3', stageName: 'Instalaciones', code: 'INS-01', name: 'Instalación eléctrica',
 		description: 'Sistema eléctrico completo: tablero principal, circuitos, iluminación y contactos.',
 		category: 'Eléctrico', categoryColor: '#F59E0B',
 		assignedRole: 'RESIDENT',
@@ -155,7 +157,7 @@ export const MOCK_ACTIVITIES: MockActivity[] = [
 		progressType: 'PERCENTAGE', progress: 0, status: 'PENDING', isCriticalPath: false,
 	},
 	{
-		id: 'ins-01a', parentId: 'ins-01', code: 'INS-01A', name: 'Tablero principal',
+		id: 'ins-01a', parentId: 'ins-01', stageId: 's3', stageName: 'Instalaciones', code: 'INS-01A', name: 'Tablero principal',
 		description: 'Instalación del tablero de distribución principal y circuitos derivados.',
 		category: 'Eléctrico', categoryColor: '#F59E0B',
 		assignedRole: 'RESIDENT',
@@ -163,7 +165,7 @@ export const MOCK_ACTIVITIES: MockActivity[] = [
 		progressType: 'PERCENTAGE', progress: 0, status: 'PENDING', isCriticalPath: false,
 	},
 	{
-		id: 'ins-01b', parentId: 'ins-01', code: 'INS-01B', name: 'Ductos y cableado',
+		id: 'ins-01b', parentId: 'ins-01', stageId: 's3', stageName: 'Instalaciones', code: 'INS-01B', name: 'Ductos y cableado',
 		description: 'Instalación de ductos conduit y tendido de cables para todos los circuitos.',
 		category: 'Eléctrico', categoryColor: '#F59E0B',
 		assignedRole: 'RESIDENT',
@@ -171,7 +173,7 @@ export const MOCK_ACTIVITIES: MockActivity[] = [
 		progressType: 'PERCENTAGE', progress: 0, status: 'PENDING', isCriticalPath: false,
 	},
 	{
-		id: 'ins-02', parentId: 'ins', code: 'INS-02', name: 'Instalación hidráulica',
+		id: 'ins-02', parentId: 'ins', stageId: 's3', stageName: 'Instalaciones', code: 'INS-02', name: 'Instalación hidráulica',
 		description: 'Sistema hidráulico y sanitario: cisternas, tuberías, muebles y accesorios.',
 		category: 'Hidráulico', categoryColor: '#06B6D4',
 		assignedRole: 'SUPERVISOR',

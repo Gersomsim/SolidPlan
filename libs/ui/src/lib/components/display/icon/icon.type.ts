@@ -71,3 +71,4 @@ export type IconType =
 	| 'bell'
 	| 'folder'
 	| 'clock'
+	| 'hourglass'

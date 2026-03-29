@@ -1,125 +1,192 @@
-<!-- ── Stats ─────────────────────────────────────────────────── -->
-<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-  <lib-stat-card
-    icon="chart-area"
-    label="Total actividades"
-    [value]="stats().total"
-    color="primary"
-  />
-  <lib-stat-card
-    icon="circle-check"
-    label="Completadas"
-    [value]="stats().completed"
-    color="success"
-  />
-  <lib-stat-card
-    icon="loader"
-    label="En progreso"
-    [value]="stats().inProgress"
-    color="primary"
-  />
-  <lib-stat-card
-    icon="triangle-alert"
-    label="Bloqueadas"
-    [value]="stats().blocked"
-    color="danger"
-  />
-</div>
+@if (stage()) {
+  @let s = stage()!;
+  @let st = stats();
 
-<!-- ── Toolbar ────────────────────────────────────────────────── -->
-<lib-card [elevated]="true" [bordered]="true" padding="sm" class="mb-5 block">
-  <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-    <!-- Search -->
-    <div class="relative flex-1 max-w-sm">
+  <!-- ── Header ──────────────────────────────────────────────────── -->
+  <div class="px-6 pt-6 pb-5 border-b border-border dark:border-dark-border">
+
+    <!-- Back nav -->
+    <a
+      [routerLink]="['/system/projects', projectId, 'stages']"
+      class="inline-flex items-center gap-1.5 text-small text-text-secondary dark:text-dark-text/60 hover:text-primary dark:hover:text-primary-light transition-colors mb-4 no-underline"
+    >
+      <lib-ui-icon icon="arrow-left" [size]="14" />
+      Volver a etapas
+    </a>
+
+    <div class="flex items-start gap-4">
+      <!-- Color badge -->
+      <div
+        class="w-12 h-12 rounded-card flex items-center justify-center shrink-0 text-white font-bold text-heading shadow-card"
+        [style.background-color]="s.info.color"
+      >
+        {{ s.order }}
+      </div>
+
+      <!-- Info -->
+      <div class="flex-1 min-w-0">
+        <div class="flex flex-wrap items-center gap-2 mb-1">
+          <h1 class="text-heading font-bold text-text-primary dark:text-dark-text">{{ s.info.name }}</h1>
+          <lib-badge [variant]="stageBadgeVariant(s.status)" [label]="stageStatusLabel(s.status)" size="sm" />
+          @if (s.templateId) {
+            <span class="px-1.5 py-0.5 rounded-badge bg-border/50 dark:bg-dark-border/50 text-tiny text-text-muted dark:text-dark-text/40 uppercase tracking-wider font-medium">
+              Plantilla
+            </span>
+          }
+        </div>
+        @if (s.info.description) {
+          <p class="text-small text-text-secondary dark:text-dark-text/60">{{ s.info.description }}</p>
+        }
+        <!-- Dates -->
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-1 mt-2">
+          @if (s.dates.plannedStartDate) {
+            <span class="flex items-center gap-1.5 text-tiny text-text-muted dark:text-dark-text/40">
+              <lib-ui-icon icon="calendar" [size]="12" />
+              Inicio plan: <span class="font-medium text-text-secondary dark:text-dark-text/60">{{ formatDate(s.dates.plannedStartDate) }}</span>
+            </span>
+          }
+          @if (s.dates.plannedEndDate) {
+            <span class="flex items-center gap-1.5 text-tiny text-text-muted dark:text-dark-text/40">
+              <lib-ui-icon icon="calendar" [size]="12" />
+              Fin plan: <span class="font-medium text-text-secondary dark:text-dark-text/60">{{ formatDate(s.dates.plannedEndDate) }}</span>
+            </span>
+          }
+          @if (s.dates.actualStartDate) {
+            <span class="flex items-center gap-1.5 text-tiny text-success">
+              <lib-ui-icon icon="check" [size]="12" />
+              Inició: {{ formatDate(s.dates.actualStartDate) }}
+            </span>
+          }
+        </div>
+      </div>
+
+      <!-- Edit button -->
+      <a
+        [routerLink]="['/system/projects', projectId, 'stages']"
+        class="flex items-center gap-2 px-3.5 py-2 rounded-input border border-border dark:border-dark-border text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:border-primary/40 dark:hover:border-primary-light/40 transition-colors no-underline shrink-0"
+      >
+        <lib-ui-icon icon="user-pen" [size]="14" />
+        Editar etapa
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Stats ───────────────────────────────────────────────────── -->
+  <div class="px-6 py-5 border-b border-border dark:border-dark-border">
+
+    <!-- Progress bar -->
+    <div class="flex items-center gap-4 mb-5">
+      <div class="flex-1">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="text-small font-medium text-text-secondary dark:text-dark-text/70">Avance general</span>
+          <span class="text-small font-bold text-text-primary dark:text-dark-text">{{ st.avgPct }}%</span>
+        </div>
+        <lib-progress-bar
+          [value]="st.avgPct"
+          size="md"
+          [color]="s.status === 'COMPLETED' ? 'success' : 'primary'"
+        />
+      </div>
+      <div class="text-right shrink-0">
+        <p class="text-tiny text-text-muted dark:text-dark-text/40">Total</p>
+        <p class="text-heading font-bold text-text-primary dark:text-dark-text">{{ st.total }}</p>
+        <p class="text-tiny text-text-muted dark:text-dark-text/40">actividades</p>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      <lib-stat-card
+        icon="circle-check"
+        label="Completadas"
+        [value]="st.completed"
+        color="success"
+      />
+      <lib-stat-card
+        icon="loader"
+        label="En progreso"
+        [value]="st.inProgress"
+        color="primary"
+      />
+      <lib-stat-card
+        icon="clock"
+        label="A tiempo"
+        [value]="st.onTime"
+        color="primary"
+      />
+      <lib-stat-card
+        icon="hourglass"
+        label="Pendientes"
+        [value]="st.pending"
+        color="primary"
+      />
+      <lib-stat-card
+        icon="triangle-alert"
+        label="Con retraso"
+        [value]="st.delayed"
+        color="danger"
+      />
+    </div>
+  </div>
+
+  <!-- ── Toolbar ──────────────────────────────────────────────────── -->
+  <div class="px-6 py-4 flex items-center justify-between gap-4 border-b border-border dark:border-dark-border">
+    <div class="relative max-w-sm flex-1">
       <lib-ui-icon icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" [size]="16" />
       <input
         type="text"
         placeholder="Buscar actividad o código..."
         (input)="onSearch($event)"
-        class="w-full pl-9 pr-4 py-2 rounded-input border border-border bg-surface text-small text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:bg-dark-surface dark:border-dark-border dark:text-dark-text dark:placeholder:text-dark-text/40"
+        class="w-full pl-9 pr-4 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-secondary dark:placeholder:text-dark-text/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
       />
     </div>
-
-    <!-- Status filters -->
-    <div class="flex flex-wrap gap-2">
-      <button [class]="statusFilterPillClass('ALL')" (click)="statusFilter.set('ALL')">Todos</button>
-      <button [class]="statusFilterPillClass('IN_PROGRESS')" (click)="statusFilter.set('IN_PROGRESS')">En progreso</button>
-      <button [class]="statusFilterPillClass('PENDING')" (click)="statusFilter.set('PENDING')">Pendientes</button>
-      <button [class]="statusFilterPillClass('BLOCKED')" (click)="statusFilter.set('BLOCKED')">Bloqueadas</button>
-      <button [class]="statusFilterPillClass('COMPLETED')" (click)="statusFilter.set('COMPLETED')">Completadas</button>
-    </div>
-
-    <!-- Add button -->
     <button
-      (click)="openCreateActivity()"
+      (click)="openCreate()"
       class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-white text-small font-medium rounded-input transition-colors whitespace-nowrap shrink-0"
     >
       <lib-ui-icon icon="plus" [size]="16" />
       Nueva actividad
     </button>
   </div>
-</lib-card>
 
-<!-- ── Activity Tree Table ────────────────────────────────────── -->
-<lib-card [elevated]="true" [bordered]="true" padding="none">
+  <!-- ── Activity table ───────────────────────────────────────────── -->
   @if (visibleRows().length === 0) {
     <div class="py-16">
       <lib-empty-state
         icon="chart-area"
         title="Sin actividades"
-        description="No se encontraron actividades con los filtros aplicados."
+        [description]="searchQuery() ? 'No se encontraron actividades con ese criterio.' : 'Esta etapa aún no tiene actividades. Crea la primera.'"
       />
     </div>
   } @else {
     <div class="overflow-x-auto">
-      <table class="w-full min-w-[900px]">
-        <!-- Header -->
+      <table class="w-full min-w-[820px]">
         <thead>
           <tr class="border-b border-border dark:border-dark-border">
-            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider w-[320px]">
-              Actividad
-            </th>
-            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">
-              Categoría
-            </th>
-            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">
-              Rol
-            </th>
-            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">
-              Inicio
-            </th>
-            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">
-              Fin
-            </th>
-            <th class="px-4 py-3 text-center text-label font-semibold text-text-secondary uppercase tracking-wider w-20">
-              Días
-            </th>
-            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider w-40">
-              Progreso
-            </th>
-            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">
-              Estado
-            </th>
+            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider w-[300px]">Actividad</th>
+            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">Categoría</th>
+            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">Rol</th>
+            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">Inicio</th>
+            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">Fin</th>
+            <th class="px-4 py-3 text-center text-label font-semibold text-text-secondary uppercase tracking-wider w-16">Días</th>
+            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider w-36">Progreso</th>
+            <th class="px-4 py-3 text-left text-label font-semibold text-text-secondary uppercase tracking-wider">Estado</th>
             <th class="px-4 py-3 w-10"></th>
           </tr>
         </thead>
-
-        <!-- Body -->
         <tbody>
           @for (row of visibleRows(); track row.id) {
             <tr
               class="border-b border-border/50 dark:border-dark-border/50 hover:bg-hover-row dark:hover:bg-dark-hover-row transition-colors group cursor-pointer"
               [class.bg-secondary-bg]="row.depth === 0"
               [class.dark:bg-dark-surface-elevated]="row.depth === 0"
-              (click)="openActivity(row)"
             >
-              <!-- Activity name + expand -->
+              <!-- Name -->
               <td class="py-3" [class]="rowDepthPadding(row.depth)">
                 <div class="flex items-center gap-2 min-w-0">
-                  <!-- Expand toggle -->
                   @if (row.hasChildren) {
                     <button
-                      class="flex items-center justify-center w-5 h-5 rounded text-text-secondary hover:text-primary hover:bg-primary/10 dark:hover:text-primary-light transition-colors shrink-0"
+                      class="flex items-center justify-center w-5 h-5 rounded text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
                       (click)="toggleExpand(row.id, $event)"
                     >
                       <lib-ui-icon icon="chevron-right" [size]="14" [class]="expandIconClass(isExpanded(row.id))" />
@@ -131,20 +198,11 @@
                       }
                     </span>
                   }
-
-                  <!-- Code + Name -->
                   <div class="min-w-0">
                     <div class="flex items-center gap-2">
                       <span class="font-mono text-xs text-text-secondary shrink-0">{{ row.code }}</span>
                       @if (row.isCriticalPath) {
-                        <span title="Ruta crítica">
-                          <lib-ui-icon icon="zap" [size]="12" class="text-accent" />
-                        </span>
-                      }
-                      @if (row.stageName && row.depth === 0) {
-                        <span class="px-1.5 py-0.5 rounded-badge bg-border/50 dark:bg-dark-border/50 text-tiny text-text-muted dark:text-dark-text/40 uppercase tracking-wider font-medium whitespace-nowrap">
-                          {{ row.stageName }}
-                        </span>
+                        <span title="Ruta crítica"><lib-ui-icon icon="zap" [size]="12" class="text-accent" /></span>
                       }
                     </div>
                     <p
@@ -154,9 +212,7 @@
                       [class.text-text-primary]="row.depth <= 1"
                       [class.dark:text-dark-text]="row.depth <= 1"
                       [class.text-text-secondary]="row.depth === 2"
-                    >
-                      {{ row.name }}
-                    </p>
+                    >{{ row.name }}</p>
                   </div>
                 </div>
               </td>
@@ -164,10 +220,7 @@
               <!-- Category -->
               <td class="px-4 py-3">
                 <div class="flex items-center gap-2">
-                  <span
-                    class="w-2 h-2 rounded-full shrink-0"
-                    [style.background-color]="row.categoryColor"
-                  ></span>
+                  <span class="w-2 h-2 rounded-full shrink-0" [style.background-color]="row.categoryColor"></span>
                   <span class="text-small text-text-secondary dark:text-dark-text/70 whitespace-nowrap">{{ row.category }}</span>
                 </div>
               </td>
@@ -179,25 +232,19 @@
                 </span>
               </td>
 
-              <!-- Start date -->
+              <!-- Start -->
               <td class="px-4 py-3">
-                <span class="text-small text-text-secondary dark:text-dark-text/70 whitespace-nowrap">
-                  {{ row.startDate | date:'dd/MM/yy' }}
-                </span>
+                <span class="text-small text-text-secondary dark:text-dark-text/70 whitespace-nowrap">{{ row.startDate | date:'dd/MM/yy' }}</span>
               </td>
 
-              <!-- End date -->
+              <!-- End -->
               <td class="px-4 py-3">
-                <span class="text-small text-text-secondary dark:text-dark-text/70 whitespace-nowrap">
-                  {{ row.endDate | date:'dd/MM/yy' }}
-                </span>
+                <span class="text-small text-text-secondary dark:text-dark-text/70 whitespace-nowrap">{{ row.endDate | date:'dd/MM/yy' }}</span>
               </td>
 
               <!-- Duration -->
               <td class="px-4 py-3 text-center">
-                <span class="text-small font-medium text-text-primary dark:text-dark-text">
-                  {{ row.durationDays }}d
-                </span>
+                <span class="text-small font-medium text-text-primary dark:text-dark-text">{{ row.durationDays }}d</span>
               </td>
 
               <!-- Progress -->
@@ -205,35 +252,27 @@
                 @if (row.progressType === 'PERCENTAGE') {
                   <div class="flex items-center gap-2">
                     <lib-progress-bar [value]="row.progress" size="sm" color="auto" class="flex-1" />
-                    <span class="text-label font-medium text-text-secondary dark:text-dark-text/70 shrink-0 w-9 text-right">
-                      {{ row.progress }}%
-                    </span>
+                    <span class="text-label font-medium text-text-secondary dark:text-dark-text/70 shrink-0 w-9 text-right">{{ row.progress }}%</span>
                   </div>
                 } @else {
                   <span
                     class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-badge text-xs font-medium uppercase tracking-wide"
                     [style.background-color]="(row.progressStateColor ?? '#718096') + '26'"
                     [style.color]="row.progressStateColor ?? '#718096'"
-                  >
-                    {{ row.progressState }}
-                  </span>
+                  >{{ row.progressState }}</span>
                 }
               </td>
 
               <!-- Status -->
               <td class="px-4 py-3">
-                <lib-badge
-                  [variant]="statusBadgeVariant(row.status)"
-                  [label]="statusLabel(row.status)"
-                  size="sm"
-                />
+                <lib-badge [variant]="statusBadgeVariant(row.status)" [label]="statusLabel(row.status)" size="sm" />
               </td>
 
               <!-- Actions -->
               <td class="px-3 py-3">
                 <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                   <a
-                    [routerLink]="['/system/projects', projectId(), 'activities', row.id, 'edit']"
+                    [routerLink]="['/system/projects', projectId, 'activities', row.id, 'edit']"
                     (click)="$event.stopPropagation()"
                     class="flex items-center justify-center w-7 h-7 rounded-default text-text-secondary hover:text-primary hover:bg-primary/10 dark:hover:text-primary-light transition-colors"
                     title="Editar"
@@ -248,28 +287,44 @@
       </table>
     </div>
 
-    <!-- Footer summary -->
+    <!-- Footer -->
     <div class="flex items-center justify-between px-6 py-3 border-t border-border dark:border-dark-border bg-background dark:bg-dark-background/50">
       <span class="text-small text-text-secondary dark:text-dark-text/60">
-        {{ visibleRows().length }} actividades mostradas
+        {{ visibleRows().length }} actividades
       </span>
-      <div class="flex items-center gap-4">
-        <span class="flex items-center gap-1.5 text-label text-text-secondary dark:text-dark-text/60">
-          <lib-ui-icon icon="zap" [size]="13" class="text-accent" />
-          {{ stats().criticalPath }} en ruta crítica
-        </span>
-      </div>
+      <span class="flex items-center gap-1.5 text-label text-text-secondary dark:text-dark-text/60">
+        <lib-ui-icon icon="zap" [size]="13" class="text-accent" />
+        {{ activities().filter(a => a.isCriticalPath).length }} en ruta crítica
+      </span>
     </div>
   }
-</lib-card>
 
-<!-- ══════════════════════════════════════════════════════════════ -->
-<!-- ── Create activity modal ──────────────────────────────────── -->
-<!-- ══════════════════════════════════════════════════════════════ -->
-<lib-modal [open]="createOpen()" size="lg" (closed)="closeCreateActivity()">
+} @else {
+  <!-- Not found -->
+  <div class="p-6">
+    <div class="py-16">
+      <lib-empty-state
+        icon="landmark"
+        title="Etapa no encontrada"
+        description="La etapa que buscas no existe o fue eliminada."
+      />
+    </div>
+  </div>
+}
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- ── Create activity modal ────────────────────────────────────── -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<lib-modal [open]="createOpen()" size="lg" (closed)="closeCreate()">
   <div modal-header class="flex items-center gap-3">
     <lib-ui-icon icon="plus" [size]="16" class="text-primary dark:text-primary-light shrink-0" />
     <span class="text-body font-semibold text-text-primary dark:text-dark-text">Nueva actividad</span>
+    @if (stage()) {
+      <span
+        class="px-2 py-0.5 rounded-badge text-tiny font-medium text-white"
+        [style.background-color]="stage()!.info.color"
+      >{{ stage()!.info.name }}</span>
+    }
   </div>
 
   <div [formGroup]="createForm" class="flex flex-col gap-5 p-6">
@@ -289,14 +344,11 @@
       }
     </div>
 
-    <!-- Parent + Category (2-col) -->
+    <!-- Parent + Category -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-      <!-- Parent activity -->
       <div>
         <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">
-          Actividad padre
-          <span class="font-normal text-text-secondary/50 ml-1">(opcional)</span>
+          Actividad padre <span class="font-normal text-text-secondary/50 ml-1">(opcional)</span>
         </label>
         <select
           formControlName="parentId"
@@ -308,8 +360,6 @@
           }
         </select>
       </div>
-
-      <!-- Category -->
       <div>
         <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Categoría *</label>
         <select
@@ -323,24 +373,7 @@
       </div>
     </div>
 
-    <!-- Stage -->
-    <div>
-      <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">
-        Etapa
-        <span class="font-normal text-text-secondary/50 ml-1">(opcional)</span>
-      </label>
-      <select
-        formControlName="stageId"
-        class="w-full px-3 py-2 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-      >
-        <option value="">Sin etapa asignada</option>
-        @for (stage of stageOptions; track stage.id) {
-          <option [value]="stage.id">{{ stage.label }}</option>
-        }
-      </select>
-    </div>
-
-    <!-- Dates (2-col) -->
+    <!-- Dates -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
         <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">Fecha de inicio *</label>
@@ -368,7 +401,7 @@
       </div>
     </div>
 
-    <!-- Assigned role (radio cards) -->
+    <!-- Assigned role -->
     <div>
       <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-2">Rol asignado *</label>
       <div class="grid grid-cols-2 gap-2">
@@ -404,10 +437,8 @@
       </div>
     </div>
 
-    <!-- Progress type + Critical path (2-col) -->
+    <!-- Progress type + Critical path -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-      <!-- Progress type -->
       <div>
         <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-2">Tipo de progreso</label>
         <div class="flex gap-2">
@@ -415,41 +446,30 @@
           <button
             type="button"
             (click)="createForm.get('progressType')?.setValue('PERCENTAGE')"
-            class="flex-1 flex items-center gap-2 px-3 py-2 rounded-card border text-left transition-all cursor-pointer text-small font-medium"
-            [class.border-primary]="isPct"
-            [class.bg-primary\/5]="isPct"
-            [class.text-primary]="isPct"
-            [class.border-border]="!isPct"
-            [class.dark:border-dark-border]="!isPct"
-            [class.text-text-secondary]="!isPct"
+            class="flex-1 flex items-center gap-2 px-3 py-2 rounded-card border text-left transition-all text-small font-medium"
+            [class.border-primary]="isPct" [class.bg-primary\/5]="isPct" [class.text-primary]="isPct"
+            [class.border-border]="!isPct" [class.dark:border-dark-border]="!isPct" [class.text-text-secondary]="!isPct"
           >
-            <lib-ui-icon icon="chart-area" [size]="14" />
-            % Porcentaje
+            <lib-ui-icon icon="chart-area" [size]="14" />% Porcentaje
           </button>
           <button
             type="button"
             (click)="createForm.get('progressType')?.setValue('STATE')"
-            class="flex-1 flex items-center gap-2 px-3 py-2 rounded-card border text-left transition-all cursor-pointer text-small font-medium"
-            [class.border-primary]="!isPct"
-            [class.bg-primary\/5]="!isPct"
-            [class.text-primary]="!isPct"
-            [class.border-border]="isPct"
-            [class.dark:border-dark-border]="isPct"
-            [class.text-text-secondary]="isPct"
+            class="flex-1 flex items-center gap-2 px-3 py-2 rounded-card border text-left transition-all text-small font-medium"
+            [class.border-primary]="!isPct" [class.bg-primary\/5]="!isPct" [class.text-primary]="!isPct"
+            [class.border-border]="isPct" [class.dark:border-dark-border]="isPct" [class.text-text-secondary]="isPct"
           >
-            <lib-ui-icon icon="zap" [size]="14" />
-            Estado
+            <lib-ui-icon icon="zap" [size]="14" />Estado
           </button>
         </div>
       </div>
 
-      <!-- Critical path -->
       <div>
         <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-2">Ruta crítica</label>
         <button
           type="button"
           (click)="createForm.get('isCriticalPath')?.setValue(!createForm.get('isCriticalPath')?.value)"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-card border w-full text-left transition-all cursor-pointer"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-card border w-full text-left transition-all"
           [class.border-accent]="createForm.get('isCriticalPath')?.value"
           [class.bg-accent\/5]="createForm.get('isCriticalPath')?.value"
           [class.border-border]="!createForm.get('isCriticalPath')?.value"
@@ -476,8 +496,7 @@
     <!-- Description -->
     <div>
       <label class="block text-label font-medium text-text-secondary dark:text-dark-text/70 mb-1.5">
-        Descripción
-        <span class="font-normal text-text-secondary/50 ml-1">(opcional)</span>
+        Descripción <span class="font-normal text-text-secondary/50 ml-1">(opcional)</span>
       </label>
       <textarea
         formControlName="description"
@@ -491,7 +510,7 @@
     <div class="flex items-center justify-end gap-2 pt-1 border-t border-border/50 dark:border-dark-border/50">
       <button
         type="button"
-        (click)="closeCreateActivity()"
+        (click)="closeCreate()"
         class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
       >
         Cancelar
@@ -515,32 +534,4 @@
       </button>
     </div>
   </div>
-</lib-modal>
-
-<!-- ── Activity detail modal ─────────────────────────────────── -->
-<lib-modal
-  [open]="modalOpen()"
-  size="xl"
-  (closed)="closeModal()"
->
-  <!-- Custom header with code + title + open-in-page link -->
-  <div modal-header class="flex items-center gap-3 min-w-0">
-    @if (selectedActivity()) {
-      <span class="font-mono text-small font-semibold px-2.5 py-1 rounded-badge bg-primary/10 text-primary dark:bg-primary-light/10 dark:text-primary-light shrink-0">
-        {{ selectedActivity()!.code }}
-      </span>
-      <span class="text-body font-semibold text-text-primary dark:text-dark-text truncate">
-        {{ selectedActivity()!.name }}
-      </span>
-    }
-  </div>
-
-  <!-- Body -->
-  @if (selectedActivity()) {
-    <app-activity-detail-view
-      [activity]="selectedActivity()!"
-      layout="modal"
-      [projectId]="projectId()"
-    />
-  }
 </lib-modal>

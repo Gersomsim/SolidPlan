@@ -6,6 +6,7 @@ import { Badge, BadgeVariant, Icon, Modal, StepItem, Stepper } from '@org/ui'
 import { ActivityStatus, ProjectStageStatus, ProjectStatus } from '@org/util'
 
 import { MOCK_ACTIVITIES, MockActivity } from '../pages/activities-page/mock-activities'
+import { MOCK_PROJECT_STAGES } from '../pages/stages-page/mock-stages'
 
 interface ProjectDetail {
 	id: string
@@ -24,14 +25,6 @@ interface ProjectDetail {
 	overallProgress: number
 }
 
-interface MockStage {
-	id: string
-	order: number
-	name: string
-	status: ProjectStageStatus
-	plannedStartDate: Date
-	plannedEndDate: Date
-}
 
 interface NavTab {
 	label: string
@@ -86,56 +79,6 @@ const MOCK_PROJECT: ProjectDetail = {
 	overallProgress: 45,
 }
 
-const MOCK_STAGES: MockStage[] = [
-	{
-		id: 's1',
-		order: 1,
-		name: 'Cimientos',
-		status: 'COMPLETED',
-		plannedStartDate: new Date('2024-03-15'),
-		plannedEndDate: new Date('2024-06-30'),
-	},
-	{
-		id: 's2',
-		order: 2,
-		name: 'Estructura',
-		status: 'IN_PROGRESS',
-		plannedStartDate: new Date('2024-07-01'),
-		plannedEndDate: new Date('2025-06-30'),
-	},
-	{
-		id: 's3',
-		order: 3,
-		name: 'Instalaciones',
-		status: 'PENDING',
-		plannedStartDate: new Date('2025-07-01'),
-		plannedEndDate: new Date('2025-12-31'),
-	},
-	{
-		id: 's4',
-		order: 4,
-		name: 'Muros y divisiones',
-		status: 'PENDING',
-		plannedStartDate: new Date('2026-01-01'),
-		plannedEndDate: new Date('2026-04-30'),
-	},
-	{
-		id: 's5',
-		order: 5,
-		name: 'Acabados',
-		status: 'PENDING',
-		plannedStartDate: new Date('2026-05-01'),
-		plannedEndDate: new Date('2026-07-31'),
-	},
-	{
-		id: 's6',
-		order: 6,
-		name: 'Entrega',
-		status: 'PENDING',
-		plannedStartDate: new Date('2026-08-01'),
-		plannedEndDate: new Date('2026-08-15'),
-	},
-]
 
 @Component({
 	selector: 'app-project-detail-page',
@@ -255,20 +198,23 @@ export class ProjectDetailPage {
 
 	// ── Stage stepper ─────────────────────────────────────────────
 	readonly stageSteps = computed<StepItem[]>(() =>
-		MOCK_STAGES.map(s => ({
-			key: s.id,
-			label: s.name,
-			description: this.stageStatusLabel(s.status),
-			status: this.stageToStepStatus(s.status),
-		})),
+		[...MOCK_PROJECT_STAGES]
+			.sort((a, b) => a.order - b.order)
+			.map(s => ({
+				key: s.id,
+				label: s.info.name,
+				description: this.stageStatusLabel(s.status),
+				status: this.stageToStepStatus(s.status),
+			})),
 	)
 
 	readonly tabs: NavTab[] = [
-		{ label: 'Resumen', route: 'overview', icon: 'house' },
+		{ label: 'Resumen',     route: 'overview',   icon: 'house' },
+		{ label: 'Etapas',      route: 'stages',     icon: 'landmark' },
 		{ label: 'Actividades', route: 'activities', icon: 'chart-area' },
-		{ label: 'Bitácoras', route: 'daily-logs', icon: 'calendar-days' },
-		{ label: 'Recursos', route: 'resources', icon: 'file' },
-		{ label: 'Equipo', route: 'members', icon: 'users' },
+		{ label: 'Bitácoras',   route: 'daily-logs', icon: 'calendar-days' },
+		{ label: 'Recursos',    route: 'resources',  icon: 'file' },
+		{ label: 'Equipo',      route: 'members',    icon: 'users' },
 	]
 
 	private stageToStepStatus(status: ProjectStageStatus): StepItem['status'] {
