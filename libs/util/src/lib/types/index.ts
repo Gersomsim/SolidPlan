@@ -3,6 +3,7 @@ export * from './activity-progress-type.type';
 export * from './activity-status.type';
 export * from './classification.type';
 export * from './file-type.type';
+// PermissionAction and PermissionResource types excluded to avoid ambiguity with same-named consts from enums barrel
 export * from './project-member-role.type';
 export * from './project-resource-status.type';
 export * from './project-stage-status.type';

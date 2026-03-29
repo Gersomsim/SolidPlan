@@ -51,6 +51,16 @@ export const privateRoutes: Routes = [
 			import('./categories-page/categories-page').then(m => m.CategoriesPage),
 	},
 	{
+		path: 'roles',
+		loadComponent: () =>
+			import('./roles-page/roles-page').then(m => m.RolesPage),
+	},
+	{
+		path: 'roles/:id',
+		loadComponent: () =>
+			import('./role-edit-page/role-edit-page').then(m => m.RoleEditPage),
+	},
+	{
 		path: 'settings',
 		loadComponent: () =>
 			import('./settings-page/settings-page').then(m => m.SettingsPage),

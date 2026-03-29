@@ -46,7 +46,8 @@ export class PrivateLayout {
 					label: 'Estados de actividad',
 					route: '/system/activity-states',
 				},
-				{ icon: 'tag', label: 'Categorías', route: '/system/categories' },
+				{ icon: 'tag',    label: 'Categorías', route: '/system/categories' },
+				{ icon: 'shield', label: 'Roles',       route: '/system/roles' },
 			],
 		},
 		{

@@ -1,4 +1,14 @@
+import { PermissionAction } from '../types/permission-action.type';
+import { PermissionResource } from '../types/permission-resource.type';
 import { RoleScope } from '../types/role-scope.type';
+
+/**
+ * Permiso granular: recurso + acción.
+ */
+export interface Permission {
+  resource: PermissionResource;
+  action: PermissionAction;
+}
 
 /**
  * Rol del sistema (para control de permisos granular).
@@ -19,12 +29,10 @@ export interface Role {
   tenantId?: string; // null para scope SYSTEM; obligatorio para TENANT y PROJECT
 
   name: string;
+  description?: string;
   scope: RoleScope;
 
-  permissions: {
-    resource: string; // 'BILLING' | 'USERS' | 'PROJECTS' | 'DAILY_LOGS' | 'SCHEDULE' | 'REPORTS' | 'SYSTEM_CONFIG'
-    action: 'CREATE' | 'READ' | 'UPDATE' | 'DELETE' | 'MANAGE';
-  }[];
+  permissions: Permission[];
 
   isSystemDefault: boolean; // true = no puede eliminarse (ej: SuperAdmin, ADMIN de proyecto)
 }

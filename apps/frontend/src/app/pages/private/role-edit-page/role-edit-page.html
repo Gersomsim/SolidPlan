@@ -1,0 +1,388 @@
+<div class="p-6">
+
+  @if (!role()) {
+    <!-- 404 -->
+    <div class="flex items-center justify-center h-64">
+      <lib-empty-state
+        icon="shield"
+        title="Rol no encontrado"
+        description="No existe un rol con ese identificador."
+      />
+    </div>
+  } @else {
+
+    <!-- ── Back + Header ──────────────────────────────────────────── -->
+    <div class="mb-6">
+      <!-- Back -->
+      <button
+        (click)="goBack()"
+        class="flex items-center gap-2 text-small text-text-secondary dark:text-dark-text/60 hover:text-text-primary dark:hover:text-dark-text mb-4 transition-colors"
+      >
+        <lib-ui-icon icon="arrow-left" [size]="15" />
+        Volver a Roles
+      </button>
+
+      <!-- Role header card -->
+      <lib-card [elevated]="true" [bordered]="true" padding="none">
+        <div class="p-6 flex flex-col sm:flex-row sm:items-center gap-5">
+          <!-- Icon bubble -->
+          <div
+            class="w-14 h-14 rounded-card flex items-center justify-center shrink-0"
+            [class]="role()!.isSystemDefault ? 'bg-primary/10 dark:bg-primary-light/10' : 'bg-success/10'"
+          >
+            <lib-ui-icon
+              [icon]="role()!.isSystemDefault ? 'shield-check' : 'shield'"
+              [size]="24"
+              [class]="role()!.isSystemDefault ? 'text-primary dark:text-primary-light' : 'text-success'"
+            />
+          </div>
+
+          <!-- Info -->
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-center gap-2 mb-1">
+              <h1 class="text-h3 font-semibold text-text-primary dark:text-dark-text">{{ role()!.name }}</h1>
+              <lib-badge [variant]="scopeBadgeVariant(role()!)" [label]="scopeLabel(role()!)" />
+              @if (role()!.isSystemDefault) {
+                <div class="flex items-center gap-1 px-2 py-0.5 rounded-badge bg-secondary-bg dark:bg-white/8 border border-border dark:border-dark-border">
+                  <lib-ui-icon icon="lock" [size]="10" class="text-text-secondary dark:text-dark-text/50" />
+                  <span class="text-label text-text-secondary dark:text-dark-text/50 uppercase tracking-wide">Sistema</span>
+                </div>
+              }
+            </div>
+            <p class="text-small text-text-secondary dark:text-dark-text/60">{{ role()!.description }}</p>
+          </div>
+
+          <!-- Stats -->
+          <div class="flex items-center gap-6 sm:gap-8 shrink-0">
+            <div class="text-center">
+              <p class="text-h3 font-bold text-text-primary dark:text-dark-text">{{ permCount() }}</p>
+              <p class="text-label text-text-secondary dark:text-dark-text/50">Permisos</p>
+            </div>
+            <div class="text-center">
+              <p class="text-h3 font-bold text-text-primary dark:text-dark-text">{{ role()!.users.length }}</p>
+              <p class="text-label text-text-secondary dark:text-dark-text/50">Usuarios</p>
+            </div>
+          </div>
+        </div>
+      </lib-card>
+    </div>
+
+    <!-- ── System default notice ───────────────────────────────── -->
+    @if (role()!.isSystemDefault) {
+      <div class="flex items-start gap-3 px-4 py-3 rounded-card border border-accent/30 bg-accent/5 mb-5">
+        <lib-ui-icon icon="triangle-alert" [size]="14" class="text-accent shrink-0 mt-0.5" />
+        <p class="text-small text-text-secondary dark:text-dark-text/70 leading-relaxed">
+          Este es un <strong class="text-text-primary dark:text-dark-text">rol predefinido del sistema</strong>.
+          Puedes ajustar sus permisos, pero no puede eliminarse.
+          Los cambios afectarán a todos los usuarios con este rol.
+        </p>
+      </div>
+    }
+
+    <!-- ── Permission matrix ───────────────────────────────────── -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-body font-semibold text-text-primary dark:text-dark-text flex items-center gap-2">
+          <lib-ui-icon icon="key-round" [size]="16" class="text-primary dark:text-primary-light" />
+          Matriz de permisos
+        </h2>
+        <div class="flex items-center gap-2">
+          <!-- Legend -->
+          <div class="hidden md:flex items-center gap-4 text-label text-text-secondary dark:text-dark-text/50 mr-2">
+            <span class="flex items-center gap-1.5">
+              <div class="w-4 h-4 rounded bg-primary/15 dark:bg-primary-light/15 flex items-center justify-center">
+                <lib-ui-icon icon="check" [size]="9" class="text-primary dark:text-primary-light" />
+              </div>
+              Activo
+            </span>
+            <span class="flex items-center gap-1.5">
+              <div class="w-4 h-4 rounded bg-primary/8 dark:bg-primary-light/8 flex items-center justify-center">
+                <lib-ui-icon icon="check" [size]="9" class="text-primary dark:text-primary-light" />
+              </div>
+              Implícito por Total
+            </span>
+            <span class="flex items-center gap-1.5">
+              <div class="w-4 h-4 rounded bg-primary dark:bg-primary-light flex items-center justify-center">
+                <lib-ui-icon icon="check" [size]="9" class="text-white" />
+              </div>
+              Total (MANAGE)
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Matrix table -->
+      <lib-card [elevated]="true" [bordered]="true" padding="none">
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[640px]">
+            <!-- Header -->
+            <thead>
+              <tr class="border-b border-border dark:border-dark-border">
+                <th class="text-left px-5 py-3 text-label font-medium text-text-secondary dark:text-dark-text/60 w-48">
+                  Recurso
+                </th>
+                @for (action of actions; track action.key) {
+                  <th class="text-center px-2 py-3 text-label font-medium text-text-secondary dark:text-dark-text/60 w-20">
+                    {{ action.short }}
+                  </th>
+                }
+                <th class="w-12 px-2 py-3"></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (group of groups; track group.label) {
+                <!-- Group header row -->
+                <tr class="border-b border-border/50 dark:border-dark-border/50 bg-secondary-bg/40 dark:bg-white/3">
+                  <td colspan="7" class="px-5 py-2">
+                    <div class="flex items-center gap-2">
+                      <lib-ui-icon [icon]="group.icon" [size]="12" class="text-text-secondary dark:text-dark-text/40" />
+                      <span class="text-label font-semibold text-text-secondary dark:text-dark-text/50 uppercase tracking-wide">
+                        {{ group.label }}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Resource rows -->
+                @for (res of group.resources; track res.key) {
+                  <tr class="border-b border-border/40 dark:border-dark-border/40 hover:bg-hover-row dark:hover:bg-white/3 transition-colors">
+                    <!-- Resource label -->
+                    <td class="px-5 py-3">
+                      <div class="flex items-center gap-2">
+                        <!-- Row toggle (select all) -->
+                        <button
+                          (click)="toggleRow(res.key)"
+                          class="w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors"
+                          [class.border-primary]="rowHasAny(res.key)"
+                          [class.bg-primary]="rowHasAny(res.key)"
+                          [class.dark:border-primary-light]="rowHasAny(res.key)"
+                          [class.dark:bg-primary-light]="rowHasAny(res.key)"
+                          [class.border-border]="!rowHasAny(res.key)"
+                          [class.dark:border-dark-border]="!rowHasAny(res.key)"
+                          [title]="rowHasAny(res.key) ? 'Quitar todos los permisos' : 'Asignar todos los permisos'"
+                        >
+                          @if (rowHasAny(res.key)) {
+                            <lib-ui-icon icon="check" [size]="9" class="text-white dark:text-dark-background" />
+                          }
+                        </button>
+                        <span class="text-small text-text-primary dark:text-dark-text">{{ res.label }}</span>
+                      </div>
+                    </td>
+
+                    <!-- Action cells -->
+                    @for (action of actions; track action.key) {
+                      <td class="px-2 py-2">
+                        <div class="flex items-center justify-center h-8">
+                          <button
+                            (click)="!isImplied(res.key, action.key) && toggle(res.key, action.key)"
+                            [class]="cellClass(res.key, action.key)"
+                            [disabled]="isImplied(res.key, action.key)"
+                            [title]="action.label"
+                            class="w-8 h-8"
+                          >
+                            @if (has(res.key, action.key)) {
+                              <lib-ui-icon icon="check" [size]="14" />
+                            }
+                          </button>
+                        </div>
+                      </td>
+                    }
+
+                    <!-- Clear row -->
+                    <td class="px-2 py-2">
+                      @if (rowHasAny(res.key)) {
+                        <button
+                          (click)="toggleRow(res.key)"
+                          class="flex items-center justify-center w-6 h-6 rounded text-text-secondary/40 hover:text-danger hover:bg-danger/10 transition-colors"
+                          title="Quitar todos"
+                        >
+                          <lib-ui-icon icon="x" [size]="12" />
+                        </button>
+                      }
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Save bar -->
+        <div class="flex items-center justify-between px-5 py-4 border-t border-border dark:border-dark-border bg-secondary-bg/30 dark:bg-white/3">
+          <p class="text-label text-text-secondary dark:text-dark-text/50">
+            {{ permCount() }} permiso{{ permCount() !== 1 ? 's' : '' }} activos en {{ resourceCount() }} recurso{{ resourceCount() !== 1 ? 's' : '' }}
+          </p>
+          <button
+            (click)="save()"
+            [disabled]="saving() || savedOk()"
+            class="flex items-center gap-2 px-5 py-2 rounded-input bg-primary hover:bg-primary-hover disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+          >
+            @if (saving()) {
+              <lib-ui-icon icon="loader-circle" [size]="15" />
+              Guardando...
+            } @else if (savedOk()) {
+              <lib-ui-icon icon="check" [size]="15" />
+              Guardado
+            } @else {
+              <lib-ui-icon icon="check" [size]="15" />
+              Guardar permisos
+            }
+          </button>
+        </div>
+      </lib-card>
+    </div>
+
+    <!-- ── Users with this role ────────────────────────────────── -->
+    <div>
+      <h2 class="text-body font-semibold text-text-primary dark:text-dark-text flex items-center gap-2 mb-3">
+        <lib-ui-icon icon="users" [size]="16" class="text-primary dark:text-primary-light" />
+        Usuarios con este rol
+        <span class="text-small font-normal text-text-secondary dark:text-dark-text/50">({{ role()!.users.length }})</span>
+      </h2>
+
+      @if (role()!.users.length === 0) {
+        <lib-card [elevated]="true" [bordered]="true" padding="none">
+          <div class="py-12">
+            <lib-empty-state
+              icon="users"
+              title="Sin usuarios"
+              description="Ningún usuario tiene este rol asignado."
+            />
+          </div>
+        </lib-card>
+      } @else {
+        <lib-card [elevated]="true" [bordered]="true" padding="none">
+          <div class="divide-y divide-border dark:divide-dark-border">
+            @for (u of role()!.users; track u.id) {
+              <div class="group flex items-center gap-4 px-5 py-3.5 hover:bg-hover-row dark:hover:bg-white/3 transition-colors">
+                <!-- Avatar -->
+                <div
+                  class="w-9 h-9 rounded-full flex items-center justify-center text-white text-small font-bold shrink-0"
+                  [style.background-color]="u.avatarBg"
+                >
+                  {{ initials(u) }}
+                </div>
+
+                <!-- Info -->
+                <div class="flex-1 min-w-0">
+                  <p class="text-small font-semibold text-text-primary dark:text-dark-text">{{ u.firstName }} {{ u.lastName }}</p>
+                  <p class="text-label text-text-secondary dark:text-dark-text/50 truncate">{{ u.jobTitle }}</p>
+                </div>
+
+                <!-- Email -->
+                <span class="hidden md:block text-label text-text-secondary dark:text-dark-text/40 truncate max-w-[200px]">{{ u.email }}</span>
+
+                <!-- Status badge -->
+                <div class="shrink-0">
+                  @if (u.status === 'ACTIVE') {
+                    <div class="flex items-center gap-1 px-2 py-0.5 rounded-badge bg-success/10 border border-success/20">
+                      <div class="w-1.5 h-1.5 rounded-full bg-success"></div>
+                      <span class="text-label font-medium text-success uppercase tracking-wide">Activo</span>
+                    </div>
+                  } @else if (u.status === 'PENDING_INVITE') {
+                    <div class="flex items-center gap-1 px-2 py-0.5 rounded-badge bg-accent/10 border border-accent/20">
+                      <lib-ui-icon icon="send" [size]="10" class="text-accent" />
+                      <span class="text-label font-medium text-accent uppercase tracking-wide">Pendiente</span>
+                    </div>
+                  } @else {
+                    <div class="flex items-center gap-1 px-2 py-0.5 rounded-badge bg-secondary-bg dark:bg-white/8 border border-border dark:border-dark-border">
+                      <div class="w-1.5 h-1.5 rounded-full bg-text-secondary/40"></div>
+                      <span class="text-label font-medium text-text-secondary dark:text-dark-text/40 uppercase tracking-wide">Inactivo</span>
+                    </div>
+                  }
+                </div>
+
+                <!-- Remove action -->
+                <div class="opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                  <button
+                    (click)="openRemove(u, $event)"
+                    class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-input text-label font-medium text-danger/70 hover:text-danger bg-danger/5 hover:bg-danger/10 transition-colors"
+                    title="Quitar de este rol"
+                  >
+                    <lib-ui-icon icon="user-minus" [size]="13" />
+                    Quitar
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Add user shortcut -->
+          <div class="px-5 py-3 border-t border-border dark:border-dark-border">
+            <button
+              class="flex items-center gap-2 text-small font-medium text-primary dark:text-primary-light hover:text-primary-hover transition-colors"
+            >
+              <lib-ui-icon icon="user-plus" [size]="14" />
+              Asignar usuario a este rol
+            </button>
+          </div>
+        </lib-card>
+      }
+    </div>
+
+  }
+
+</div>
+
+<!-- ── Remove user modal ───────────────────────────────────────── -->
+<lib-modal [open]="removeOpen()" size="sm" (closed)="closeRemove()">
+  <div modal-header class="flex items-center gap-3">
+    <lib-ui-icon icon="user-minus" [size]="16" class="text-danger shrink-0" />
+    <span class="text-body font-semibold text-text-primary dark:text-dark-text">Quitar usuario del rol</span>
+  </div>
+
+  @if (removeCandidate()) {
+    <div class="flex flex-col gap-5 p-6">
+      <!-- User preview -->
+      <div class="flex items-center gap-3 px-4 py-3.5 rounded-card border border-border dark:border-dark-border bg-secondary-bg/50 dark:bg-white/5">
+        <div
+          class="w-10 h-10 rounded-full flex items-center justify-center text-white text-small font-bold shrink-0"
+          [style.background-color]="removeCandidate()!.avatarBg"
+        >
+          {{ initials(removeCandidate()!) }}
+        </div>
+        <div>
+          <p class="text-small font-semibold text-text-primary dark:text-dark-text">
+            {{ removeCandidate()!.firstName }} {{ removeCandidate()!.lastName }}
+          </p>
+          <p class="text-label text-text-secondary dark:text-dark-text/50">{{ removeCandidate()!.jobTitle }}</p>
+        </div>
+      </div>
+
+      <!-- Warning -->
+      <div class="flex items-start gap-2.5 px-4 py-3 rounded-card bg-accent/5 border border-accent/20">
+        <lib-ui-icon icon="triangle-alert" [size]="14" class="text-accent shrink-0 mt-0.5" />
+        <p class="text-small text-text-secondary dark:text-dark-text/60">
+          Al quitar este usuario del rol <strong class="text-text-primary dark:text-dark-text">{{ role()?.name }}</strong>,
+          perderá los permisos asociados inmediatamente.
+        </p>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center justify-end gap-2">
+        <button
+          type="button"
+          (click)="closeRemove()"
+          class="px-3.5 py-2 rounded-input text-small font-medium text-text-secondary dark:text-dark-text/70 hover:text-text-primary hover:bg-secondary-bg dark:hover:bg-white/10 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          (click)="confirmRemove()"
+          [disabled]="removing()"
+          class="flex items-center gap-2 px-4 py-2 rounded-input bg-danger hover:bg-danger/90 disabled:opacity-60 text-white text-small font-semibold shadow-card transition-colors"
+        >
+          @if (removing()) {
+            <lib-ui-icon icon="loader-circle" [size]="15" />
+            Quitando...
+          } @else {
+            <lib-ui-icon icon="user-minus" [size]="15" />
+            Quitar del rol
+          }
+        </button>
+      </div>
+    </div>
+  }
+</lib-modal>

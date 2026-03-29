@@ -2,6 +2,8 @@ export * from './activity-dependency.enum';
 export * from './activity-progress-type.enum';
 export * from './activity-status.enum';
 export * from './file-type.enum';
+export * from './permission-action.enum';
+export * from './permission-resource.enum';
 export * from './project-member-role.enum';
 export * from './project-stage-status.enum';
 export * from './project-status.enum';

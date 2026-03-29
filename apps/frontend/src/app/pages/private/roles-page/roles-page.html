@@ -1,0 +1,146 @@
+<div class="p-6">
+
+  <!-- ── Stats ──────────────────────────────────────────────────── -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+    <lib-stat-card icon="shield"       label="Total roles"        [value]="stats().total"         color="primary" />
+    <lib-stat-card icon="shield-check" label="Roles del sistema"  [value]="stats().systemDefault" color="primary" />
+    <lib-stat-card icon="sliders-horizontal" label="Roles personalizados" [value]="stats().custom" color="success" />
+    <lib-stat-card icon="users"        label="Usuarios asignados" [value]="stats().totalUsers"    color="primary" />
+  </div>
+
+  <!-- ── Info banner ────────────────────────────────────────────── -->
+  <div class="flex items-start gap-3 px-4 py-3 rounded-card border border-border dark:border-dark-border bg-surface dark:bg-dark-surface mb-5">
+    <lib-ui-icon icon="info" [size]="14" class="text-primary dark:text-primary-light shrink-0 mt-0.5" />
+    <p class="text-small text-text-secondary dark:text-dark-text/70 leading-relaxed">
+      Los roles controlan qué puede hacer cada usuario en la organización y en los proyectos.
+      Los <strong class="text-text-primary dark:text-dark-text">roles del sistema</strong> son predefinidos y no pueden eliminarse, pero sí puedes ajustar sus permisos.
+      Los <strong class="text-text-primary dark:text-dark-text">roles personalizados</strong> los creas tú y son completamente configurables.
+    </p>
+  </div>
+
+  <!-- ── Toolbar ─────────────────────────────────────────────────── -->
+  <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between mb-5">
+    <!-- Search -->
+    <div class="relative flex-1 max-w-sm">
+      <lib-ui-icon icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" [size]="16" />
+      <input
+        type="text"
+        placeholder="Buscar rol..."
+        (input)="onSearch($event)"
+        class="w-full pl-9 pr-4 py-2 rounded-input border border-border bg-surface text-small text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary dark:bg-dark-surface dark:border-dark-border dark:text-dark-text dark:placeholder:text-dark-text/40"
+      />
+    </div>
+
+    <!-- Filters + action -->
+    <div class="flex items-center gap-2 flex-wrap">
+      <!-- Scope filter pills -->
+      <div class="flex items-center gap-1.5">
+        <button [class]="filterPillClass(scopeFilter(), 'ALL')"     (click)="scopeFilter.set('ALL')">     Todos    </button>
+        <button [class]="filterPillClass(scopeFilter(), 'TENANT')"  (click)="scopeFilter.set('TENANT')">  Tenant   </button>
+        <button [class]="filterPillClass(scopeFilter(), 'PROJECT')" (click)="scopeFilter.set('PROJECT')"> Proyecto </button>
+      </div>
+
+      <!-- New role -->
+      <button
+        class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-white text-small font-medium rounded-input transition-colors whitespace-nowrap"
+      >
+        <lib-ui-icon icon="plus" [size]="16" />
+        Nuevo rol
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Roles list ──────────────────────────────────────────────── -->
+  @if (filteredRoles().length === 0) {
+    <lib-card [elevated]="true" [bordered]="true" padding="none">
+      <div class="py-16">
+        <lib-empty-state
+          icon="shield"
+          title="Sin roles"
+          description="No hay roles que coincidan con la búsqueda."
+        />
+      </div>
+    </lib-card>
+  } @else {
+    <div class="flex flex-col gap-3">
+      @for (role of filteredRoles(); track role.id) {
+        <div
+          class="group flex flex-col sm:flex-row sm:items-center gap-4 px-5 py-4 rounded-card border border-border dark:border-dark-border bg-surface dark:bg-dark-surface shadow-card hover:shadow-hover transition-shadow"
+        >
+          <!-- Icon + name -->
+          <div class="flex items-center gap-3 flex-1 min-w-0">
+            <!-- Icon bubble -->
+            <div class="w-10 h-10 rounded-card flex items-center justify-center shrink-0"
+                 [class]="role.isSystemDefault ? 'bg-primary/10 dark:bg-primary-light/10' : 'bg-success/10'">
+              <lib-ui-icon
+                [icon]="role.isSystemDefault ? 'shield-check' : 'shield'"
+                [size]="18"
+                [class]="role.isSystemDefault ? 'text-primary dark:text-primary-light' : 'text-success'"
+              />
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2 mb-0.5">
+                <span class="text-small font-semibold text-text-primary dark:text-dark-text">{{ role.name }}</span>
+                <lib-badge [variant]="scopeBadgeVariant(role)" [label]="scopeLabel(role)" />
+                @if (role.isSystemDefault) {
+                  <div class="flex items-center gap-1 px-2 py-0.5 rounded-badge bg-secondary-bg dark:bg-white/8 border border-border dark:border-dark-border">
+                    <lib-ui-icon icon="lock" [size]="10" class="text-text-secondary dark:text-dark-text/50" />
+                    <span class="text-label text-text-secondary dark:text-dark-text/50 uppercase tracking-wide">Sistema</span>
+                  </div>
+                }
+              </div>
+              <p class="text-label text-text-secondary dark:text-dark-text/60 truncate">{{ role.description }}</p>
+            </div>
+          </div>
+
+          <!-- Permissions summary -->
+          <div class="hidden md:flex items-center gap-1.5 text-label text-text-secondary dark:text-dark-text/50 shrink-0 w-44">
+            <lib-ui-icon icon="key-round" [size]="12" />
+            <span>{{ permissionSummary(role) }}</span>
+          </div>
+
+          <!-- Users -->
+          <div class="flex items-center gap-2 shrink-0">
+            <!-- Avatar stack -->
+            @if (role.users.length > 0) {
+              <div class="flex -space-x-2">
+                @for (u of role.users.slice(0, 4); track u.id) {
+                  <div
+                    class="w-7 h-7 rounded-full flex items-center justify-center text-white text-label font-bold ring-2 ring-surface dark:ring-dark-surface shrink-0"
+                    [style.background-color]="u.avatarBg"
+                    [title]="u.firstName + ' ' + u.lastName"
+                  >
+                    {{ initials(u) }}
+                  </div>
+                }
+                @if (role.users.length > 4) {
+                  <div
+                    class="w-7 h-7 rounded-full flex items-center justify-center text-white text-label font-bold ring-2 ring-surface dark:ring-dark-surface bg-secondary"
+                  >
+                    +{{ role.users.length - 4 }}
+                  </div>
+                }
+              </div>
+            }
+            <span class="text-label text-text-secondary dark:text-dark-text/50 w-14">
+              {{ role.users.length }} usuario{{ role.users.length !== 1 ? 's' : '' }}
+            </span>
+          </div>
+
+          <!-- Edit action -->
+          <div class="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+            <a
+              [routerLink]="['/system/roles', role.id]"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-input text-small font-medium text-primary dark:text-primary-light bg-primary/8 dark:bg-primary-light/8 hover:bg-primary/15 dark:hover:bg-primary-light/15 transition-colors"
+            >
+              <lib-ui-icon icon="settings" [size]="13" />
+              Gestionar
+            </a>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>
