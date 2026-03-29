@@ -1,0 +1,76 @@
+<div>
+	<div class="mb-8">
+		<h2 class="text-heading font-semibold text-text-primary dark:text-dark-text">Organización</h2>
+		<p class="text-small text-text-secondary dark:text-dark-text/60 mt-1">Información de la empresa y datos públicos</p>
+	</div>
+
+	<!-- Logo -->
+	<div class="flex items-center gap-5 mb-8 p-5 rounded-card border border-border dark:border-dark-border bg-surface dark:bg-dark-surface">
+		<div class="w-16 h-16 rounded-card border-2 border-dashed border-border dark:border-dark-border flex items-center justify-center bg-border/20 dark:bg-dark-border/20 shrink-0">
+			<lib-ui-icon icon="building" [size]="24" class="text-text-muted dark:text-dark-text/40" />
+		</div>
+		<div class="flex-1 min-w-0">
+			<p class="text-small font-medium text-text-primary dark:text-dark-text">Logo de la empresa</p>
+			<p class="text-tiny text-text-muted dark:text-dark-text/40 mt-0.5">PNG o SVG. Recomendado 256×256 px.</p>
+		</div>
+		<button type="button" class="px-4 py-2 rounded-input border border-border dark:border-dark-border text-small text-text-secondary dark:text-dark-text/60 hover:border-primary hover:text-primary dark:hover:border-primary-light dark:hover:text-primary-light transition-colors">
+			Subir logo
+		</button>
+	</div>
+
+	<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
+		<div class="flex flex-col gap-1.5">
+			<label class="text-small font-medium text-text-primary dark:text-dark-text">Nombre de la empresa <span class="text-error">*</span></label>
+			<input
+				formControlName="name"
+				type="text"
+				placeholder="Ej: Constructora Pérez S.A."
+				class="h-10 px-3 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-muted dark:placeholder:text-dark-text/40 focus:outline-none focus:border-primary dark:focus:border-primary-light transition-colors"
+				[class.border-error]="form.get('name')?.invalid && form.get('name')?.touched"
+			/>
+		</div>
+
+		<div class="flex flex-col gap-1.5">
+			<label class="text-small font-medium text-text-primary dark:text-dark-text">Identificador (slug)</label>
+			<div class="relative">
+				<span class="absolute left-3 top-1/2 -translate-y-1/2 text-small text-text-muted dark:text-dark-text/40">solidplan.app/</span>
+				<input
+					formControlName="slug"
+					type="text"
+					class="h-10 w-full pl-[110px] pr-10 rounded-input border border-border dark:border-dark-border bg-border/30 dark:bg-dark-border/30 text-small text-text-muted dark:text-dark-text/40 cursor-not-allowed"
+				/>
+				<lib-ui-icon icon="lock" [size]="14" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted dark:text-dark-text/40" />
+			</div>
+			<p class="text-tiny text-text-muted dark:text-dark-text/40">El identificador no puede modificarse. Contacta a soporte si es necesario.</p>
+		</div>
+
+		<div class="flex flex-col gap-1.5">
+			<label class="text-small font-medium text-text-primary dark:text-dark-text">Industria</label>
+			<select
+				formControlName="industry"
+				class="h-10 px-3 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:border-primary dark:focus:border-primary-light transition-colors"
+			>
+				<option value="CONSTRUCTION">Construcción</option>
+				<option value="ARCHITECTURE">Arquitectura</option>
+				<option value="ENGINEERING">Ingeniería</option>
+				<option value="REAL_ESTATE">Inmobiliaria</option>
+			</select>
+		</div>
+
+		<div class="flex items-center justify-end gap-3 pt-2 border-t border-border dark:border-dark-border">
+			@if (savedOk()) {
+				<span class="flex items-center gap-1.5 text-small text-success">
+					<lib-ui-icon icon="check" [size]="14" />
+					Cambios guardados
+				</span>
+			}
+			<button
+				type="submit"
+				[disabled]="saving()"
+				class="h-9 px-5 rounded-input bg-primary text-white text-small font-medium hover:bg-primary/90 disabled:opacity-60 transition-colors"
+			>
+				@if (saving()) { Guardando… } @else { Guardar cambios }
+			</button>
+		</div>
+	</form>
+</div>

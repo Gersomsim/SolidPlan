@@ -64,6 +64,16 @@ import {
 	LucidePlus,
 	LucideTag,
 	LucideZap,
+	LucideLock,
+	LucideSlidersHorizontal,
+	LucideCreditCard,
+	LucideEyeOff,
+	LucideShield,
+	LucideCheckCircle,
+	LucideDownload,
+	LucideBell,
+	LucideFolder,
+	LucideClock,
 } from '@lucide/angular'
 
 import { IconType } from './icon.type'
@@ -141,6 +151,16 @@ export class Icon {
 			info: LucideInfo,
 			cloud: LucideCloud,
 			'cloud-rain': LucideCloudRain,
+			lock: LucideLock,
+			'sliders-horizontal': LucideSlidersHorizontal,
+			'credit-card': LucideCreditCard,
+			'eye-off': LucideEyeOff,
+			shield: LucideShield,
+			'check-circle': LucideCheckCircle,
+			download: LucideDownload,
+			bell: LucideBell,
+			folder: LucideFolder,
+			clock: LucideClock,
 		}
 
 		return dic[this.icon()]

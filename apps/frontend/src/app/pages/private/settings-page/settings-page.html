@@ -1,1 +1,38 @@
-<p>settings-page works!</p>
+<div class="flex h-full min-h-screen bg-background dark:bg-dark-background">
+	<!-- Left nav -->
+	<aside class="w-64 shrink-0 border-r border-border dark:border-dark-border bg-surface dark:bg-dark-surface">
+		<div class="sticky top-0 p-6">
+			<h1 class="text-heading font-semibold text-text-primary dark:text-dark-text mb-6">Configuración</h1>
+
+			<nav class="flex flex-col gap-6">
+				@for (group of navGroups; track group.label) {
+					<div>
+						<p class="text-tiny font-semibold uppercase tracking-wider text-text-muted dark:text-dark-text/40 mb-2 px-3">
+							{{ group.label }}
+						</p>
+						<div class="flex flex-col gap-0.5">
+							@for (item of group.items; track item.route) {
+								<a
+									[routerLink]="item.route"
+									routerLinkActive="bg-primary/10 text-primary dark:bg-primary-light/10 dark:text-primary-light font-medium"
+									[routerLinkActiveOptions]="{ exact: false }"
+									class="flex items-center gap-3 px-3 py-2.5 rounded-input transition-colors cursor-pointer no-underline text-text-secondary dark:text-dark-text/60 hover:bg-border/40 dark:hover:bg-dark-border/30 hover:text-text-primary dark:hover:text-dark-text"
+								>
+									<lib-ui-icon [icon]="item.icon" [size]="16" class="shrink-0" />
+									<span class="text-small">{{ item.label }}</span>
+								</a>
+							}
+						</div>
+					</div>
+				}
+			</nav>
+		</div>
+	</aside>
+
+	<!-- Content area -->
+	<main class="flex-1 overflow-auto">
+		<div class="max-w-2xl mx-auto px-8 py-8">
+			<router-outlet />
+		</div>
+	</main>
+</div>

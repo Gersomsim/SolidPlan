@@ -1,0 +1,99 @@
+<div>
+	<div class="mb-8">
+		<h2 class="text-heading font-semibold text-text-primary dark:text-dark-text">Perfil</h2>
+		<p class="text-small text-text-secondary dark:text-dark-text/60 mt-1">Información personal y datos de contacto</p>
+	</div>
+
+	<!-- Avatar -->
+	<div class="flex items-center gap-5 mb-8 p-5 rounded-card border border-border dark:border-dark-border bg-surface dark:bg-dark-surface">
+		<div
+			class="w-16 h-16 rounded-full flex items-center justify-center text-white font-semibold text-xl shrink-0"
+			style="background-color: #1E3A5F"
+		>
+			CM
+		</div>
+		<div class="flex-1 min-w-0">
+			<p class="text-small font-medium text-text-primary dark:text-dark-text">Foto de perfil</p>
+			<p class="text-tiny text-text-muted dark:text-dark-text/40 mt-0.5">JPG o PNG. Máximo 2 MB.</p>
+		</div>
+		<button type="button" class="px-4 py-2 rounded-input border border-border dark:border-dark-border text-small text-text-secondary dark:text-dark-text/60 hover:border-primary hover:text-primary dark:hover:border-primary-light dark:hover:text-primary-light transition-colors">
+			Cambiar foto
+		</button>
+	</div>
+
+	<!-- Form -->
+	<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
+		<div class="grid grid-cols-2 gap-4">
+			<div class="flex flex-col gap-1.5">
+				<label class="text-small font-medium text-text-primary dark:text-dark-text">Nombre <span class="text-error">*</span></label>
+				<input
+					formControlName="firstName"
+					type="text"
+					placeholder="Tu nombre"
+					class="h-10 px-3 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-muted dark:placeholder:text-dark-text/40 focus:outline-none focus:border-primary dark:focus:border-primary-light transition-colors"
+					[class.border-error]="form.get('firstName')?.invalid && form.get('firstName')?.touched"
+				/>
+			</div>
+			<div class="flex flex-col gap-1.5">
+				<label class="text-small font-medium text-text-primary dark:text-dark-text">Apellido <span class="text-error">*</span></label>
+				<input
+					formControlName="lastName"
+					type="text"
+					placeholder="Tu apellido"
+					class="h-10 px-3 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-muted dark:placeholder:text-dark-text/40 focus:outline-none focus:border-primary dark:focus:border-primary-light transition-colors"
+					[class.border-error]="form.get('lastName')?.invalid && form.get('lastName')?.touched"
+				/>
+			</div>
+		</div>
+
+		<div class="flex flex-col gap-1.5">
+			<label class="text-small font-medium text-text-primary dark:text-dark-text">Cargo <span class="text-error">*</span></label>
+			<input
+				formControlName="jobTitle"
+				type="text"
+				placeholder="Ej: Director General, Residente de Obra"
+				class="h-10 px-3 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-muted dark:placeholder:text-dark-text/40 focus:outline-none focus:border-primary dark:focus:border-primary-light transition-colors"
+				[class.border-error]="form.get('jobTitle')?.invalid && form.get('jobTitle')?.touched"
+			/>
+		</div>
+
+		<div class="flex flex-col gap-1.5">
+			<label class="text-small font-medium text-text-primary dark:text-dark-text">Teléfono</label>
+			<input
+				formControlName="phone"
+				type="tel"
+				placeholder="+52 55 0000 0000"
+				class="h-10 px-3 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-muted dark:placeholder:text-dark-text/40 focus:outline-none focus:border-primary dark:focus:border-primary-light transition-colors"
+			/>
+		</div>
+
+		<div class="flex flex-col gap-1.5">
+			<label class="text-small font-medium text-text-primary dark:text-dark-text">Correo electrónico</label>
+			<div class="relative">
+				<input
+					formControlName="email"
+					type="email"
+					class="h-10 w-full px-3 pr-10 rounded-input border border-border dark:border-dark-border bg-border/30 dark:bg-dark-border/30 text-small text-text-muted dark:text-dark-text/40 cursor-not-allowed"
+				/>
+				<lib-ui-icon icon="lock" [size]="14" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted dark:text-dark-text/40" />
+			</div>
+			<p class="text-tiny text-text-muted dark:text-dark-text/40">El correo no puede modificarse desde aquí. Contacta a soporte.</p>
+		</div>
+
+		<div class="flex items-center justify-end gap-3 pt-2 border-t border-border dark:border-dark-border">
+			@if (savedOk()) {
+				<span class="flex items-center gap-1.5 text-small text-success">
+					<lib-ui-icon icon="check" [size]="14" />
+					Cambios guardados
+				</span>
+			}
+			<button
+				type="submit"
+				[disabled]="saving()"
+				class="h-9 px-5 rounded-input bg-primary text-white text-small font-medium hover:bg-primary/90 disabled:opacity-60 transition-colors"
+			>
+				@if (saving()) { Guardando… } @else { Guardar cambios }
+			</button>
+		</div>
+	</form>
+</div>

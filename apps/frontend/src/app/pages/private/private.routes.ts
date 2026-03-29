@@ -49,5 +49,7 @@ export const privateRoutes: Routes = [
 		path: 'settings',
 		loadComponent: () =>
 			import('./settings-page/settings-page').then(m => m.SettingsPage),
+		loadChildren: () =>
+			import('./settings-page/settings.routes').then(m => m.settingsRoutes),
 	},
 ]

@@ -1,0 +1,130 @@
+<div>
+	<div class="mb-8">
+		<h2 class="text-heading font-semibold text-text-primary dark:text-dark-text">Facturación</h2>
+		<p class="text-small text-text-secondary dark:text-dark-text/60 mt-1">Métodos de pago e historial de facturas</p>
+	</div>
+
+	<!-- Payment methods -->
+	<section class="mb-8">
+		<div class="flex items-center justify-between mb-4">
+			<h3 class="text-small font-semibold text-text-primary dark:text-dark-text">Métodos de pago</h3>
+			<button
+				type="button"
+				(click)="addCardOpen.set(!addCardOpen())"
+				class="flex items-center gap-1.5 px-3 py-1.5 rounded-input border border-border dark:border-dark-border text-small text-text-secondary dark:text-dark-text/60 hover:border-primary hover:text-primary dark:hover:border-primary-light dark:hover:text-primary-light transition-colors"
+			>
+				<lib-ui-icon icon="plus" [size]="14" />
+				Agregar tarjeta
+			</button>
+		</div>
+
+		@if (addCardOpen()) {
+			<div class="mb-4 p-5 rounded-card border border-primary/30 dark:border-primary-light/30 bg-primary/5 dark:bg-primary-light/5">
+				<p class="text-small font-medium text-text-primary dark:text-dark-text mb-3">Nueva tarjeta</p>
+				<div class="flex flex-col gap-3">
+					<input type="text" placeholder="Número de tarjeta" class="h-10 px-3 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-muted dark:placeholder:text-dark-text/40 focus:outline-none focus:border-primary dark:focus:border-primary-light transition-colors" />
+					<div class="grid grid-cols-2 gap-3">
+						<input type="text" placeholder="MM / AA" class="h-10 px-3 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-muted dark:placeholder:text-dark-text/40 focus:outline-none focus:border-primary dark:focus:border-primary-light transition-colors" />
+						<input type="text" placeholder="CVC" class="h-10 px-3 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text placeholder:text-text-muted dark:placeholder:text-dark-text/40 focus:outline-none focus:border-primary dark:focus:border-primary-light transition-colors" />
+					</div>
+					<div class="flex items-center justify-end gap-2">
+						<button type="button" (click)="addCardOpen.set(false)" class="h-9 px-4 rounded-input border border-border dark:border-dark-border text-small text-text-secondary dark:text-dark-text/60 hover:border-primary/50 hover:text-text-primary transition-colors">
+							Cancelar
+						</button>
+						<button type="button" class="h-9 px-4 rounded-input bg-primary text-white text-small font-medium hover:bg-primary/90 transition-colors">
+							Guardar tarjeta
+						</button>
+					</div>
+				</div>
+			</div>
+		}
+
+		<div class="flex flex-col gap-3">
+			@for (method of paymentMethods(); track method.last4) {
+				<div class="flex items-center gap-4 p-4 rounded-card border border-border dark:border-dark-border bg-surface dark:bg-dark-surface">
+					<!-- Card icon -->
+					<div class="w-10 h-7 rounded-[4px] border border-border dark:border-dark-border bg-border/30 dark:bg-dark-border/30 flex items-center justify-center">
+						<span class="text-tiny font-bold text-text-muted dark:text-dark-text/40">{{ cardIcon(method.brand) }}</span>
+					</div>
+
+					<div class="flex-1 min-w-0">
+						<p class="text-small font-medium text-text-primary dark:text-dark-text">
+							{{ method.brand }} ···· {{ method.last4 }}
+						</p>
+						<p class="text-tiny text-text-muted dark:text-dark-text/40">
+							Vence {{ method.expMonth }}/{{ method.expYear }}
+						</p>
+					</div>
+
+					@if (method.isDefault) {
+						<span class="px-2 py-0.5 rounded-badge bg-success/10 text-success text-tiny font-semibold uppercase tracking-wider">
+							Predeterminada
+						</span>
+					}
+
+					<div class="flex items-center gap-1">
+						@if (!method.isDefault) {
+							<button
+								type="button"
+								(click)="setDefault(method.last4)"
+								class="h-7 px-2.5 rounded-input text-tiny text-text-muted dark:text-dark-text/40 hover:text-primary dark:hover:text-primary-light hover:bg-primary/5 transition-colors"
+							>
+								Usar como predeterminada
+							</button>
+						}
+						<button
+							type="button"
+							(click)="removeMethod(method.last4)"
+							class="w-7 h-7 rounded-input flex items-center justify-center text-text-muted dark:text-dark-text/40 hover:text-error hover:bg-error/5 transition-colors"
+						>
+							<lib-ui-icon icon="trash-2" [size]="14" />
+						</button>
+					</div>
+				</div>
+			}
+		</div>
+	</section>
+
+	<!-- Invoice history -->
+	<section>
+		<h3 class="text-small font-semibold text-text-primary dark:text-dark-text mb-4">Historial de facturas</h3>
+
+		<div class="rounded-card border border-border dark:border-dark-border overflow-hidden">
+			<table class="w-full">
+				<thead>
+					<tr class="border-b border-border dark:border-dark-border bg-border/20 dark:bg-dark-border/20">
+						<th class="text-left px-4 py-3 text-tiny font-semibold uppercase tracking-wider text-text-muted dark:text-dark-text/40">Fecha</th>
+						<th class="text-left px-4 py-3 text-tiny font-semibold uppercase tracking-wider text-text-muted dark:text-dark-text/40">Descripción</th>
+						<th class="text-right px-4 py-3 text-tiny font-semibold uppercase tracking-wider text-text-muted dark:text-dark-text/40">Monto</th>
+						<th class="text-center px-4 py-3 text-tiny font-semibold uppercase tracking-wider text-text-muted dark:text-dark-text/40">Estado</th>
+						<th class="px-4 py-3"></th>
+					</tr>
+				</thead>
+				<tbody>
+					@for (invoice of invoices; track invoice.id) {
+						<tr class="border-b border-border dark:border-dark-border last:border-0 hover:bg-border/10 dark:hover:bg-dark-border/10 transition-colors">
+							<td class="px-4 py-3 text-small text-text-secondary dark:text-dark-text/60 whitespace-nowrap">
+								{{ invoice.date | date: 'd MMM yyyy' : '' : 'es' }}
+							</td>
+							<td class="px-4 py-3 text-small text-text-primary dark:text-dark-text">
+								{{ invoice.description }}
+							</td>
+							<td class="px-4 py-3 text-small text-text-primary dark:text-dark-text text-right font-medium tabular-nums whitespace-nowrap">
+								${{ invoice.amount }} {{ invoice.currency }}
+							</td>
+							<td class="px-4 py-3 text-center">
+								<lib-badge [variant]="statusBadgeVariant(invoice.status)" [label]="statusLabel(invoice.status)" />
+							</td>
+							<td class="px-4 py-3 text-right">
+								<button type="button" class="flex items-center gap-1 text-tiny text-text-muted dark:text-dark-text/40 hover:text-primary dark:hover:text-primary-light transition-colors ml-auto">
+									<lib-ui-icon icon="download" [size]="13" />
+									PDF
+								</button>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</section>
+</div>

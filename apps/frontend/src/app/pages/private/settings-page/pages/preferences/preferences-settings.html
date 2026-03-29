@@ -1,0 +1,182 @@
+<div>
+	<div class="mb-8">
+		<h2 class="text-heading font-semibold text-text-primary dark:text-dark-text">Preferencias</h2>
+		<p class="text-small text-text-secondary dark:text-dark-text/60 mt-1">Comportamiento del sistema para toda la organización</p>
+	</div>
+
+	<div class="flex flex-col gap-6">
+		<!-- Projects -->
+		<section class="rounded-card border border-border dark:border-dark-border bg-surface dark:bg-dark-surface p-6">
+			<h3 class="text-small font-semibold text-text-primary dark:text-dark-text mb-5 flex items-center gap-2">
+				<lib-ui-icon icon="folder" [size]="16" class="text-text-muted dark:text-dark-text/40" />
+				Proyectos
+			</h3>
+			<div class="flex flex-col divide-y divide-border dark:divide-dark-border">
+				<!-- autoAssignViewer -->
+				<div class="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+					<div class="flex-1 pr-8">
+						<p class="text-small font-medium text-text-primary dark:text-dark-text">Asignar todos al crear proyecto</p>
+						<p class="text-tiny text-text-muted dark:text-dark-text/40 mt-0.5">Al crear un proyecto, todos los usuarios del tenant se agregan automáticamente como Visualizadores</p>
+					</div>
+					<button
+						type="button"
+						(click)="autoAssignViewer.set(!autoAssignViewer())"
+						class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200"
+						[class]="autoAssignViewer() ? 'bg-primary dark:bg-primary-light' : 'bg-border dark:bg-dark-border'"
+					>
+						<span class="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-200"
+							[class]="autoAssignViewer() ? 'translate-x-[18px]' : 'translate-x-[3px]'"></span>
+					</button>
+				</div>
+
+				<!-- requireApproval -->
+				<div class="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+					<div class="flex-1 pr-8">
+						<p class="text-small font-medium text-text-primary dark:text-dark-text">Requerir aprobación de bitácoras</p>
+						<p class="text-tiny text-text-muted dark:text-dark-text/40 mt-0.5">Las bitácoras diarias deben ser aprobadas por un supervisor antes de quedar registradas</p>
+					</div>
+					<button
+						type="button"
+						(click)="requireApprovalForDailyLog.set(!requireApprovalForDailyLog())"
+						class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200"
+						[class]="requireApprovalForDailyLog() ? 'bg-primary dark:bg-primary-light' : 'bg-border dark:bg-dark-border'"
+					>
+						<span class="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-200"
+							[class]="requireApprovalForDailyLog() ? 'translate-x-[18px]' : 'translate-x-[3px]'"></span>
+					</button>
+				</div>
+
+				<!-- guestAccess -->
+				<div class="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+					<div class="flex-1 pr-8">
+						<p class="text-small font-medium text-text-primary dark:text-dark-text flex items-center gap-2">
+							Acceso de invitados
+							<span class="px-1.5 py-0.5 rounded-badge bg-border dark:bg-dark-border text-tiny text-text-muted dark:text-dark-text/40 uppercase font-semibold tracking-wider">Próximamente</span>
+						</p>
+						<p class="text-tiny text-text-muted dark:text-dark-text/40 mt-0.5">Permite acceso de lectura sin cuenta registrada mediante un enlace</p>
+					</div>
+					<button
+						type="button"
+						disabled
+						class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full bg-border dark:bg-dark-border opacity-50 cursor-not-allowed"
+					>
+						<span class="inline-block h-3.5 w-3.5 translate-x-[3px] transform rounded-full bg-white transition-transform duration-200"></span>
+					</button>
+				</div>
+			</div>
+		</section>
+
+		<!-- Horario -->
+		<section class="rounded-card border border-border dark:border-dark-border bg-surface dark:bg-dark-surface p-6">
+			<h3 class="text-small font-semibold text-text-primary dark:text-dark-text mb-5 flex items-center gap-2">
+				<lib-ui-icon icon="clock" [size]="16" class="text-text-muted dark:text-dark-text/40" />
+				Horario laboral
+			</h3>
+
+			<div class="flex flex-col gap-5">
+				<!-- Working days -->
+				<div>
+					<p class="text-small text-text-secondary dark:text-dark-text/60 mb-3">Días laborables</p>
+					<div class="flex gap-2">
+						@for (day of workDays(); track day.value) {
+							<button
+								type="button"
+								(click)="toggleWorkDay(day.value)"
+								class="w-9 h-9 rounded-input text-small font-medium transition-colors"
+								[class]="day.enabled ? 'bg-primary text-white dark:bg-primary-light dark:text-dark-background' : 'border border-border dark:border-dark-border text-text-muted dark:text-dark-text/40 hover:border-primary/50 hover:text-text-primary dark:hover:border-primary-light/50 dark:hover:text-dark-text'"
+							>
+								{{ day.short }}
+							</button>
+						}
+					</div>
+				</div>
+
+				<!-- Working hours -->
+				<div class="grid grid-cols-2 gap-4">
+					<div class="flex flex-col gap-1.5">
+						<label class="text-small text-text-secondary dark:text-dark-text/60">Hora de inicio</label>
+						<input
+							type="time"
+							[value]="workStart()"
+							(change)="workStart.set($any($event.target).value)"
+							class="h-10 px-3 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:border-primary dark:focus:border-primary-light transition-colors"
+						/>
+					</div>
+					<div class="flex flex-col gap-1.5">
+						<label class="text-small text-text-secondary dark:text-dark-text/60">Hora de fin</label>
+						<input
+							type="time"
+							[value]="workEnd()"
+							(change)="workEnd.set($any($event.target).value)"
+							class="h-10 px-3 rounded-input border border-border dark:border-dark-border bg-surface dark:bg-dark-surface text-small text-text-primary dark:text-dark-text focus:outline-none focus:border-primary dark:focus:border-primary-light transition-colors"
+						/>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Notificaciones -->
+		<section class="rounded-card border border-border dark:border-dark-border bg-surface dark:bg-dark-surface p-6">
+			<h3 class="text-small font-semibold text-text-primary dark:text-dark-text mb-5 flex items-center gap-2">
+				<lib-ui-icon icon="bell" [size]="16" class="text-text-muted dark:text-dark-text/40" />
+				Notificaciones por correo
+			</h3>
+			<div class="flex flex-col divide-y divide-border dark:divide-dark-border">
+				<div class="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+					<div>
+						<p class="text-small font-medium text-text-primary dark:text-dark-text">Nueva bitácora</p>
+						<p class="text-tiny text-text-muted dark:text-dark-text/40 mt-0.5">Notificar cuando se registra una bitácora diaria</p>
+					</div>
+					<button type="button" (click)="emailOnDailyLog.set(!emailOnDailyLog())"
+						class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200"
+						[class]="emailOnDailyLog() ? 'bg-primary dark:bg-primary-light' : 'bg-border dark:bg-dark-border'">
+						<span class="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-200"
+							[class]="emailOnDailyLog() ? 'translate-x-[18px]' : 'translate-x-[3px]'"></span>
+					</button>
+				</div>
+				<div class="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+					<div>
+						<p class="text-small font-medium text-text-primary dark:text-dark-text">Actividad retrasada</p>
+						<p class="text-tiny text-text-muted dark:text-dark-text/40 mt-0.5">Notificar cuando una actividad supera su fecha límite</p>
+					</div>
+					<button type="button" (click)="emailOnActivityDelay.set(!emailOnActivityDelay())"
+						class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200"
+						[class]="emailOnActivityDelay() ? 'bg-primary dark:bg-primary-light' : 'bg-border dark:bg-dark-border'">
+						<span class="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-200"
+							[class]="emailOnActivityDelay() ? 'translate-x-[18px]' : 'translate-x-[3px]'"></span>
+					</button>
+				</div>
+				<div class="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+					<div>
+						<p class="text-small font-medium text-text-primary dark:text-dark-text">Cambio de estado de proyecto</p>
+						<p class="text-tiny text-text-muted dark:text-dark-text/40 mt-0.5">Notificar cuando el estado de un proyecto cambia</p>
+					</div>
+					<button type="button" (click)="emailOnProjectStatusChange.set(!emailOnProjectStatusChange())"
+						class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-200"
+						[class]="emailOnProjectStatusChange() ? 'bg-primary dark:bg-primary-light' : 'bg-border dark:bg-dark-border'">
+						<span class="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-200"
+							[class]="emailOnProjectStatusChange() ? 'translate-x-[18px]' : 'translate-x-[3px]'"></span>
+					</button>
+				</div>
+			</div>
+		</section>
+
+		<!-- Save -->
+		<div class="flex items-center justify-end gap-3">
+			@if (savedOk()) {
+				<span class="flex items-center gap-1.5 text-small text-success">
+					<lib-ui-icon icon="check" [size]="14" />
+					Preferencias guardadas
+				</span>
+			}
+			<button
+				type="button"
+				(click)="onSave()"
+				[disabled]="saving()"
+				class="h-9 px-5 rounded-input bg-primary text-white text-small font-medium hover:bg-primary/90 disabled:opacity-60 transition-colors"
+			>
+				@if (saving()) { Guardando… } @else { Guardar cambios }
+			</button>
+		</div>
+	</div>
+</div>
