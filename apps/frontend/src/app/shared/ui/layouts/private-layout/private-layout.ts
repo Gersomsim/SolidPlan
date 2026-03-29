@@ -31,8 +31,9 @@ export class PrivateLayout {
 		{
 			label: 'Principal',
 			items: [
-				{ icon: 'house', label: 'Dashboard', route: '/system/dashboard' },
-				{ icon: 'building', label: 'Proyectos', route: '/system/projects' },
+				{ icon: 'house',           label: 'Dashboard',  route: '/system/dashboard' },
+				{ icon: 'building',        label: 'Proyectos',  route: '/system/projects' },
+				{ icon: 'shopping-basket', label: 'Recursos',   route: '/system/resources' },
 			],
 		},
 		{
